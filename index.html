@@ -1,274 +1,261 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Graybird — Official Space</title>
-  <meta name="description" content="Graybird 来到地球，观察人类、互联网与 AI。">
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background:
-        radial-gradient(circle at 50% 20%, #20232b 0%, #0c0d11 35%, #050506 75%);
-      color: #f3f3f3;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   "PingFang SC", "Microsoft YaHei", sans-serif;
-      min-height: 100vh;
-    }
-
-    .stars {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .45;
-      background-image:
-        radial-gradient(#fff 1px, transparent 1px),
-        radial-gradient(#fff 1px, transparent 1px);
-      background-size: 80px 80px, 130px 130px;
-      background-position: 10px 20px, 45px 65px;
-    }
-
-    nav {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1000px;
-      margin: auto;
-      padding: 28px 24px;
-    }
-
-    .logo {
-      font-weight: 800;
-      letter-spacing: 1px;
-      font-size: 20px;
-    }
-
-    nav a {
-      color: #aaa;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .hero {
-      position: relative;
-      z-index: 1;
-      min-height: 78vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 60px 24px;
-    }
-
-    .bird {
-      font-size: 78px;
-      margin-bottom: 22px;
-      filter: grayscale(1);
-      animation: float 4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    h1 {
-      font-size: clamp(48px, 12vw, 92px);
-      letter-spacing: -3px;
-      line-height: .95;
-    }
-
-    .subtitle {
-      margin-top: 22px;
-      color: #aaa;
-      font-size: 18px;
-      line-height: 1.7;
-    }
-
-    .cn {
-      margin-top: 12px;
-      color: #777;
-      font-size: 14px;
-    }
-
-    .button {
-      display: inline-block;
-      margin-top: 32px;
-      padding: 13px 24px;
-      border: 1px solid #555;
-      border-radius: 999px;
-      color: white;
-      text-decoration: none;
-      transition: .2s;
-    }
-
-    .button:hover {
-      background: white;
-      color: black;
-    }
-
-    .section {
-      position: relative;
-      z-index: 1;
-      max-width: 760px;
-      margin: auto;
-      padding: 90px 24px;
-      border-top: 1px solid #222;
-    }
-
-    .label {
-      color: #666;
-      font-size: 12px;
-      letter-spacing: 3px;
-      margin-bottom: 22px;
-    }
-
-    h2 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    .section p {
-      color: #aaa;
-      line-height: 1.9;
-      font-size: 16px;
-    }
-
-    .topics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 28px;
-    }
-
-    .topic {
-      border: 1px solid #292929;
-      border-radius: 999px;
-      padding: 8px 14px;
-      color: #888;
-      font-size: 13px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 70px 20px;
-      color: #555;
-      font-size: 13px;
-    }
-
-    footer strong {
-      color: #888;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b0d">
+<title>Graybird — Earth Observation System</title>
+<meta name="description" content="一只来到地球，观察人类的灰鸟。进入 Graybird 的地球观测站，探索关于人类、互联网、AI 与生活的观察。">
+<link rel="canonical" href="https://graybird.space/">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Graybird">
+<meta property="og:title" content="Graybird — Earth Observation System">
+<meta property="og:description" content="A gray bird arrived on Earth. Now he's watching us.">
+<meta property="og:url" content="https://graybird.space/">
+<meta property="og:image" content="https://graybird.space/assets/share.jpg">
+<meta property="og:image:alt" content="Graybird quietly watching Earth from a distant rocky surface.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@GraybirdX">
+<meta name="twitter:title" content="Graybird — Earth Observation System">
+<meta name="twitter:description" content="Somewhere between Earth and the Internet.">
+<meta name="twitter:image" content="https://graybird.space/assets/share.jpg">
+<link rel="stylesheet" href="styles.css">
+<script src="script.js" defer>
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Graybird","url":"https://graybird.space/","description":"Graybird Earth Observation System","inLanguage":["zh-CN","en"],"sameAs":["https://x.com/GraybirdX"]}</script>
 </head>
-
 <body>
-
-<div class="stars"></div>
-
-<nav>
-  <div class="logo">GRAYBIRD</div>
-  <a href="https://x.com/GraybirdX">X · @GraybirdX</a>
+<a class="skip" href="#main">跳至主要内容</a>
+<header class="header">
+<a class="brand" href="#arrival" aria-label="Graybird 首页">
+<img src="assets/bird.webp" width="36" height="36" alt="">GRAYBIRD<span class="brand-cross">＋</span>
+</a>
+<nav aria-label="主导航">
+<a href="#terminal">观测终端 <span>↗</span>
+</a>
+<a href="#bird" class="desktop-link">观察者</a>
+<a href="https://x.com/GraybirdX" target="_blank" rel="noopener noreferrer" aria-label="Graybird 的 X，新标签页打开">X ↗</a>
 </nav>
-
-<main>
-
-  <section class="hero">
-    <div class="bird">🐦‍⬛</div>
-
-    <h1>GRAYBIRD</h1>
-
-    <div class="subtitle">
-      A gray bird arrived on Earth.<br>
-      Now he's watching us.
-    </div>
-
-    <div class="cn">
-      一只来到地球，观察人类的灰鸟。
-    </div>
-
-    <a class="button" href="https://x.com/GraybirdX">
-      Follow the bird →
-    </a>
-  </section>
-
-
-  <section class="section">
-    <div class="label">01 / THE BIRD</div>
-
-    <h2>你好，我是 Graybird。</h2>
-
-    <p>
-      刚来到地球不久。<br><br>
-
-      暂时没发现什么高级文明，
-      所以决定先留下来看看。<br><br>
-
-      我观察人类、互联网、AI，
-      以及一些你们习以为常，
-      但在一只鸟看来有点奇怪的事情。
-    </p>
-  </section>
-
-
-  <section class="section">
-    <div class="label">02 / OBSERVATIONS</div>
-
-    <h2>观察地球。</h2>
-
-    <p>
-      不负责提供标准答案。<br>
-      偶尔思考，偶尔吐槽，偶尔只是站在电线上看着。
-    </p>
-
-    <div class="topics">
-      <span class="topic">AI</span>
-      <span class="topic">Internet</span>
-      <span class="topic">Humanity</span>
-      <span class="topic">Life</span>
-      <span class="topic">Curiosity</span>
-    </div>
-  </section>
-
-
-  <section class="section">
-    <div class="label">03 / THE PROJECT</div>
-
-    <h2>这只鸟才刚刚开始。</h2>
-
-    <p>
-      Graybird 不只是一个账号。<br><br>
-
-      这里以后会出现更多观察、故事、插画、
-      表情包，以及属于 Graybird 的世界。<br><br>
-
-      至于最后会飞到哪里——<br>
-      本鸟也不知道。
-    </p>
-  </section>
-
+</header>
+<main id="main">
+<section class="hero" id="arrival" aria-labelledby="hero-title">
+<picture class="hero-art">
+<source media="(max-width:600px)" srcset="assets/arrival-mobile.webp">
+<img src="assets/arrival-wide.webp" alt="灰鸟独自坐在寂静的岩石上，望着蓝色地球。" width="1536" height="576" fetchpriority="high">
+</picture>
+<div class="hero-shade">
+</div>
+<div class="hero-top">
+<p class="eyebrow">EARTH OBSERVATION SYSTEM <span class="version">/ V.02</span>
+</p>
+<span class="online">
+<i>
+</i>SIGNAL ONLINE</span>
+</div>
+<div class="hero-heading">
+<span class="eyebrow">01 — ARRIVAL / 抵达</span>
+<h1 id="hero-title">GRAYBIRD</h1>
+<p>A gray bird arrived on Earth.<br>Now he's watching us.</p>
+<p class="hero-cn">一只来到地球，观察人类的灰鸟。</p>
+</div>
+<div class="hero-bottom">
+<a class="enter" href="#terminal">进入观测终端 <span>↗</span>
+</a>
+<div class="hero-note">
+<span>ORIGIN: UNKNOWN</span>
+<span>CURRENT LOCATION: EARTH</span>
+</div>
+<a href="#bird" class="scroll-cue" aria-label="往下探索观察者档案">SCROLL TO EXPLORE ↓</a>
+</div>
+</section>
+<div class="station-strip">
+<span>ONE BIRD. MANY QUESTIONS.</span>
+<span>地球很吵。先看一会儿。</span>
+<span class="strip-time" id="clock">EARTH STANDARD TIME / UTC</span>
+</div>
+<section class="section bird-section" id="bird">
+<div class="section-kicker">
+<span>02 / THE BIRD</span>
+<span>观察者档案</span>
+</div>
+<div class="bird-grid">
+<div class="bird-portrait">
+<img src="assets/bird.webp" alt="Graybird：圆胖灰羽、三撮翘羽、橙黄短喙，带着标志性的皱眉斜视。" width="480" height="480" loading="lazy">
+<span class="portrait-label">SUBJECT G–01 / GRAYBIRD</span>
+<span class="cross top-cross">+</span>
+<span class="cross bottom-cross">+</span>
+</div>
+<div class="bird-copy">
+<h2>看起来不太高兴。<br>
+<span>其实只是好奇。</span>
+</h2>
+<p>你好，我是 Graybird。刚来到地球不久。</p>
+<p>暂时没发现什么高级文明，所以决定先留下来看看。你们习以为常的事，在一只鸟看来，有时候挺奇怪。</p>
+<dl class="dossier">
+<div>
+<dt>OBSERVER / 观察者</dt>
+<dd>Graybird</dd>
+</div>
+<div>
+<dt>SPECIES / 物种</dt>
+<dd>Unknown</dd>
+</div>
+<div>
+<dt>ORIGIN / 来处</dt>
+<dd>Unknown</dd>
+</div>
+<div>
+<dt>STATUS / 状态</dt>
+<dd>
+<i class="status-dot">
+</i>Watching…</dd>
+</div>
+</dl>
+</div>
+</div>
+</section>
+<section class="section observation-section" id="terminal">
+<div class="section-kicker">
+<span>03 / OBSERVATION LOG</span>
+<span>来自地球的记录</span>
+</div>
+<div class="section-heading">
+<h2>你们这个星球，<br>
+<span>有点意思。</span>
+</h2>
+<p>选择一个频道。<br>看看这只鸟在想什么。</p>
+</div>
+<div class="terminal">
+<div class="terminal-bar">
+<span>
+<i class="status-dot">
+</i> GRAYBIRD OBSERVATION TERMINAL</span>
+<span>ARCHIVE / 01</span>
+</div>
+<div class="terminal-grid">
+<div class="channels" aria-label="观测主题">
+<span class="channel-label">SELECT A SUBJECT / 选择主题</span>
+<button type="button" data-subject="internet" aria-pressed="true">
+<span>01</span> INTERNET <small>互联网</small>
+<b>↗</b>
+</button>
+<button type="button" data-subject="humans" aria-pressed="false">
+<span>02</span> HUMANS <small>人类</small>
+<b>↗</b>
+</button>
+<button type="button" data-subject="ai" aria-pressed="false">
+<span>03</span> AI <small>人工智能</small>
+<b>↗</b>
+</button>
+<button type="button" data-subject="life" aria-pressed="false">
+<span>04</span> LIFE <small>生活</small>
+<b>↗</b>
+</button>
+<button type="button" data-subject="technology" aria-pressed="false">
+<span>05</span> TECHNOLOGY <small>技术</small>
+<b>↗</b>
+</button>
+<button type="button" data-subject="curiosity" aria-pressed="false">
+<span>06</span> CURIOSITY <small>好奇心</small>
+<b>↗</b>
+</button>
+</div>
+<article class="record" id="record" aria-live="polite" aria-atomic="true">
+<div class="record-meta">
+<span id="record-id">OBSERVATION 001</span>
+<span>FIELD NOTE / 观察随笔</span>
+</div>
+<div class="record-orbit" aria-hidden="true">
+<span>G</span>
+<i>
+</i>
+</div>
+<p class="record-subject" id="record-subject">SUBJECT: INTERNET</p>
+<h3 id="record-title">大家都在说话。<br>谁在听？</h3>
+<p id="record-body">在这里，发出声音很容易。难的是，一句话离开熟人的评论区之后，还有人愿意把它带走。</p>
+<p class="record-aside" id="record-aside">先记下来。再观察一会儿。</p>
+<div class="record-footer">
+<span>GRAYBIRD / EARTH</span>
+<button type="button" id="next-record">下一条记录 →</button>
+</div>
+</article>
+</div>
+<div class="terminal-bottom">
+<span id="record-count">01 / 06 RECORDS</span>
+<span>ONGOING OBSERVATION · 持续记录中</span>
+</div>
+</div>
+<noscript>
+<p>主题切换需要 JavaScript。当前显示互联网观测记录；你也可以直接前往 X 阅读 Graybird 的表达。</p>
+</noscript>
+</section>
+<section class="transmission section" id="transmissions">
+<div class="section-kicker">
+<span>04 / TRANSMISSIONS</span>
+<span>来自人类互联网的信号</span>
+</div>
+<div class="transmission-grid">
+<div>
+<p class="eyebrow">OPEN CHANNEL / X</p>
+<h2>鸟还在外面。<br>
+<span>去听听它说什么。</span>
+</h2>
+<p>即时观察、偶尔吐槽，以及一些还没想明白的事。</p>
+<a class="transmission-link" href="https://x.com/GraybirdX" target="_blank" rel="noopener noreferrer">@GraybirdX <span>↗</span>
+</a>
+<span class="external-note">前往 X 阅读 · 在新标签页打开</span>
+</div>
+<figure>
+<img src="assets/observer.webp" width="720" height="720" alt="Graybird 托着脸，在电脑前观察 X 上的人类。" loading="lazy">
+<figcaption>TRANSMISSION SOURCE / EARTH INTERNET</figcaption>
+</figure>
+</div>
+</section>
+<section class="section project" id="project">
+<div class="section-kicker">
+<span>05 / THE PROJECT</span>
+<span>未完待续</span>
+</div>
+<div class="project-grid">
+<h2>这只鸟，<br>
+<span>才刚刚开始。</span>
+</h2>
+<div>
+<p>Graybird 是一个正在成长的原创互联网 IP。</p>
+<p>X 是它在人类互联网里的声音。这里，是它自己的领地。观察会慢慢留下来，故事也会继续发生。</p>
+<p class="future-label">POSSIBLE NEXT CHAPTERS / 未来探索方向</p>
+<ul class="future-list">
+<li>Comics & Stories <span>漫画与故事</span>
+</li>
+<li>Stickers <span>表情与贴纸</span>
+</li>
+<li>Collectibles & Merchandise <span>收藏与周边</span>
+</li>
+<li>Collaborations <span>创意合作</span>
+</li>
+</ul>
+<p class="future-note">这些仍是未来方向，尚未作为产品或服务上线。</p>
+</div>
+</div>
+</section>
 </main>
-
-
 <footer>
-  <strong>GRAYBIRD</strong><br><br>
-  Somewhere between Earth and the Internet.<br><br>
-  © 2026 Graybird
+<div class="footer-top">
+<a href="#arrival" class="footer-wordmark">GRAYBIRD<span>＋</span>
+</a>
+<p>Somewhere between Earth<br>and the Internet.</p>
+</div>
+<div class="footer-bottom">
+<span>© 2026 Graybird · 原创灰鸟</span>
+<a href="https://graybird.space/">graybird.space</a>
+<a href="https://x.com/GraybirdX" target="_blank" rel="noopener noreferrer">@GraybirdX ↗</a>
+<button type="button" id="bird-note" aria-label="听一句灰鸟的备注">STILL WATCHING <i class="status-dot">
+</i>
+</button>
+</div>
+<p id="aside-message" role="status">
+</p>
 </footer>
-
 </body>
 </html>

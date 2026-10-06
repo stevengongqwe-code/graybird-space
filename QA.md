@@ -1,3 +1,17 @@
+# Current deployment verification
+
+- Supplied V2 deployed to `main` in commit `24bcb81`; GitHub Pages run [37522972213](https://github.com/stevengongqwe-code/graybird-space/actions/runs/37522972213) completed build, report-build-status and deploy successfully.
+- Original `CNAME` bytes remain `graybird.space`. No DNS, nameserver, GoDaddy or GitHub Pages domain/settings changes were made.
+- Chromium checks passed at widths 360, 390, 412, 430, 768, 1024, 1440, 1920 and 2560 px: no horizontal overflow, valid image loading, six channels, exclusive selection, next-record wraparound, deep links and footer interaction.
+- Internal anchors and local asset paths passed; all six images decode. The repository server returns the deployed HTML, CSS, JavaScript, images, robots, sitemap and 404 page with HTTP 200 and appropriate content types.
+- No-JavaScript content and 404 return link passed; reduced-motion preference was exercised. Desktop and mobile screenshots were visually inspected.
+- Minimal corrections: ignore initial whitespace when toggling the footer note; adjust only the mobile hero image position to keep Graybird in view. Supplied artwork, copy and design were retained.
+- Still blocked: requests to `graybird.space`, `api.github.com` and `x.com` are rejected by this cloud environment's network proxy. Live custom-domain content, asset delivery, HTTPS certificate/redirect behavior and X destination availability remain unverified. Local Chromium checks do not establish real iPhone Safari or Android browser compatibility.
+
+## Original package verification notes (historical)
+
+The notes below were included in the uploaded ZIP. Their blocked-browser and failed-push statements describe that earlier preparation, not this deployment.
+
 # V2 verification status
 
 ## Completed

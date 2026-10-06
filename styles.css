@@ -1128,6 +1128,7 @@ footer {
 .archive-controls>span { color:#99a7b2; font:9px var(--mono); }
 .art-dialog { width:min(1120px,calc(100% - 40px)); max-width:none; max-height:92vh; max-height:92dvh; padding:16px; color:var(--ink); border:1px solid #56636f; background:#090b0d; overflow:auto; }
 .art-dialog::backdrop { background:#020407ee; }
+.art-dialog:not([open]) { display:none; }
 .art-dialog-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:12px; }
 .art-dialog-header p { font:10px var(--mono); color:#c4cfd9; letter-spacing:.7px; }
 .art-dialog-header button { min-height:44px; min-width:64px; font-size:12px; }
@@ -1135,7 +1136,7 @@ footer {
 .art-dialog-note { margin-top:12px; color:#adb9c3; font-size:12px; }
 body.art-open { overflow:hidden; }
 @media(max-width:600px) {
-  .visual-archive { margin-top:48px; padding-top:24px; }
+  .visual-archive { margin-top:48px; padding-top:24px; scroll-margin-top:60px; }
   .archive-heading { gap:10px; margin-bottom:20px; }
   .archive-heading .eyebrow { font-size:7px; letter-spacing:.5px; }
   .archive-heading h3 { font-size:23px; }

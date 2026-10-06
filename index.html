@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b0d">
-<title>Graybird — Earth Observation System</title>
+<title>Graybird — Interactive Earth Observation System</title>
 <meta name="description" content="一只来到地球，观察人类的灰鸟。进入 Graybird 的地球观测站，探索关于人类、互联网、AI 与生活的观察。">
 <link rel="canonical" href="https://graybird.space/">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Graybird">
-<meta property="og:title" content="Graybird — Earth Observation System">
+<meta property="og:title" content="Graybird — Interactive Earth Observation System">
 <meta property="og:description" content="A gray bird arrived on Earth. Now he's watching us.">
 <meta property="og:url" content="https://graybird.space/">
 <meta property="og:image" content="https://graybird.space/assets/share.jpg">
 <meta property="og:image:alt" content="Graybird quietly watching Earth from a distant rocky surface.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@GraybirdX">
-<meta name="twitter:title" content="Graybird — Earth Observation System">
+<meta name="twitter:title" content="Graybird — Interactive Earth Observation System">
 <meta name="twitter:description" content="Somewhere between Earth and the Internet.">
 <meta name="twitter:image" content="https://graybird.space/assets/share.jpg">
 <link rel="stylesheet" href="styles.css">
@@ -26,6 +26,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Graybird","url":"https://graybird.space/","description":"Graybird Earth Observation System","inLanguage":["zh-CN","en"],"sameAs":["https://x.com/GraybirdX"]}</script>
 </head>
 <body>
+<div class="system-axis" aria-hidden="true"><span></span></div>
 <a class="skip" href="#main">跳至主要内容</a>
 <header class="header">
 <a class="brand" href="#arrival" aria-label="Graybird 首页">
@@ -44,23 +45,28 @@
 <source media="(max-width:600px)" srcset="assets/arrival-mobile.webp">
 <img src="assets/arrival-wide.webp" alt="灰鸟独自坐在寂静的岩石上，望着蓝色地球。" width="1536" height="576" fetchpriority="high">
 </picture>
+<div class="scene-stars scene-stars-far" aria-hidden="true"></div>
+<div class="scene-stars scene-stars-near" aria-hidden="true"></div>
+<button type="button" id="scene-bird" class="scene-bird-target" aria-label="与 Graybird 交流" hidden><span>G–01 / OBSERVER</span></button>
+<p class="bird-message" id="bird-message" role="status" aria-live="polite"></p>
 <div class="hero-shade">
 </div>
 <div class="hero-top">
-<p class="eyebrow">EARTH OBSERVATION SYSTEM <span class="version">/ V.02</span>
+<p class="eyebrow">EARTH OBSERVATION SYSTEM <span class="version">/ V.03</span>
 </p>
 <span class="online">
 <i>
-</i>SIGNAL ONLINE</span>
+</i>LINK ESTABLISHED</span>
 </div>
 <div class="hero-heading">
 <span class="eyebrow">01 — ARRIVAL / 抵达</span>
+<span class="access-note">UNSCHEDULED CONNECTION / 意外接入</span>
 <h1 id="hero-title">GRAYBIRD</h1>
 <p>A gray bird arrived on Earth.<br>Now he's watching us.</p>
 <p class="hero-cn">一只来到地球，观察人类的灰鸟。</p>
 </div>
 <div class="hero-bottom">
-<a class="enter" href="#terminal">进入观测终端 <span>↗</span>
+<a class="enter" href="#terminal">接入观测系统 <span>↗</span>
 </a>
 <div class="hero-note">
 <span>ORIGIN: UNKNOWN</span>
@@ -70,18 +76,21 @@
 </div>
 </section>
 <div class="station-strip">
-<span>ONE BIRD. MANY QUESTIONS.</span>
-<span>地球很吵。先看一会儿。</span>
+<span><span id="system-phase">01 / ARRIVAL</span></span>
+<span><span id="system-distance">SURFACE LINK / 月面信号</span></span>
 <span class="strip-time" id="clock">EARTH STANDARD TIME / UTC</span>
 </div>
 <section class="section bird-section" id="bird">
 <div class="section-kicker">
-<span>02 / THE BIRD</span>
+<span>02 / OBSERVATION — THE BIRD</span>
 <span>观察者档案</span>
 </div>
 <div class="bird-grid">
 <div class="bird-portrait">
+<button type="button" class="portrait-contact" aria-label="与观察者 Graybird 交流" disabled>
 <img src="assets/bird.webp" alt="Graybird：圆胖灰羽、三撮翘羽、橙黄短喙，带着标志性的皱眉斜视。" width="480" height="480" loading="lazy">
+</button>
+<p class="portrait-message" id="portrait-message" role="status"></p>
 <span class="portrait-label">SUBJECT G–01 / GRAYBIRD</span>
 <span class="cross top-cross">+</span>
 <span class="cross bottom-cross">+</span>
@@ -117,24 +126,24 @@
 </section>
 <section class="section observation-section" id="terminal">
 <div class="section-kicker">
-<span>03 / OBSERVATION LOG</span>
+<span>03 / DATABASE — OBSERVATIONS</span>
 <span>来自地球的记录</span>
 </div>
 <div class="section-heading">
 <h2>你们这个星球，<br>
 <span>有点意思。</span>
 </h2>
-<p>选择一个频道。<br>看看这只鸟在想什么。</p>
+<p>信号已接入。<br>选择频道，调阅一条地球记录。</p>
 </div>
 <div class="terminal">
 <div class="terminal-bar">
 <span>
 <i class="status-dot">
 </i> GRAYBIRD OBSERVATION TERMINAL</span>
-<span>ARCHIVE / 01</span>
+<span id="request-status" role="status">DATABASE READY</span>
 </div>
 <div class="terminal-grid">
-<div class="channels" aria-label="观测主题">
+<div class="channels" aria-label="观测数据库主题">
 <span class="channel-label">SELECT A SUBJECT / 选择主题</span>
 <button type="button" data-subject="internet" aria-pressed="true">
 <span>01</span> INTERNET <small>互联网</small>
@@ -161,7 +170,7 @@
 <b>↗</b>
 </button>
 </div>
-<article class="record" id="record" aria-live="polite" aria-atomic="true">
+<article class="record" id="record" aria-live="polite" aria-atomic="true" aria-busy="false">
 <div class="record-meta">
 <span id="record-id">OBSERVATION 001</span>
 <span>FIELD NOTE / 观察随笔</span>
@@ -177,12 +186,13 @@
 <p class="record-aside" id="record-aside">先记下来。再观察一会儿。</p>
 <div class="record-footer">
 <span>GRAYBIRD / EARTH</span>
-<button type="button" id="next-record">下一条记录 →</button>
+<div class="record-actions"><button type="button" id="share-record" hidden>复制记录链接 ↗</button><button type="button" id="next-record">下一条记录 →</button></div>
 </div>
+<input id="record-link" type="text" aria-label="记录分享链接" readonly hidden>
 </article>
 </div>
 <div class="terminal-bottom">
-<span id="record-count">01 / 06 RECORDS</span>
+<span id="record-count">01 / 02 · INTERNET</span>
 <span>ONGOING OBSERVATION · 持续记录中</span>
 </div>
 </div>
@@ -192,7 +202,7 @@
 </section>
 <section class="transmission section" id="transmissions">
 <div class="section-kicker">
-<span>04 / TRANSMISSIONS</span>
+<span>04 / TRANSMISSION — TRANSMISSIONS</span>
 <span>来自人类互联网的信号</span>
 </div>
 <div class="transmission-grid">
@@ -214,7 +224,7 @@
 </section>
 <section class="section project" id="project">
 <div class="section-kicker">
-<span>05 / THE PROJECT</span>
+<span>05 / PROJECT — THE PROJECT</span>
 <span>未完待续</span>
 </div>
 <div class="project-grid">

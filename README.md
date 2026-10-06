@@ -1,24 +1,35 @@
-# Graybird — Earth Observation System
+# Graybird — Interactive Earth Observation System / V3
 
-A framework-free, static website for the original Graybird IP. Deployed on GitHub Pages at https://graybird.space.
+A quiet, framework-free Earth observation experience at https://graybird.space, developed from the working V2. Official artwork, character, six original field notes and the Graybird world are retained.
 
-## Local preview
+## Development
 
-Run `python3 -m http.server 8000` in this directory and open http://localhost:8000. No build step or dependencies.
+Run `python3 -m http.server 8000 --bind 127.0.0.1` from the repository root. No build, install, WebGL, remote font or external JavaScript dependency is required.
 
-## Files
+## Experience
 
-- `index.html`: page structure, metadata, initial accessible observation.
-- `styles.css`: responsive layout; breakpoints at 600 / 900 / 1800 px; reduced motion.
-- `script.js`: original editorial field notes, topic switching, shareable hash state, UTC clock, small footer interaction.
-- `assets/`: compressed supplied Graybird artwork. Hero uses mobile and wide sources. GIF deliberately represented by a static first frame to avoid perpetual animation and cost.
-- `404.html`, `robots.txt`, `sitemap.xml`: static hosting and search support.
-- `CNAME`: existing production custom domain. **Do not change or remove.**
+Arrival is the original lunar scene, with separate CSS-masked depth layers using the same artwork. Pointer input adds a few pixels of parallax; touch and scroll provide restrained spatial feedback. Graybird is a keyboard-operable, touchable scene object and portrait, with short original observations.
 
-## Editorial maintenance
+The observation database has six channels and twelve editorial records. A brief, cancellable 140 ms signal read switches content inside the terminal. Arrow keys, Home/End and native Enter/Space activation work alongside touch. Each record has a stable hash (`#observation-001` through `#observation-012`); V2 subject links such as `#observation-ai` remain supported. Browser history restores the selected record. Copying a link has an accessible manual-copy fallback.
 
-The observation entries are original website copy, not a live feed, not quotes from published X posts, and not scientific findings. Update the `observations` array in `script.js`. When changing the first record, also update its initial HTML so it stays readable without JavaScript. If adding topics, update the subject buttons and record total. Future project categories are explicitly marked as directions, not available products.
+A sticky telemetry strip and a quiet signal line track arrival, observation, database, transmission and project as the reader moves through the system. A small number of hidden interactions exist; their activation is intentionally not documented here.
 
-## Deployment / rollback
+## Performance and fallbacks
 
-Retain the current GitHub Pages configuration and CNAME. Publish these static files using the existing repository branch deployment. No DNS, nameserver, HTTPS, workflow, or domain-setting changes are required. Revert the V2 commit to restore the previous site. No external scripts, trackers, fonts or X embeds are used.
+Mobile disables the extra foreground layer, near-star layer and continuous Earth motion. Scene updates run only in response to input, at most once per animation frame, and stop outside the viewport. Animations and the clock pause in the background. Reduced motion disables spatial and scan animation while retaining all controls. Without JavaScript, the complete website and initial V2 observation remain readable. If CSS masks or IntersectionObserver are unavailable, the original scene and database remain usable.
+
+## Files and maintenance
+
+- `index.html`: semantic structure, initial accessible record, metadata and original content.
+- `styles.css`: V2 visual foundation plus responsive scene, signal and terminal styling.
+- `script.js`: V2 records, added records, database state, sharing, character feedback and event-driven scene.
+- `assets/`: unchanged official V2 artwork, favicon and social image.
+- `404.html`, `robots.txt`, `sitemap.xml`: retained static hosting and search support.
+- `QA.md`: measured verification and limits.
+- `CNAME`: exact production domain; do not change or remove.
+
+Field notes are original editorial copy, not scientific findings or a live X feed. Update the first HTML record when editing its matching JavaScript data. Future project directions remain explicitly unlaunched.
+
+## Deployment and rollback
+
+Publish on the existing GitHub Pages `main` branch, root directory. Retain `CNAME` bytes `graybird.space` and all existing DNS, nameserver, GoDaddy and Pages domain/HTTPS settings. A revert of the V3 code commit restores V2; no hosting or infrastructure migration is required.

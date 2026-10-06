@@ -991,9 +991,116 @@ footer {
   html {
   scroll-behavior:auto
 }
+
+
 *,*:before,*:after {
   animation:none!important;
   transition:none!important
 }
 
+}
+
+/* V3: an event-driven scene built from the original V2 artwork. */
+[hidden] { display:none!important; }
+.hero { --camera-x:0px; --camera-y:0px; --camera-scale:1; --star-x:0px; --star-y:0px; --bird-x:0px; --bird-y:0px; }
+.hero-art { z-index:-4; transform:translate3d(var(--camera-x),var(--camera-y),0) scale(var(--camera-scale)); }
+.hero-art img { animation:earth-drift 36s ease-in-out infinite alternate; animation-play-state:paused; }
+.scene-active .hero-art img { animation-play-state:running; }
+@keyframes earth-drift { to { transform:translate3d(-2px,1px,0) scale(1.008); } }
+.scene-layer { position:absolute; inset:0; z-index:-2; pointer-events:none; }
+.scene-layer img { width:100%; height:100%; object-fit:cover; object-position:50% 65%; }
+.scene-bird {
+  mask-image:radial-gradient(ellipse var(--bird-radius-x,100px) var(--bird-radius-y,130px) at var(--bird-center-x,30%) var(--bird-center-y,60%),#000 65%,transparent 95%);
+  transform:translate3d(calc(var(--camera-x) + var(--bird-x)),calc(var(--camera-y) + var(--bird-y)),0) scale(var(--camera-scale));
+}
+.scene-foreground { mask-image:linear-gradient(transparent 72%,#000 94%); transform:translate3d(calc(var(--camera-x) + var(--bird-x)),calc(var(--camera-y) + var(--bird-y)),0) scale(var(--camera-scale)); }
+.scene-stars { position:absolute; inset:-15px; z-index:-3; pointer-events:none; opacity:.34; transform:translate3d(var(--star-x),var(--star-y),0); }
+.scene-stars-far { background-image:radial-gradient(1px 1px at 8% 22%,#d6dce4 80%,transparent),radial-gradient(1px 1px at 33% 7%,#b2bac4 80%,transparent),radial-gradient(1px 1px at 72% 16%,#c6cdd5 80%,transparent),radial-gradient(1px 1px at 91% 39%,#c6cdd5 80%,transparent); background-size:390px 310px; }
+.scene-stars-near { opacity:.16; background-image:radial-gradient(1.3px 1.3px at 22% 12%,#f3f4f5 80%,transparent),radial-gradient(1.2px 1.2px at 65% 28%,#d0d6df 80%,transparent); background-size:710px 490px; transform:translate3d(calc(var(--star-x) + var(--bird-x)),calc(var(--star-y) + var(--bird-y)),0); }
+.hero-shade { pointer-events:none; }
+.access-note { display:block; margin-top:12px; font:8px var(--mono); letter-spacing:1.7px; color:#a6b8c6; }
+.hero-heading { pointer-events:none; }
+.hero h1 { margin-top:12px; }
+.scene-bird-target { position:absolute; z-index:2; padding:0; border:1px solid transparent; min-width:44px; min-height:44px; background:transparent; touch-action:manipulation; }
+.scene-bird-target span { position:absolute; left:0; right:0; bottom:-23px; font:8px var(--mono); color:#bbc6cf; letter-spacing:1px; text-align:center; white-space:nowrap; }
+.scene-bird-target::before,.scene-bird-target::after { content:""; position:absolute; width:12px; height:12px; opacity:.35; transition:opacity .2s; }
+.scene-bird-target::before { left:0; top:0; border-top:1px solid #a6b5c1; border-left:1px solid #a6b5c1; }
+.scene-bird-target::after { right:0; bottom:0; border-bottom:1px solid #a6b5c1; border-right:1px solid #a6b5c1; }
+.scene-bird-target:focus-visible::before,.scene-bird-target:focus-visible::after { opacity:1; }
+.bird-message { position:absolute; z-index:3; bottom:112px; left:4.5%; width:min(430px,90%); padding:12px 16px; background:#080d12e8; border-left:1px solid #a6cbe3; font-size:13px; color:#d0d8df; pointer-events:none; }
+.bird-message:empty { display:none; }
+.is-observed .scene-bird img { filter:brightness(1.06); }
+.is-observed .scene-bird-target::before,.is-observed .scene-bird-target::after { opacity:1; }
+.portrait-contact { display:grid; width:100%; min-height:44px; padding:0; place-items:center; touch-action:manipulation; }
+.portrait-contact img { transition:transform .35s,filter .35s; }
+.portrait-contact.is-observed img { transform:translateY(-2px); filter:brightness(1.06); }
+.portrait-message { margin-top:16px; min-height:45px; text-align:center; font-size:12px; color:#bdc7ce; max-width:340px; }
+.station-strip { position:sticky; top:0; z-index:8; background:#090b0df5; min-height:53px; padding-top:18px; padding-bottom:18px; }
+.station-strip>span:first-child { color:#d4dde5; min-width:145px; }
+.system-axis { position:fixed; z-index:9; left:16px; top:25%; height:48vh; width:1px; background:#73869925; pointer-events:none; }
+.system-axis span { display:block; height:100%; background:#8fadc3; opacity:.5; transform:scaleY(var(--system-progress,.2)); transform-origin:top; transition:transform .7s; }
+.system-depth { transition:opacity .6s,transform .7s; }
+.system-connected .system-depth:not(.is-entered) { opacity:.8; transform:translateY(14px); }
+.system-depth.is-entered .section-kicker { border-color:#6e879754; }
+.terminal { position:relative; scroll-margin-top:80px; }
+.terminal-bar #request-status { color:#a9c1d2; letter-spacing:.6px; }
+.terminal.is-scanning .record::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg,transparent,#b5d5e81a,transparent); transform:translateX(-100%); animation:signal-read .14s linear forwards; }
+@keyframes signal-read { to { transform:translateX(100%); } }
+.terminal.is-scanning .record-orbit { opacity:.5; }
+.record-actions { display:flex; gap:18px; flex-wrap:wrap; justify-content:flex-end; }
+.record-actions button { padding:5px 0; color:#b5c2cd; }
+.record-link { width:100%; }
+#record-link { width:100%; min-height:44px; background:#141b21; border:1px solid var(--line); color:var(--ink); padding:10px; font:11px var(--mono); margin-top:12px; }
+#record-link:focus-visible { outline:2px solid var(--blue); outline-offset:3px; }
+.record-footer { margin-top:auto; }
+.record-aside { margin-bottom:30px; }
+.footer-wordmark { min-height:44px; }
+.system-paused *, .system-paused *::before, .system-paused *::after { animation-play-state:paused!important; }
+@media(hover:hover) and (pointer:fine) {
+  .scene-bird-target:hover::before,.scene-bird-target:hover::after { opacity:.8; }
+  .portrait-contact:hover img { filter:brightness(1.04); }
+}
+@media(min-width:1800px) { .scene-layer img { object-position:50% 62%; } }
+@media(max-width:900px) {
+  .record-actions { gap:8px; }
+  .record-footer { align-items:flex-start; }
+  .record-footer>span { padding-top:18px; }
+}
+@media(max-width:600px) {
+  .scene-layer img { object-position:20% 100%; }
+  .scene-foreground,.scene-stars-near { display:none; }
+  .hero-art img { animation:none; }
+  .access-note { font-size:7px; letter-spacing:.7px; margin-top:10px; }
+  .hero-heading { top:11%; }
+  .hero-heading>p:not(.hero-cn) { font-size:17px; }
+  .hero h1 { margin:12px 0; }
+  .scene-bird-target span { font-size:7px; bottom:-15px; }
+  .bird-message { left:23px; bottom:94px; width:calc(100% - 46px); font-size:12px; padding:10px 12px; }
+  .station-strip { padding:16px 18px; gap:12px; font-size:7px; letter-spacing:.3px; min-height:49px; }
+  .station-strip>span:first-child { min-width:112px; }
+  .station-strip>span:nth-child(2) { text-align:right; }
+  .system-axis { left:7px; opacity:.45; }
+  .section-kicker { font-size:7px; letter-spacing:.3px; gap:10px; }
+  .terminal-bar { gap:5px; flex-wrap:wrap; min-height:56px; }
+  .terminal-bar>span:last-child { display:block; font-size:7px; }
+  .channel-label { margin-bottom:8px; }
+  .channels button { min-height:48px; }
+  .record { min-height:495px; }
+  .record-meta { font-size:7px; }
+  .record-footer { display:block; }
+  .record-footer>span { display:block; margin-bottom:4px; }
+  .record-actions { justify-content:space-between; gap:12px; }
+  .record-actions button { min-height:48px; font-size:10px; }
+  .record-aside { margin-bottom:24px; }
+  .terminal-bottom { font-size:7px; }
+  .portrait-message { min-height:42px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .hero-art,.scene-layer,.scene-stars { transform:none!important; }
+  .scene-bird,.scene-foreground,.scene-stars-near { display:none; }
+  .hero-art img,.portrait-contact img { transform:none!important; animation:none!important; }
+  .system-connected .system-depth { opacity:1!important; transform:none!important; }
+  .system-axis span { transition:none; }
+  .is-observed .scene-bird img { filter:none; }
+  .terminal.is-scanning .record::after { display:none; }
 }

@@ -6,7 +6,10 @@
 - Internal anchors and local asset paths passed; all six images decode. The repository server returns the deployed HTML, CSS, JavaScript, images, robots, sitemap and 404 page with HTTP 200 and appropriate content types.
 - No-JavaScript content and 404 return link passed; reduced-motion preference was exercised. Desktop and mobile screenshots were visually inspected.
 - Minimal corrections: ignore initial whitespace when toggling the footer note; adjust only the mobile hero image position to keep Graybird in view. Supplied artwork, copy and design were retained.
-- Still blocked: requests to `graybird.space`, `api.github.com` and `x.com` are rejected by this cloud environment's network proxy. Live custom-domain content, asset delivery, HTTPS certificate/redirect behavior and X destination availability remain unverified. Local Chromium checks do not establish real iPhone Safari or Android browser compatibility.
+- Production verification completed: `https://graybird.space/` and all referenced static assets return HTTP 200 and match deployed file bytes. A nonexistent URL returns the custom page with HTTP 404. The X destination responds with HTTP 200.
+- The same nine-width Chromium checks passed directly on the production HTTPS domain, including images, all channel controls, deep links, the footer, no-JavaScript fallback and the 404 page. No JavaScript exceptions or failed resource requests were observed. Existing platform proxy CA trust was used; certificate verification was not disabled. Chromium required access to the environment NSS database outside the filesystem sandbox.
+- GitHub Pages reports `built`, branch `main`, path `/`, custom domain `graybird.space`, and `https_enforced: false`. HTTPS requests pass the environment trust validation (TLS 1.3 through the platform proxy); HTTP currently also returns 200 without an HTTPS redirect. Pages settings were preserved.
+- Real iPhone Safari and Android devices have not been tested; viewport and touch emulation were performed in Chromium.
 
 ## Original package verification notes (historical)
 

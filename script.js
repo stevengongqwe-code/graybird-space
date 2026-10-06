@@ -29,6 +29,7 @@ let pending = 0;
 let scanTimer = 0;
 let scanGeneration = 0;
 const unfiled = {subject:'unfiled',label:'UNFILED',title:'观测对象，\n正在观察我。',body:'我以为这条线路只通向地球。刚才另一端传来一个很轻的动作。现在，我们都不太确定谁是观察者。',aside:'这条记录暂时不归档。'};
+let syncArtwork = () => {};
 
 function renderRecord(index) {
  const note = index < 0 ? unfiled : observations[index];
@@ -47,6 +48,7 @@ function renderRecord(index) {
  terminal.classList.remove('is-scanning');
  record.setAttribute('aria-busy', 'false');
  $('#request-status').textContent = 'SIGNAL READ / 已读取';
+ syncArtwork(note.subject);
 }
 
 function selectRecord(index, updateUrl = true, scan = true) {
@@ -280,3 +282,69 @@ function pauseOrResume() {
 document.addEventListener('visibilitychange', pauseOrResume);
 if (motion.addEventListener) motion.addEventListener('change', pauseOrResume);
 else if (motion.addListener) motion.addListener(pauseOrResume);
+
+// The supplied artwork is kept byte-for-byte, below the fold and lazy loaded.
+const archive = $('#visual-archive');
+const artFrames = [...archive.querySelectorAll('.archive-frame')];
+const artButtons = [...archive.querySelectorAll('[data-art-index]')];
+const artDialog = $('#art-dialog');
+let activeArt = 0;
+function showArtwork(index) {
+ activeArt = (index + artFrames.length) % artFrames.length;
+ artFrames.forEach((figure, i) => { figure.hidden = i !== activeArt; });
+ artButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === activeArt)));
+ $('#art-count').textContent = `${String(activeArt + 1).padStart(2, '0')} / ${String(artFrames.length).padStart(2, '0')}`;
+}
+function chooseArtwork(index) {
+ showArtwork(index);
+ const subject = artFrames[activeArt].dataset.artSubject;
+ if (pending < 0 || observations[pending].subject !== subject) selectRecord(observations.findIndex(note => note.subject === subject));
+}
+artButtons.forEach((button, index) => {
+ button.addEventListener('click', () => chooseArtwork(index));
+ button.addEventListener('keydown', event => {
+  let next;
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % artButtons.length;
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index + artButtons.length - 1) % artButtons.length;
+  if (event.key === 'Home') next = 0;
+  if (event.key === 'End') next = artButtons.length - 1;
+  if (next !== undefined) { event.preventDefault(); artButtons[next].focus(); chooseArtwork(next); }
+ });
+});
+$('#previous-art').addEventListener('click', () => chooseArtwork(activeArt - 1));
+$('#next-art').addEventListener('click', () => chooseArtwork(activeArt + 1));
+syncArtwork = subject => {
+ const mapped = subject === 'technology' ? 'internet' : subject;
+ const index = artFrames.findIndex(figure => figure.dataset.artSubject === mapped);
+ if (index >= 0) showArtwork(index);
+};
+archive.classList.add('is-interactive');
+archive.querySelector('.archive-index').hidden = false;
+archive.querySelector('.archive-controls').hidden = false;
+showArtwork(0);
+syncArtwork(current < 0 ? 'unfiled' : observations[current].subject);
+
+artFrames.forEach(figure => {
+ const link = figure.querySelector('.archive-image');
+ if (typeof artDialog.showModal !== 'function') return; // Keep the original link fallback.
+ link.setAttribute('aria-haspopup', 'dialog');
+ link.setAttribute('aria-label', `查看${figure.querySelector('h4').textContent}完整画面`);
+ link.addEventListener('click', event => {
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  const image = figure.querySelector('img');
+  $('#art-dialog-image').src = image.getAttribute('src');
+  $('#art-dialog-image').alt = image.alt;
+  $('#art-dialog-title').textContent = figure.querySelector('.archive-coordinate').textContent;
+  $('#art-dialog-note').textContent = figure.querySelector('h4').textContent;
+  artDialog.showModal();
+  document.body.classList.add('art-open');
+ });
+});
+$('#close-art').addEventListener('click', () => artDialog.close());
+artDialog.addEventListener('close', () => document.body.classList.remove('art-open'));
+artDialog.addEventListener('click', event => {
+ if (event.target !== artDialog) return;
+ const box = artDialog.getBoundingClientRect();
+ if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) artDialog.close();
+});

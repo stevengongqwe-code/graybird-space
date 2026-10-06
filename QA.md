@@ -16,7 +16,7 @@
 - Internal anchors, IDs, exact local resource responses and declared image paths checked. Desktop and mobile screenshots inspected.
 - Stage telemetry, offscreen animation pause, simulated visibility-event pause/resume and hidden-interaction recovery checked. Headless Chromium does not provide a physical Android background/thermal measurement.
 
-## Performance evidence
+## V3 baseline performance evidence (before the image archive addition)
 
 390px Chromium; cold cache; 4x CPU slowdown; approximately 1.6Mbps download and 100ms latency:
 
@@ -28,6 +28,16 @@
 - No framework, particle loop, Canvas/WebGL or new image payload. CSS/JS/HTML total approximately 51KB uncompressed.
 
 These values are controlled development measurements, not guarantees for every device or connection.
+
+## Supplied artwork integration checks
+
+- Five new `assets/earth-*.jpg` files match the original uploads byte-for-byte, with no cropping, retouching or character regeneration. Each is 1280x960; total source JPG payload is 885131 bytes, below the fold and lazy loaded.
+- Local Chromium checks passed at 360, 390, 412, 430, 768 and 1440 px. No new image was requested on the first screen in these runs.
+- Every picture was selected, decoded and opened in the full-image dialog at every tested width. Four-to-three aspect ratios, all asset URLs, touch/keyboard input, 44px-or-larger index targets, terminal synchronization, previous/next wraparound, deep links and browser history passed.
+- Closing via Escape and the button restores page scrolling. Reduced motion, no-JavaScript five-picture browsing and unsupported-dialog link fallback passed.
+- No JavaScript exceptions, error-level console messages, failed resource requests or horizontal overflow were observed. Mobile and desktop archive screenshots inspected.
+- CSS/JavaScript URLs now carry a release query to avoid using an older cached V3 control/style bundle.
+- Existing official assets and CNAME are unchanged. Production delivery and interaction are checked separately after the Pages deployment.
 
 ## Production acceptance
 

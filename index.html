@@ -20,8 +20,8 @@
 <meta name="twitter:title" content="Graybird — Interactive Earth Observation System">
 <meta name="twitter:description" content="Somewhere between Earth and the Internet.">
 <meta name="twitter:image" content="https://graybird.space/assets/share.jpg">
-<link rel="stylesheet" href="styles.css">
-<script src="script.js" defer>
+<link rel="stylesheet" href="styles.css?v=3-art-1">
+<script src="script.js?v=3-art-1" defer>
 </script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Graybird","url":"https://graybird.space/","description":"Graybird Earth Observation System","inLanguage":["zh-CN","en"],"sameAs":["https://x.com/GraybirdX"]}</script>
 </head>
@@ -199,6 +199,42 @@
 <noscript>
 <p>主题切换需要 JavaScript。当前显示互联网观测记录；你也可以直接前往 X 阅读 Graybird 的表达。</p>
 </noscript>
+<div class="visual-archive" id="visual-archive" aria-labelledby="archive-heading">
+<div class="archive-heading">
+<div><p class="eyebrow">VISUAL FIELD NOTES / 图像观测档案</p><h3 id="archive-heading">记录之外，还有画面。</h3></div>
+<span class="archive-counter" id="art-count" aria-live="polite">05 RECORDS</span>
+</div>
+<div class="archive-index" role="group" aria-label="选择图像观测档案" hidden>
+<button type="button" data-art-index="0" aria-pressed="true" aria-controls="archive-stage"><span>01</span>人类</button>
+<button type="button" data-art-index="1" aria-pressed="false" aria-controls="archive-stage"><span>02</span>互联网</button>
+<button type="button" data-art-index="2" aria-pressed="false" aria-controls="archive-stage"><span>03</span>AI</button>
+<button type="button" data-art-index="3" aria-pressed="false" aria-controls="archive-stage"><span>04</span>生活</button>
+<button type="button" data-art-index="4" aria-pressed="false" aria-controls="archive-stage"><span>05</span>好奇心</button>
+</div>
+<div id="archive-stage">
+<figure class="archive-frame" id="art-humans" data-art-subject="humans">
+<a class="archive-image" href="assets/earth-humans.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看人类观测完整画面，新窗口打开"><img src="assets/earth-humans.jpg" width="1280" height="960" loading="lazy" decoding="async" alt="夕阳下的人行道上，Graybird 站在人群之间，安静地观察来往的人类。"></a>
+<figcaption><span class="archive-coordinate">01 / HUMANS · 地球街头</span><h4>他们都在赶路。</h4><p>我先站一会儿。看看这个星球往哪里走。</p></figcaption>
+</figure>
+<figure class="archive-frame" id="art-internet" data-art-subject="internet">
+<a class="archive-image" href="assets/earth-internet.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看互联网观测完整画面，新窗口打开"><img src="assets/earth-internet.jpg" width="1280" height="960" loading="lazy" decoding="async" alt="Graybird 飞过由社交信息和影像构成的深空通道，远处是蓝色地球。"></a>
+<figcaption><span class="archive-coordinate">02 / INTERNET · 信号之间</span><h4>这么多声音，来自同一颗星球。</h4><p>飞近一点。也许能听见一句真正想说的话。</p></figcaption>
+</figure>
+<figure class="archive-frame" id="art-ai" data-art-subject="ai">
+<a class="archive-image" href="assets/earth-ai.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看 AI 观测完整画面，新窗口打开"><img src="assets/earth-ai.jpg" width="1280" height="960" loading="lazy" decoding="async" alt="Graybird 面对信息漩涡中带有 Grok 标识的巨大暗影，周围悬浮着地球互联网的片段。"></a>
+<figcaption><span class="archive-coordinate">03 / AI · 未知回声</span><h4>它也在看。</h4><p>当答案开始回望，问题还在谁手里？</p></figcaption>
+</figure>
+<figure class="archive-frame" id="art-life" data-art-subject="life">
+<a class="archive-image" href="assets/earth-life.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看生活观测完整画面，新窗口打开"><img src="assets/earth-life.jpg" width="1280" height="960" loading="lazy" decoding="async" alt="月光和城市灯光映入卧室，Graybird 躺在被窝里看手机，床边放着书、杯子和夜宵。"></a>
+<figcaption><span class="archive-coordinate">04 / LIFE · 夜间观测</span><h4>地球已经很晚了。</h4><p>窗外的月亮没有更新。我又看了一次。</p></figcaption>
+</figure>
+<figure class="archive-frame" id="art-curiosity" data-art-subject="curiosity">
+<a class="archive-image" href="assets/earth-curiosity.jpg" target="_blank" rel="noopener noreferrer" aria-label="查看好奇心观测完整画面，新窗口打开"><img src="assets/earth-curiosity.jpg" width="1280" height="960" loading="lazy" decoding="async" alt="Graybird 站在月夜古堡的台阶前，望向烛光照亮的门内，远处是群山与小镇。"></a>
+<figcaption><span class="archive-coordinate">05 / CURIOSITY · 门的另一边</span><h4>这里还没看过。</h4><p>有些问题，走进去才知道。</p></figcaption>
+</figure>
+</div>
+<div class="archive-controls" hidden><button type="button" id="previous-art" aria-label="上一幅图像观测">← 上一幅</button><span>查看完整画面 ↗</span><button type="button" id="next-art" aria-label="下一幅图像观测">下一幅 →</button></div>
+</div>
 </section>
 <section class="transmission section" id="transmissions">
 <div class="section-kicker">
@@ -267,5 +303,10 @@
 <p id="aside-message" role="status">
 </p>
 </footer>
+<dialog class="art-dialog" id="art-dialog" aria-labelledby="art-dialog-title">
+<div class="art-dialog-header"><p id="art-dialog-title"></p><button type="button" id="close-art" aria-label="关闭完整画面">关闭 ×</button></div>
+<img id="art-dialog-image" width="1280" height="960" alt="">
+<p class="art-dialog-note" id="art-dialog-note"></p>
+</dialog>
 </body>
 </html>

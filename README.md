@@ -14,6 +14,12 @@ The observation database has six channels and twelve editorial records. A brief,
 
 A sticky telemetry strip and a quiet signal line track arrival, observation, database, transmission and project as the reader moves through the system. A small number of hidden interactions exist; their activation is intentionally not documented here.
 
+## Visual field notes
+
+Five supplied finished scenes are embedded in the database: humans, internet, AI, life and curiosity. The existing lunar arrival and earlier official assets remain unchanged. The JPGs in `assets/earth-*.jpg` preserve the supplied bytes and full 4:3 composition.
+
+The terminal and image index stay in sync. Previous/next controls and keyboard navigation are supported. Opening a scene shows its complete image in a native dialog; Escape, the close button or the backdrop dismiss it and restore scrolling/focus. Without dialog support, the original image link opens normally. Without JavaScript, all five figures remain readable. Images are lazy loaded below the fold; there is no autoplay or new continuous animation.
+
 ## Performance and fallbacks
 
 Mobile disables the extra foreground layer, near-star layer and continuous Earth motion. Scene updates run only in response to input, at most once per animation frame, and stop outside the viewport. Animations and the clock pause in the background. Reduced motion disables spatial and scan animation while retaining all controls. Without JavaScript, the complete website and initial V2 observation remain readable. If CSS masks or IntersectionObserver are unavailable, the original scene and database remain usable.

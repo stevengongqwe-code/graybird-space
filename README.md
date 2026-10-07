@@ -57,3 +57,19 @@ To add or update content:
 `TopicCard`, `ForumSection` and `GarybirdHeader` are small serverless build functions in `scripts/build_content.py`; `templates/community.html` is the shared page shell. `community.css` follows the original palette. `community.js` only enhances filters/history/keyboard navigation; all records remain readable without it. Homepage generated content sits between the `BIRD NEST START/END` comments; everything outside that region is retained by the builder.
 
 Maintenance limits: the initial opening topics are editorial prompts, not active X conversations. Submissions and comments remain unopened. Data edits require rerunning the builder before pushing; GitHub Pages does not run Python. Removing a topic from the data intentionally leaves its old generated entry available to avoid destroying a shared URL; retire records manually only with a deliberate content decision. Old entries' original publication dates are unknown and shown honestly as collection dates. No database, authentication, third-party runtime service or new account is required.
+
+## Frontend capability pack (adapted)
+
+The owner's frontend pack is integrated as repository-local instructions, not an installer: `AGENTS.md`, `GRAYBIRD_MASTER_VISUAL_CHARACTER_LOCK.md`, `DESIGN.md`, four skills under `.agents/skills/`, and `docs/FRONTEND_CAPABILITIES.md`. The obsolete slim character, forced new prototypes/font migration and mandatory GSAP/Lenis/Three.js stack are retired. The removed rotating globe remains removed. No global Codex files are overwritten and no upstream skills/packages are blindly installed.
+
+Bird Nest/archive now have local text search combined with existing category filters. Search matches titles and introductions, normalizes text and updates the URL (`?q=...` plus the existing category hash). Input changes replace history instead of adding a history entry per keystroke. Browser back/reload restore search and category. The empty state has a reset action; unavailable submissions remain honestly empty. Without JavaScript all static records are readable. Entry pages suggest up to two actual records sharing a room or category; no invented related content is padded in.
+
+Repeatable browser QA (development-only; the website still has no runtime dependencies): use the environment's installed Chromium and Python Playwright, start the local static server, then run:
+
+```bash
+python3 scripts/qa_frontend.py --base-url http://127.0.0.1:8000 --output /tmp/graybird-qa
+```
+
+Defaults cover 375/390/768/1280/1920px. `--browser` selects an already installed browser. The script reports page/console/resource checks and writes paused-motion screenshots; inspect those screenshots as well. Use `--base-url https://graybird.space --widths 390,1280` for authorized live acceptance while keeping HTTPS verification enabled. Do not enable `ignore_https_errors` to hide trust failures.
+
+Run `python3 scripts/check_links.py --base-url http://127.0.0.1:8000` for generated-page resource and fragment checks (Python standard library only). The browser QA dependency is developer-only; existing cloud tooling already provides Python Playwright/Chromium. For a different development machine, provision those tools separately rather than adding them to the website's runtime or executing the legacy pack installer.

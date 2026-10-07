@@ -58,6 +58,14 @@ def ForumSection(room):
 def filters(scope,values):
  return f'<div class="community-filters" role="group" aria-label="{scope}" hidden><button type="button" data-filter="all" aria-pressed="true">全部</button>'+''.join(f'<button type="button" data-filter="{e(k)}" aria-pressed="false">{e(v)}</button>' for k,v in values.items())+'</div>'
 
+def SearchRecords(label):
+ return f'<form class="record-search" role="search" hidden><label for="record-search-input">{label}</label><div><input id="record-search-input" type="search" maxlength="80" autocomplete="off" placeholder="找一个词，或一个问题" aria-controls="search-results"><button type="button" data-clear-search>清空</button></div></form><div class="search-empty" hidden><p>这里暂时没有这条记录。换个词，或回到全部内容。</p><button type="button" data-reset-results>查看全部记录 →</button></div>'
+
+def RelatedTopics(topic):
+ matches=[item for item in TOPICS if item['id']!=topic['id'] and (item['room']==topic['room'] or item['kind']==topic['kind'])][:2]
+ if not matches:return ''
+ return '<aside class="related-topics" aria-labelledby="related-title"><h2 id="related-title">沿着这个问题，再看一会儿。</h2>'+''.join(f'<a href="{url(item)}"><span>{e(ROOMS[item["room"]]["name"])}</span>{e(item["title"])}<b aria-hidden="true">→</b></a>' for item in matches)+'</aside>'
+
 def intro(kicker,title,body):
  return f'<div class="community-intro"><p class="eyebrow">{kicker}</p><h1>{title}</h1><p>{body}</p></div>'
 
@@ -85,11 +93,11 @@ def main():
   groups+='</section>'
  content=intro('GRAYBIRD / BIRD NEST','鸟窝。<span>互联网里的一小块地方。</span>','问题可以留下来，不急着有答案。认识一只鸟，再看看它最近在想什么。')
  content+='<p class="community-status">X 账号申诉中。现阶段可以阅读和保存话题，评论现场暂未开放。</p><nav class="forum-rooms" aria-label="鸟窝栏目">'+room_content+'</nav>'
- content+='<div class="community-records" data-filter-scope="room">'+filters('按栏目浏览',{k:r['name'] for k,r in ROOMS.items()})+groups+'</div>'
+ content+='<div class="community-records" data-filter-scope="room">'+SearchRecords('在鸟窝里找一找')+filters('按栏目浏览',{k:r['name'] for k,r in ROOMS.items()})+'<p class="filter-summary" role="status" aria-live="polite"></p><div id="search-results">'+groups+'</div></div>'
  content+='<a class="community-text-link" href="/archive/">去档案馆慢慢翻 →</a>'
  write_page('/nest/','鸟窝 / Bird Nest — Graybird','Garybird 的私人互联网领地：议事厅、地球观察记录、夜话、实验室与鸟友投稿。',content,'nest')
  content=intro('GRAYBIRD / EARTH INTERNET ARCHIVE','留下来的东西。','观察、观点、故事、实验和讨论。一只鸟在地球互联网留下的记录。')
- content+='<p class="community-status">日期区分发布与收录；原始发布日期未知的记录显示收录日期。</p><div class="community-records" data-filter-scope="kind">'+filters('按内容类型筛选',KINDS)+'<p class="filter-summary" role="status" aria-live="polite"></p><h2 class="community-list-title">档案索引</h2><div class="archive-list">'
+ content+='<p class="community-status">日期区分发布与收录；原始发布日期未知的记录显示收录日期。</p><div class="community-records" data-filter-scope="kind">'+SearchRecords('在档案里找一找')+filters('按内容类型筛选',KINDS)+'<p class="filter-summary" role="status" aria-live="polite"></p><h2 class="community-list-title">档案索引</h2><div class="archive-list" id="search-results">'
  content+=''.join(TopicCard(t,True) for t in TOPICS)+'</div></div>'
  write_page('/archive/','内容档案馆 — Graybird','Garybird 的长期内容档案馆，按观察、观点、故事、实验与讨论浏览。',content,'archive')
  for t in TOPICS:
@@ -99,6 +107,7 @@ def main():
   content+='<div class="entry-body">'+''.join('<p>'+e(p)+'</p>' for p in t['paragraphs'])+'</div>'
   if t.get('sourceUrl'):content+=f'<a class="community-text-link" href="{e(t["sourceUrl"])}">回到原始记录 →</a>'
   content+=f'<section class="entry-discussion" id="discussion"><h2>把话题带回广场。</h2><p>'+('在对应 X 原帖下继续讨论。' if t.get('discussionUrl') else '这条记录尚未绑定 X 原帖。账号仍在申诉中，讨论入口待开放。内容会先留在这里。')+f'</p>{discussion(t)}</section></article>'
+  content+=RelatedTopics(t)
   write_page(url(t),t['title']+' — Graybird',t['excerpt'],content,'archive','article')
  # Preserve every existing sitemap entry and append current static content routes.
  sitemap=ROOT/'sitemap.xml';ns='http://www.sitemaps.org/schemas/sitemap/0.9';ET.register_namespace('',ns)

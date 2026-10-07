@@ -22,7 +22,7 @@
 <meta name="twitter:image" content="https://graybird.space/assets/share.jpg">
 <link rel="stylesheet" href="styles.css?v=3-no-globe-1">
 <link rel="stylesheet" href="status-notice.css?v=2">
-<link rel="stylesheet" href="community.css?v=1">
+<link rel="stylesheet" href="community.css?v=2">
 <script src="script.js?v=3-scroll-1" defer>
 </script>
 <script src="scroll.js?v=3-no-globe-1" defer></script>
@@ -68,12 +68,12 @@
 </div>
 </aside>
 <section class="hero" id="arrival" aria-labelledby="hero-title">
-<picture class="hero-art">
+<picture class="hero-art" data-qa="motion">
 <source media="(max-width:600px)" srcset="assets/arrival-mobile.webp">
 <img src="assets/arrival-wide.webp" alt="灰鸟独自坐在寂静的岩石上，望着蓝色地球。" width="1536" height="576" fetchpriority="high">
 </picture>
-<div class="scene-stars scene-stars-far" aria-hidden="true"></div>
-<div class="scene-stars scene-stars-near" aria-hidden="true"></div>
+<div class="scene-stars scene-stars-far" data-qa="motion" aria-hidden="true"></div>
+<div class="scene-stars scene-stars-near" data-qa="motion" aria-hidden="true"></div>
 <button type="button" id="scene-bird" class="scene-bird-target" aria-label="与 Graybird 交流" hidden><span>G–01 / OBSERVER</span></button>
 <p class="bird-message" id="bird-message" role="status" aria-live="polite"></p>
 <div class="hero-shade">

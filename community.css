@@ -151,7 +151,7 @@
 .community-filters { gap:8px; padding:12px 0 22px; }
 .community-filters button { padding:10px 16px; border:1px solid #36434d; border-radius:999px; transition:background .2s,color .2s; }
 .community-filters button[aria-pressed=true] { background:#dbe3e9; color:#10151a; border-color:#dbe3e9; }
-.record-search input { background:#10161b; border-color:#43515d; border-radius:4px; padding:15px 16px; }
+.record-search input { background:#161a1e; border-color:#ffffff24; border-radius:12px; padding:15px 16px; }
 .archive-entry h1 { font-size:clamp(34px,4.5vw,60px); font-weight:500; line-height:1.4; letter-spacing:-.035em; }
 .entry-body { margin:48px 0; }
 .entry-body p { line-height:2.1; }
@@ -177,4 +177,26 @@
  .community-filters button { padding:9px 12px; }
  .archive-entry h1 { font-size:34px; }
  .entry-body { margin:32px 0; }
+}
+
+/* Shared reading rhythm and control surfaces. */
+.community-intro h1 { letter-spacing:-.045em; }
+.community-intro h1 span { color:#a1a1a6; line-height:1.4; }
+.community-intro>p:last-child { font-size:17px; color:#b2b5ba; }
+.topic-card { border-top-color:#ffffff1c; }
+.topic-card h3 { font-weight:550; letter-spacing:-.025em; }
+.topic-card .topic-content>p { color:#aeb2b8; }
+.topic-read { background:#171d22; border-color:#ffffff12; color:#e0e6eb; }
+.community-filters button { border-color:#ffffff1c; background:#12161a; }
+.community-filters button[aria-pressed=true] { background:#eceff1; color:#16191c; border-color:#eceff1; }
+.record-search input { font-family:inherit; }
+.forum-room { border-bottom-color:#ffffff1c; }
+.forum-room h2 { font-weight:550; letter-spacing:-.025em; }
+.forum-room-number { color:#7f8a94; font-size:22px; }
+.entry-body p { color:#c9cbd0; }
+.entry-byline { border-color:#ffffff1c; }
+@media(max-width:600px) {
+ .community-intro>p:last-child { font-size:15px; }
+ .topic-card h3 { font-size:21px; line-height:1.55; }
+ .forum-room-number { font-size:19px; }
 }

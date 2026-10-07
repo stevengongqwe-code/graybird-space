@@ -69,7 +69,7 @@
 .status-notice h2 { font-size:clamp(28px,3.5vw,48px); font-weight:500; letter-spacing:-.035em; max-width:560px; }
 .status-notice-label { letter-spacing:.8px; margin-bottom:18px; }
 .status-notice-photo { margin-top:28px; }
-.status-notice-photo img { border:1px solid #59677350; border-radius:3px; }
+.status-notice-photo img { border:1px solid #ffffff14; border-radius:12px; }
 .status-notice-copy { align-self:center; }
 .status-notice-copy p { line-height:1.95; }
 .status-notice-copy p+p { margin-top:16px; }
@@ -82,4 +82,16 @@
  .status-notice { padding-top:34px; padding-bottom:36px; gap:26px; }
  .status-notice-label { font-size:8px; letter-spacing:.4px; }
  .status-notice-copy p+p { margin-top:12px; }
+}
+
+/* Existing notice, refined as a calm editorial opening. */
+.status-notice { background:#101316; border-bottom-color:#ffffff18; }
+.status-notice::before { opacity:.5; }
+.status-notice h2 { font-weight:600; line-height:1.16; letter-spacing:-.04em; }
+.status-notice-label { color:#9faab3; }
+.status-notice-copy p { color:#b6bbc1; line-height:2; }
+.status-notice-photo figcaption { color:#979fa7; }
+.status-notice-copy .status-notice-signoff { border-color:#ffffff1c; }
+@media(min-width:900px) {
+ .status-notice { gap:9%; padding-top:64px; padding-bottom:64px; }
 }

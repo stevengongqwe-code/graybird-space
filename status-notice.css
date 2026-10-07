@@ -53,3 +53,13 @@
   .status-notice::before { left:4.5%; top:34px; bottom:34px; }
   .status-notice-copy p { font-size:15px; }
 }
+
+.status-notice-photo { margin:20px 0 0; }
+.status-notice-photo a { display:block; }
+.status-notice-photo img { display:block; width:100%; height:auto; }
+.status-notice-photo figcaption {
+  margin-top:10px;
+  color:#aab6bf;
+  font:11px/1.8 Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  letter-spacing:.3px;
+}

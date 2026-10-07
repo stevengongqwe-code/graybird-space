@@ -22,7 +22,7 @@ The terminal and image index stay in sync. Previous/next controls and keyboard n
 
 ## Performance and fallbacks
 
-Mobile disables the extra foreground layer, near-star layer and continuous Earth motion. Scene updates run only in response to input, at most once per animation frame, and stop outside the viewport. Animations and the clock pause in the background. Reduced motion disables spatial and scan animation while retaining all controls. Without JavaScript, the complete website and initial V2 observation remain readable. If CSS masks or IntersectionObserver are unavailable, the original scene and database remain usable.
+Mobile disables the extra foreground layer, near-star layer and continuous scene motion. Scene updates run only in response to input, at most once per animation frame, and stop outside the viewport. Animations and the clock pause in the background. Reduced motion disables spatial and scan animation while retaining all controls. Without JavaScript, the complete website and initial V2 observation remain readable. If CSS masks or IntersectionObserver are unavailable, the original scene and database remain usable.
 
 ## Files and maintenance
 
@@ -39,3 +39,21 @@ Field notes are original editorial copy, not scientific findings or a live X fee
 ## Deployment and rollback
 
 Publish on the existing GitHub Pages `main` branch, root directory. Retain `CNAME` bytes `graybird.space` and all existing DNS, nameserver, GoDaddy and Pages domain/HTTPS settings. A revert of the V3 code commit restores V2; no hosting or infrastructure migration is required.
+
+## Bird Nest and content archive
+
+The site now has three connected entrances: the original homepage, `/nest/` (five forum rooms) and `/archive/` (filterable long-term records). Each record also has a real static `/archive/<id>/` page. GitHub Pages serves these directory indexes directly, including a redirect from `/nest` and `/archive`; no SPA rewrite or hosting changes are needed.
+
+Content lives in `data/topics.json`. Four opening topics, twelve unchanged editorial field notes and the supplied Maomao story are initially archived. No comments, member activity or X threads are invented. The account-appeal notice remains visible; unbound discussion actions clearly wait for a real X post.
+
+To add or update content:
+
+1. Edit a topic in `data/topics.json`. Keep its `id` stable so existing links survive. Choose a `room` and `kind` from the existing IDs. `paragraphs` contains the readable full entry; `excerpt` appears in lists.
+2. Set `publishedAt` only when the publication date is known. `archivedAt` is the date the content was collected here. Both use `YYYY-MM-DD`.
+3. Set `discussionUrl` to the exact `https://x.com/<account>/status/<post-id>` URL when a real post is available. Leave it `null` while unavailable. No profile URL is used as a substitute discussion thread.
+4. Mark up to five topics `featured: true` for the homepage. Add optional `image`, `imageWidth`, `imageHeight` and `imageAlt` for illustrated entries; retain the source artwork.
+5. Run `python3 scripts/build_content.py` from this existing checkout, then review and commit the data and generated HTML together. The builder needs only Python's standard library and validates IDs, categories, dates and links. There is no install step.
+
+`TopicCard`, `ForumSection` and `GarybirdHeader` are small serverless build functions in `scripts/build_content.py`; `templates/community.html` is the shared page shell. `community.css` follows the original palette. `community.js` only enhances filters/history/keyboard navigation; all records remain readable without it. Homepage generated content sits between the `BIRD NEST START/END` comments; everything outside that region is retained by the builder.
+
+Maintenance limits: the initial opening topics are editorial prompts, not active X conversations. Submissions and comments remain unopened. Data edits require rerunning the builder before pushing; GitHub Pages does not run Python. Removing a topic from the data intentionally leaves its old generated entry available to avoid destroying a shared URL; retire records manually only with a deliberate content decision. Old entries' original publication dates are unknown and shown honestly as collection dates. No database, authentication, third-party runtime service or new account is required.

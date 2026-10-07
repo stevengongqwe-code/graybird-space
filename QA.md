@@ -49,3 +49,16 @@ Production verification is performed after the code commit is deployed, against 
 - Existing Pages `https_enforced` is false: HTTPS works, while HTTP is also available without a forced redirect. This setting is intentionally preserved.
 - Without JavaScript the initial observation and all narrative content remain readable; interactive database controls require JavaScript, as explained in the page.
 - No severe known functional issue was found in completed local checks. Production status is verified separately after publishing.
+
+## Bird Nest extension
+
+- Existing deployment remains GitHub Pages/main/root, exact CNAME `graybird.space`; no domain, DNS, nameserver, GoDaddy or HTTPS setting changes.
+- New static routes: `/nest/`, `/archive/` and seventeen `/archive/<id>/` entries. Extensionless directory requests redirect correctly with the local static server. Deployment compatibility is checked on production after publishing.
+- Four homepage opening topics; five forum rooms; filters for five archive types; stable topic addresses; truthful pending discussion actions where no verified X post is available.
+- Local Chromium/touch checks cover 360, 390, 412, 430 and 1440 px. Homepage, nest, archive, story image, all filters, keyboard navigation, shareable filter hashes, history and reload pass. No horizontal overflow, errors or failed image resources were observed.
+- Original observation selection, full-image dialog, notice image and reduced-motion behavior remain functional. No rotating Earth is reintroduced. Original official images, original character and original terminal/scene scripts are unchanged.
+- All static entry routes respond; exact X-post action rendering/safe external attributes and pending state verified. Rebuilding twice produces identical HTML and sitemap. The extension uses no framework, external font, API or client fetch.
+- No-JavaScript browsing works on nest/archive/entries. Unknown publication dates are not fabricated. Discussion posts must be bound manually once real links exist.
+- Physical Android hardware, thermal behavior and assistive-technology hardware are not available; checks use Chromium emulation. Existing HTTPS enforcement configuration is preserved. Production acceptance is reported with the deployed commit.
+- Extension performance sample: Chromium 390px, 4x CPU slowdown, 1.6Mbps download, 100ms latency, cache disabled. Nest LCP 772ms; archive LCP 628ms; measured CLS 0 on both. First-view subresources about 69.8KB on each (HTML additional). These are controlled local measurements, not physical Android results.
+- Link audit covered 21 actual HTML pages, 38 unique local resource/link targets and 65 internal fragment references. All passed. Header brand/navigation do not overlap at the four mobile widths or desktop width.

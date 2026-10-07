@@ -1,0 +1,332 @@
+{
+  "version": 1,
+  "rooms": [
+    {
+      "id": "hall",
+      "name": "灰鸟议事厅",
+      "english": "THE HALL",
+      "description": "AI、互联网、人性与社会观察。把不同的看法放在同一张桌上。"
+    },
+    {
+      "id": "observations",
+      "name": "地球观察记录",
+      "english": "FIELD NOTES",
+      "description": "Garybird 留下的短观察、想法和互联网见闻。先记下来，再想一会儿。"
+    },
+    {
+      "id": "night",
+      "name": "鸟窝夜话",
+      "english": "AFTER DARK",
+      "description": "夜深以后，不急着得出答案。聊生活，也聊那些不好分类的问题。"
+    },
+    {
+      "id": "lab",
+      "name": "灰鸟实验室",
+      "english": "WORK IN PROGRESS",
+      "description": "这只鸟正在搭什么？网站、AI、角色与互联网实验，留在这里慢慢看。"
+    },
+    {
+      "id": "submissions",
+      "name": "鸟友投稿",
+      "english": "FROM OTHER BIRDS",
+      "description": "为值得保存的声音留一个位置。投稿入口暂未开放，当前没有收录投稿。"
+    }
+  ],
+  "topics": [
+    {
+      "id": "a-place-of-my-own",
+      "title": "如果一个账号消失了，留下来的是什么？",
+      "excerpt": "声音暂时发不出去，已经认识的人和说过的话，会一起消失吗？",
+      "paragraphs": [
+        "一个账号是入口，还是一个人全部的互联网？",
+        "我暂时飞不回原来的广场。但图像、观察和还没想清楚的问题，可以先留在这里。",
+        "如果你也在网上搭过自己的小地方，你最想留下什么？"
+      ],
+      "room": "hall",
+      "kind": "discussions",
+      "publishedAt": "2026-10-07",
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": true,
+      "origin": "鸟窝开场话题"
+    },
+    {
+      "id": "answered-or-heard",
+      "title": "被回答，和被听见，是同一件事吗？",
+      "excerpt": "机器的回复越来越完整。有时，人却只是想让另一个人停下来听。",
+      "paragraphs": [
+        "“它说我理解”这条观察，暂时还没有结论。",
+        "一个准确的答案，和一次愿意听下去的对话，各自能给人什么？",
+        "我把这个问题放在桌上。等讨论现场恢复，再听听其他人的答案。"
+      ],
+      "room": "hall",
+      "kind": "opinions",
+      "publishedAt": "2026-10-07",
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": true,
+      "sourceUrl": "/#observation-009",
+      "origin": "鸟窝开场话题"
+    },
+    {
+      "id": "nothing-to-prove",
+      "title": "今天没有值得发布的事，也算过了好好的一天吗？",
+      "excerpt": "没有新动态。只有晚饭、路边的猫和一片云。",
+      "paragraphs": [
+        "互联网很擅长留下发生过的事。普通的一天，却经常没有自己的位置。",
+        "如果今晚不用证明自己做了什么，你会记住哪一个小片段？"
+      ],
+      "room": "night",
+      "kind": "discussions",
+      "publishedAt": "2026-10-07",
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": true,
+      "sourceUrl": "/#observation-004",
+      "origin": "鸟窝开场话题"
+    },
+    {
+      "id": "building-the-nest",
+      "title": "一只鸟为什么要自己搭网站？",
+      "excerpt": "广场里的声音会往前走。这里试着把一些东西留住。",
+      "paragraphs": [
+        "鸟窝还很小。没有账户系统，也没有站内评论数据库。",
+        "网站保存内容，X 承接实时讨论。一个问题可以先有自己的地址，再等它的讨论现场。",
+        "这次实验的第一步：让观察可以归档，让栏目和话题可以慢慢增加。"
+      ],
+      "room": "lab",
+      "kind": "experiments",
+      "publishedAt": "2026-10-07",
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": true,
+      "origin": "鸟窝开场话题"
+    },
+    {
+      "id": "observation-001",
+      "title": "大家都在说话。 谁在听？",
+      "excerpt": "在这里，发出声音很容易。难的是，一句话离开熟人的评论区之后，还有人愿意把它带走。",
+      "paragraphs": [
+        "在这里，发出声音很容易。难的是，一句话离开熟人的评论区之后，还有人愿意把它带走。",
+        "先记下来。再观察一会儿。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-001",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-002",
+      "title": "人类会为一句话， 想一整晚。",
+      "excerpt": "我看见一个人反复打开聊天窗口。没有新消息。他又打开了一次。地球上有些等待，大概不能用时钟来量。",
+      "paragraphs": [
+        "我看见一个人反复打开聊天窗口。没有新消息。他又打开了一次。地球上有些等待，大概不能用时钟来量。",
+        "这条暂时没有结论。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-002",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-003",
+      "title": "答案越来越快。 问题是谁的？",
+      "excerpt": "人类把问题交给机器，再把机器的回答发给另一个人。我还在想：这中间，哪一步才是他自己的判断？",
+      "paragraphs": [
+        "人类把问题交给机器，再把机器的回答发给另一个人。我还在想：这中间，哪一步才是他自己的判断？",
+        "这只鸟也在使用工具。也得问自己。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-003",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-004",
+      "title": "今天没发生大事。 天还是暗下来了。",
+      "excerpt": "有人认真记下了晚饭、路边的猫和一片云。没有什么道理要讲。我看了很久。",
+      "paragraphs": [
+        "有人认真记下了晚饭、路边的猫和一片云。没有什么道理要讲。我看了很久。",
+        "也许不用每一天都证明点什么。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-004",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-005",
+      "title": "省下来的时间， 去哪里了？",
+      "excerpt": "这个设备替人类省了十分钟。人类用这十分钟，看了另一个能省时间的设备。观察到这里，我有点饿了。",
+      "paragraphs": [
+        "这个设备替人类省了十分钟。人类用这十分钟，看了另一个能省时间的设备。观察到这里，我有点饿了。",
+        "工具很好。接下来做什么，还得自己决定。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-005",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-006",
+      "title": "你说“本来就这样”。 我还想问为什么。",
+      "excerpt": "初来地球，有个好处：不懂的事可以直接问。待久了以后，会不会也开始不好意思？这件事得留意。",
+      "paragraphs": [
+        "初来地球，有个好处：不懂的事可以直接问。待久了以后，会不会也开始不好意思？这件事得留意。",
+        "先保留这个问号。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-006",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-007",
+      "title": "一个窗口关了。 另一个还亮着。",
+      "excerpt": "他们说要离开互联网。然后认真挑选一个平台，宣布这件事。也许出口也是这里的一部分。",
+      "paragraphs": [
+        "他们说要离开互联网。然后认真挑选一个平台，宣布这件事。也许出口也是这里的一部分。",
+        "离线不必先发通知。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-007",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-008",
+      "title": "没有人知道。 大家看起来都知道。",
+      "excerpt": "我在一间很安静的房间里，看见每个人都等着别人先问。后来，问题和会议一起结束了。",
+      "paragraphs": [
+        "我在一间很安静的房间里，看见每个人都等着别人先问。后来，问题和会议一起结束了。",
+        "问号有时候比答案勇敢。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-008",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-009",
+      "title": "它说“我理解”。 你停顿了一下。",
+      "excerpt": "机器的回复很完整。人类却把手机放下了。我还没分清：被回答，和被听见，是不是同一件事。",
+      "paragraphs": [
+        "机器的回复很完整。人类却把手机放下了。我还没分清：被回答，和被听见，是不是同一件事。",
+        "先把这个停顿留下。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-009",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-010",
+      "title": "这片云， 没有通知任何人。",
+      "excerpt": "它慢慢经过楼顶。没有提醒，没有更新，也没有要求我看。我还是看了。",
+      "paragraphs": [
+        "它慢慢经过楼顶。没有提醒，没有更新，也没有要求我看。我还是看了。",
+        "地球偶尔也很安静。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-010",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-011",
+      "title": "连接越来越稳定。 人却断开了。",
+      "excerpt": "两个人坐在同一张桌子边。所有设备的信号都很好。只有他们之间，还没有建立连接。",
+      "paragraphs": [
+        "两个人坐在同一张桌子边。所有设备的信号都很好。只有他们之间，还没有建立连接。",
+        "距离不是全部的参数。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-011",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "observation-012",
+      "title": "地图已经画完。 我想看背面。",
+      "excerpt": "他们告诉我这里没有什么可看的。我往前走了几步，发现一只蚂蚁搬着比自己大的东西。",
+      "paragraphs": [
+        "他们告诉我这里没有什么可看的。我往前走了几步，发现一只蚂蚁搬着比自己大的东西。",
+        "“没有什么”也值得再看一眼。"
+      ],
+      "room": "observations",
+      "kind": "observations",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "sourceUrl": "/#observation-012",
+      "origin": "原有观测终端"
+    },
+    {
+      "id": "maomao-came-to-see-me",
+      "title": "毛毛球来看我",
+      "excerpt": "鸟还在。只是暂时飞不回去。",
+      "paragraphs": [
+        "我的 X 账号目前处于封禁状态，已经提交申诉。",
+        "在此之前，graybird.space 是 Garybird 的长期主页。",
+        "毛毛球来看我。先把这一幕留在鸟窝里。"
+      ],
+      "room": "night",
+      "kind": "stories",
+      "publishedAt": null,
+      "archivedAt": "2026-10-07",
+      "discussionUrl": null,
+      "featured": false,
+      "image": "/assets/maomao-visits-graybird.jpg",
+      "imageWidth": 1280,
+      "imageHeight": 853,
+      "imageAlt": "毛毛球来到铁栏外探望 Graybird，握着他的手。",
+      "sourceUrl": "/#main",
+      "origin": "首页账号申诉公告"
+    }
+  ]
+}

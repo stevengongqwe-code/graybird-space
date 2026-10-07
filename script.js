@@ -352,3 +352,35 @@ artDialog.addEventListener('click', event => {
  const box = artDialog.getBoundingClientRect();
  if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) artDialog.close();
 });
+
+// Small pointer feedback; existing text, events and scene transforms stay intact.
+(() => {
+ const finePointer = matchMedia('(hover:hover) and (pointer:fine)');
+ const targets = [...document.querySelectorAll('.portrait-contact,.enter')];
+ let queued = 0, current = null, x = 0, y = 0;
+ function reset() {
+  cancelAnimationFrame(queued); queued = 0;
+  targets.forEach(el => { el.style.removeProperty('--magnet-x'); el.style.removeProperty('--magnet-y'); });
+  current = null;
+ }
+ targets.forEach(el => {
+  el.addEventListener('pointermove', event => {
+   if (motion.matches || !finePointer.matches || document.hidden || event.pointerType === 'touch') return;
+   const box = el.getBoundingClientRect();
+   current = el;
+   x = Math.max(-4, Math.min(4, (event.clientX - box.left - box.width / 2) * .035));
+   y = Math.max(-3, Math.min(3, (event.clientY - box.top - box.height / 2) * .035));
+   if (!queued) queued = requestAnimationFrame(() => {
+    queued = 0;
+    if (!current) return;
+    current.style.setProperty('--magnet-x', `${x}px`);
+    current.style.setProperty('--magnet-y', `${y}px`);
+   });
+  }, {passive:true});
+  el.addEventListener('pointerleave', reset);
+  el.addEventListener('blur', reset);
+ });
+ document.addEventListener('visibilitychange', reset);
+ motion.addEventListener('change', reset);
+ finePointer.addEventListener('change', reset);
+})();

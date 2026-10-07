@@ -63,3 +63,23 @@
   font:11px/1.8 Arial,"PingFang SC","Microsoft YaHei",sans-serif;
   letter-spacing:.3px;
 }
+
+/* A quiet editorial opening, using the complete existing notice and artwork. */
+.status-notice { padding-top:44px; padding-bottom:44px; background:#0d1115; }
+.status-notice h2 { font-size:clamp(28px,3.5vw,48px); font-weight:500; letter-spacing:-.035em; max-width:560px; }
+.status-notice-label { letter-spacing:.8px; margin-bottom:18px; }
+.status-notice-photo { margin-top:28px; }
+.status-notice-photo img { border:1px solid #59677350; border-radius:3px; }
+.status-notice-copy { align-self:center; }
+.status-notice-copy p { line-height:1.95; }
+.status-notice-copy p+p { margin-top:16px; }
+.status-notice-copy .status-notice-signoff { border-top:1px solid #46545f60; padding-top:22px; margin-top:26px; }
+@media(min-width:900px) {
+ .status-notice { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8%; padding-top:56px; padding-bottom:56px; }
+ .status-notice-copy { padding-top:64px; }
+}
+@media(max-width:600px) {
+ .status-notice { padding-top:34px; padding-bottom:36px; gap:26px; }
+ .status-notice-label { font-size:8px; letter-spacing:.4px; }
+ .status-notice-copy p+p { margin-top:12px; }
+}

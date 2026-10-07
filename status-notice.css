@@ -95,3 +95,8 @@
 @media(min-width:900px) {
  .status-notice { gap:9%; padding-top:64px; padding-bottom:64px; }
 }
+
+/* Supplied account-suspension illustration, kept in its original proportions. */
+.status-notice-account-photo { margin:28px 0 0; }
+.status-notice-account-photo a { display:block; }
+.status-notice-account-photo img { width:100%; height:auto; border:1px solid #ffffff14; border-radius:12px; }

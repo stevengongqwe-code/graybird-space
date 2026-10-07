@@ -182,6 +182,8 @@ function drawScene() {
  hero.style.setProperty('--star-y', `${py * -5 * strength + progress * -18 * strength}px`);
  hero.style.setProperty('--bird-x', `${px * 3 * strength}px`);
  hero.style.setProperty('--bird-y', `${py * 2 * strength}px`);
+ hero.style.setProperty('--title-y', `${progress * -65}px`);
+ hero.style.setProperty('--title-opacity', String(Math.max(0, 1 - progress * 1.8)));
 }
 
 function measureScene() {
@@ -276,7 +278,7 @@ function pauseOrResume() {
   clearTimeout(scanTimer); if (record.getAttribute('aria-busy') === 'true') renderRecord(pending);
  } else { scheduleScene(); updatePhase(); }
  if (motion.matches) {
-  ['--camera-x', '--camera-y', '--camera-scale', '--star-x', '--star-y', '--bird-x', '--bird-y'].forEach(name => hero.style.removeProperty(name));
+  ['--camera-x', '--camera-y', '--camera-scale', '--star-x', '--star-y', '--bird-x', '--bird-y', '--title-y', '--title-opacity'].forEach(name => hero.style.removeProperty(name));
  }
 }
 document.addEventListener('visibilitychange', pauseOrResume);
@@ -289,14 +291,16 @@ const artFrames = [...archive.querySelectorAll('.archive-frame')];
 const artButtons = [...archive.querySelectorAll('[data-art-index]')];
 const artDialog = $('#art-dialog');
 let activeArt = 0;
+let scrollArchiveMode = false;
 function showArtwork(index) {
  activeArt = (index + artFrames.length) % artFrames.length;
- artFrames.forEach((figure, i) => { figure.hidden = i !== activeArt; });
+ artFrames.forEach((figure, i) => { figure.hidden = !scrollArchiveMode && i !== activeArt; figure.classList.toggle('is-current', i === activeArt); });
  artButtons.forEach((button, i) => button.setAttribute('aria-pressed', String(i === activeArt)));
- $('#art-count').textContent = `${String(activeArt + 1).padStart(2, '0')} / ${String(artFrames.length).padStart(2, '0')}`;
+ if (!scrollArchiveMode) $('#art-count').textContent = `${String(activeArt + 1).padStart(2, '0')} / ${String(artFrames.length).padStart(2, '0')}`;
 }
 function chooseArtwork(index) {
  showArtwork(index);
+ if (scrollArchiveMode) artFrames[activeArt].scrollIntoView({block: 'center', behavior: motion.matches ? 'instant' : 'smooth'});
  const subject = artFrames[activeArt].dataset.artSubject;
  if (pending < 0 || observations[pending].subject !== subject) selectRecord(observations.findIndex(note => note.subject === subject));
 }

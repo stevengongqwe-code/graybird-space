@@ -56,6 +56,29 @@ for(let i=0;i<BOSS_NAMES.length;i++){
 {
  const g=isolated();g.weapon='bomb';g.weaponLevel=1;const a=spawnEnemy(g,'ad',{x:g.x,y:g.y-110,hp:20,maxHp:20}),b=spawnEnemy(g,'ad',{x:g.x+40,y:g.y-110,hp:20,maxHp:20});stepGame(g,.16);assert.ok(a.hp<20);assert.ok(b.hp<20,'splash hits neighbour');
 }
+// Early progression must not snowball even when a dense wave is cleared instantly.
+{
+ const g=isolated();g.fireTimer=999;
+ const clearWave=()=>{for(let i=0;i<24;i++){const e=spawnEnemy(g,'ad',{x:100,y:100});hitEnemy(g,e,10000);}};
+ clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no kill chip before 35s');
+ g.elapsed=40;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);
+ g.elapsed=50;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1,'kill sources share 24s cooldown');
+ g.elapsed=65;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,2);
+}
+{
+ const g=isolated();g.nextSupply=55;g.fireTimer=999;g.invincible=100;
+ stepGame(g,54.9);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no scheduled chip before 55s');
+ stepGame(g,.2);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);assert.equal(g.nextSupply,120);
+}
+{
+ const g=isolated();const rates=[];
+ for(const kind of ['pierce','track','spread','pierce','track','spread']){
+  g.choice=true;g.choiceQueue=1;assert.equal(chooseEvolution(g,kind),true);rates.push(firingRate(g));
+ }
+ assert.deepEqual(rates,[2.5,3.3,3.3,4.3,4.3,5.5],'six evolutions required to reach maximum fire rate');
+ assert.ok(difficulty(0).hp>1,'unupgraded cannon needs two hits on ordinary starting monsters');
+ assert.ok(difficulty(0).interval<1.3&&difficulty(0).speed>1.07,'opening pressure increased');
+}
 // Soak both arena sizes with actual random spawns, all pools and chip choices.
 for(const [w,h] of [[600,760],[900,600]]){
  const g=createGame(w,h);g.running=true;const random=rng(37);let seenBoss=false;

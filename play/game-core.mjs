@@ -1,5 +1,5 @@
 // Peanut Hunter: isolated, dependency-free simulation. All moving entities are pooled.
-export const FIRE_RATES = [2.5, 4, 6, 8];
+export const FIRE_RATES = [2.5, 3.3, 4.3, 5.5];
 export const REVIVE_COSTS = [50,150,400,1000];
 export const BOSS_NAMES = ['弹窗矩阵','标题党巨兽','AI 味聚合体','水军头目','诈骗短信王','算法茧房','键盘侠','缓存幽灵','时钟螃蟹','垃圾回收王','数据吞噬者'];
 export const BOSS_LINES = ['又弹。你没别的事吗。','标题挺大，脑子呢。','咕，又开始绕了。','人挺多。都没话说。','花生还带诈骗？','圈这么小，房租挺贵吧。','哟，嘴替来了。','删掉了，怎么还在。','别催。鸟没有考勤。','这些垃圾，也配当王。','吃数据行。花生不行。'];
@@ -37,7 +37,7 @@ export function applyLoadout(g,value) {
  const loadout=cleanLoadout(value);g.loadout=loadout;g.weapon=loadout.selected;g.weaponLevel=loadout.levels[g.weapon];
  g.shield=1+loadout.levels.shell;g.moveSpeed=1+loadout.levels.boots*.08;g.pickupRadius=loadout.levels.collector*18;g.rewardBonus=loadout.levels.fortune*.05;
 }
-export const difficulty = t => ({interval:Math.max(.38,1.3-t*.0032),speed:Math.min(2.6,1.07+t/360),hp:1+Math.max(0,t-35)/115,cap:Math.min(24,7+Math.floor(t/40)),level:1+Math.floor(t/60)});
+export const difficulty = t => ({interval:Math.max(.4,1.12-t*.0032),speed:Math.min(2.7,1.18+t/300),hp:1.45+Math.max(0,t-25)/110,cap:Math.min(24,8+Math.floor(t/35)),level:1+Math.floor(t/60)});
 export const firingRate = g => FIRE_RATES[Math.min(3,g.gun-1)]*(WEAPONS.find(w=>w.id===g.weapon)?.rate||1)*(g.effects.rage>0?1.7:1)*(g.effects.rapid>0?1.25:1);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const TAU=Math.PI*2;
@@ -45,7 +45,7 @@ let nextID=0;
 function pool(size){return Array.from({length:size},()=>({active:false}));}
 function take(p){for(let i=0;i<p.length;i++)if(!p[i].active){const o=p[i];o.active=true;o.id=++nextID;return o;}return null;}
 export function createGame(width=900,height=600){
- return {width,height,running:false,paused:false,elapsed:0,x:width/2,y:height-72,target:width/2,targetY:height-72,hp:1,shield:1,invincible:0,score:0,rewardCarry:0,reliefUntil:0,kills:0,combo:0,maxCombo:0,grazes:0,shots:0,gun:1,build:{pierce:0,spread:0,track:0},effects:{magnet:0,rage:0,slow:0,double:0,rapid:0,fortune:0},enemies:pool(64),bullets:pool(256),hostile:pool(1024),items:pool(320),particles:pool(96),texts:pool(48),groups:pool(32),spawn:0,foodTimer:0,fireTimer:0,nextBoss:120,bossIndex:0,bossBag:[],pendingBossRoster:null,weapon:'worm',weaponLevel:1,loadout:cleanLoadout(),moveSpeed:1,pickupRadius:0,rewardBonus:0,nextSupply:30,bossesDefeated:0,warningIndex:-1,nextEvent:90,event:'',eventUntil:0,notice:'',noticeTime:0,noticeSerial:0,choice:false,choiceQueue:0,revives:0,cause:'',frame:0,last:0,random:Math.random};
+ return {width,height,running:false,paused:false,elapsed:0,x:width/2,y:height-72,target:width/2,targetY:height-72,hp:1,shield:1,invincible:0,score:0,rewardCarry:0,reliefUntil:0,kills:0,combo:0,maxCombo:0,grazes:0,shots:0,gun:1,build:{pierce:0,spread:0,track:0},effects:{magnet:0,rage:0,slow:0,double:0,rapid:0,fortune:0},enemies:pool(64),bullets:pool(256),hostile:pool(1024),items:pool(320),particles:pool(96),texts:pool(48),groups:pool(32),spawn:0,foodTimer:0,fireTimer:0,nextBoss:120,bossIndex:0,bossBag:[],pendingBossRoster:null,weapon:'worm',weaponLevel:1,loadout:cleanLoadout(),moveSpeed:1,pickupRadius:0,rewardBonus:0,nextSupply:55,lastChipDrop:-Infinity,bossesDefeated:0,warningIndex:-1,nextEvent:90,event:'',eventUntil:0,notice:'',noticeTime:0,noticeSerial:0,choice:false,choiceQueue:0,revives:0,cause:'',frame:0,last:0,random:Math.random};
 }
 export function notice(g,line,seconds=2.5){g.notice=line;g.noticeTime=seconds;g.noticeSerial++;}
 function floating(g,x,y,label,color='#d5e8f3'){const p=take(g.texts);if(p)Object.assign(p,{x,y,label,color,life:1.1});}
@@ -66,7 +66,7 @@ export function spawnEnemy(g,type='ad',options={},priority=false){
 function army(g,y=-35){if(difficulty(g.elapsed).cap-g.enemies.reduce((n,e)=>n+(e.active&&!e.retiring?1:0),0)<5)return false;const center=clamp(g.random()*g.width,110,g.width-110);for(let i=0;i<5;i++)spawnEnemy(g,'army',{x:center+(i-2)*42,y:y-Math.abs(i-2)*20,speed:120*difficulty(g.elapsed).speed});return true;}
 export function spawnBoss(g,index=g.bossIndex,selectedRoster=index%BOSS_NAMES.length){
  const group=take(g.groups);if(!group)return null;
- const roster=selectedRoster%BOSS_NAMES.length,scale=1+Math.min(.8,Math.floor(index/3)*.1),hp=Math.round((72+g.bossesDefeated*24)*scale*[1,1.05,.85,1,1,1,1,1,1.1,1.15,1.1][roster]);
+ const roster=selectedRoster%BOSS_NAMES.length,scale=1+Math.min(.8,Math.floor(index/3)*.1),hp=Math.round((92+g.bossesDefeated*30)*scale*[1,1.05,.85,1,1,1,1,1,1.1,1.15,1.1][roster]);
  Object.assign(group,{roster,index,scale,maxHp:hp,remaining:1,defeated:false,rage:false});
  const e=enemySlot(g,true);if(!e){group.active=false;return null;}
  Object.assign(e,{type:'boss',boss:true,retiring:false,label:BOSS_NAMES[roster],roster,x:g.width/2,y:g.height*.23,baseX:g.width/2,r:52,hp,maxHp:hp,speed:85*scale,age:0,phase:'drift',timer:0,attack:1.6/scale,slow:0,vx:0,vy:0,affix:'',shield:0,graze:false,generation:0,flee:false,group,cocoonRadius:Math.hypot(g.width,g.height)*.65,tauntAt:10,flash:false});
@@ -74,20 +74,20 @@ export function spawnBoss(g,index=g.bossIndex,selectedRoster=index%BOSS_NAMES.le
 }
 function peanuts(g,x,y,count){for(let i=0;i<count;i++){const p=drop(g,'peanut',x+(g.random()-.5)*80,y,1);if(p){p.vx=(g.random()-.5)*240;p.vy=-80-g.random()*140;}}}
 function kill(g,e){
- if(!e.active)return;e.active=false;g.kills++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);if(g.kills%12===0&&!e.boss)drop(g,'chip',e.x,e.y);sparks(g,e.x,e.y);
+ if(!e.active)return;e.active=false;g.kills++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);if(g.kills%24===0&&!e.boss)dropEvolution(g,e.x,e.y);sparks(g,e.x,e.y);
  if(e.boss){
   const group=e.group;
   if(e.roster===2&&e.generation<2){group.remaining++;e.active=true;e.retiring=true;for(let i=0;i<2;i++){const child=enemySlot(g,true);if(child)Object.assign(child,e,{active:true,retiring:false,id:++nextID,x:clamp(e.x+(i?45:-45),35,g.width-35),baseX:e.x+(i?45:-45),y:e.y+28,generation:e.generation+1,hp:Math.ceil(e.maxHp*.55),maxHp:Math.ceil(e.maxHp*.55),r:Math.max(24,e.r*.7),age:0,speed:e.speed*(group.rage?1.8:1),affix:group.rage?'swift':'',label:['再强调一下','总而言之'][i],phase:'drift',attack:.7});else group.remaining--;}
    e.active=false;e.retiring=false;floating(g,e.x,e.y,'换句话说……');return;
   }
   group.remaining--;
-  if(group.remaining===0){group.defeated=true;group.active=false;g.bossesDefeated++;g.reliefUntil=g.elapsed+5;for(const b of g.hostile)b.active=false;drop(g,'magnet',e.x,e.y);g.nextEvent=Math.max(g.nextEvent,g.elapsed+12);g.nextBoss=Math.max(g.nextBoss,g.elapsed+30);peanuts(g,e.x,e.y,30+Math.floor(g.random()*21));drop(g,'chip',e.x,e.y);notice(g,BOSS_NAMES[e.roster]+'，下线了。',3);if(e.roster===3)for(const m of g.enemies)if(m.active&&!m.boss)m.flee=true;}
+  if(group.remaining===0){group.defeated=true;group.active=false;g.bossesDefeated++;g.reliefUntil=g.elapsed+5;for(const b of g.hostile)b.active=false;drop(g,'magnet',e.x,e.y);g.nextEvent=Math.max(g.nextEvent,g.elapsed+12);g.nextBoss=Math.max(g.nextBoss,g.elapsed+30);peanuts(g,e.x,e.y,30+Math.floor(g.random()*21));dropEvolution(g,e.x,e.y,true);notice(g,BOSS_NAMES[e.roster]+'，下线了。',3);if(e.roster===3)for(const m of g.enemies)if(m.active&&!m.boss)m.flee=true;}
   return;
  }
  const x=e.x,y=e.y,type=e.type,affix=e.affix,speed=e.speed;const count=type==='elite'?5:type==='tank'?4:1;peanuts(g,x,y,count);
  if(type==='splitter'||affix==='split'){for(let i=0;i<2;i++)spawnEnemy(g,'small',{x:x+(i?24:-24),y,r:14,hp:1,maxHp:1,speed:speed*1.25},true);}
- if(type==='elite'&&g.random()<.4)drop(g,'chip',x,y);
- const chance=Math.min(.22,.07+g.elapsed/9000);
+ if(type==='elite'&&g.random()<.18)dropEvolution(g,x,y);
+ const chance=Math.min(.14,.045+g.elapsed/12000);
  if(g.random()<chance)drop(g,['magnet','egg','rage','slow','double','rapid','repair','clear','fortune'][Math.floor(g.random()*9)],x,y);
 }
 export function hitEnemy(g,e,amount=1){if(!e.active)return;if(e.shield>0){e.shield=Math.max(0,e.shield-amount);sparks(g,e.x,e.y);return;}e.hp-=amount;if(e.boss&&e.hp<=e.maxHp*.5&&!e.group.rage){e.group.rage=true;notice(g,e.label+' · 狂暴',2);if(e.roster===2)for(const a of g.enemies)if(a.active&&a.group===e.group&&a.generation>0){a.speed*=1.8;a.affix='swift';}}if(e.hp<=0)kill(g,e);}
@@ -98,7 +98,12 @@ export function damage(g,cause,amount=1){
  g.hp-=amount;if(g.hp<=0){g.running=false;g.choice=false;return true;}g.invincible=1;return false;
 }
 export function reviveGame(g){if(g.running)return false;g.revives++;g.hp=1;g.invincible=2;g.running=true;g.paused=false;g.choice=false;g.combo=0;g.cause='';notice(g,'花生买命。贵得要死。');return true;}
-export function chooseEvolution(g,type){if(!g.choice||!(type in g.build)||g.build[type]>=3)return false;g.build[type]++;g.gun=Math.min(4,1+g.build.pierce+g.build.spread+g.build.track);g.choiceQueue--;if(Object.values(g.build).every(v=>v===3)&&g.choiceQueue>0){g.score+=10*g.choiceQueue;g.choiceQueue=0;}g.choice=g.choiceQueue>0;g.fireTimer=0;notice(g,{pierce:'穿透虫，串起来。',spread:'散射虫，别挤。',track:'追踪虫，追着烦。'}[type]);return true;}
+export function chooseEvolution(g,type){if(!g.choice||!(type in g.build)||g.build[type]>=3)return false;g.build[type]++;g.gun=Math.min(4,1+Math.floor((g.build.pierce+g.build.spread+g.build.track)/2));g.choiceQueue--;if(Object.values(g.build).every(v=>v===3)&&g.choiceQueue>0){g.score+=10*g.choiceQueue;g.choiceQueue=0;}g.choice=g.choiceQueue>0;g.fireTimer=0;notice(g,{pierce:'穿透虫，串起来。',spread:'散射虫，别挤。',track:'追踪虫，追着烦。'}[type]);return true;}
+// All ordinary chip sources share a cooldown: dense waves cannot snowball upgrades.
+function dropEvolution(g,x,y,bossReward=false){
+ if(!bossReward&&(g.elapsed<35||g.elapsed-g.lastChipDrop<24))return false;
+ const item=drop(g,'chip',x,y);if(!item)return false;g.lastChipDrop=g.elapsed;return true;
+}
 function chip(g){if(Object.values(g.build).every(v=>v===3)){g.score+=10;floating(g,g.x,g.y-35,'芯片满级 +10');return;}g.choiceQueue++;g.choice=true;}
 function fire(g){
  const weapon=WEAPONS.find(w=>w.id===g.weapon)||WEAPONS[0],level=g.weaponLevel||1;
@@ -189,7 +194,7 @@ function graze(g,o,distance,hitRadius){if(!o.graze&&g.invincible<=0&&distance>=h
 function segmentDistance(x,y,ax,ay,bx,by){const vx=bx-ax,vy=by-ay,len=vx*vx+vy*vy,k=len?clamp(((x-ax)*vx+(y-ay)*vy)/len,0,1):0;return Math.hypot(x-ax-k*vx,y-ay-k*vy);}
 function pickup(g,p){
  p.active=false;if(p.kind==='fake'){damage(g,'诈骗短信');return;}
- if(p.kind==='peanut'){const earned=p.value*Math.min(2.5,1+Math.floor(g.combo/12)*.25)*(1+g.rewardBonus)*(g.effects.double>0?2:1)*(g.effects.fortune>0?1.25:1)+g.rewardCarry;const v=Math.floor(earned+1e-9);g.rewardCarry=Math.max(0,earned-v);g.score+=v;return;}
+ if(p.kind==='peanut'){const earned=p.value*Math.min(2,1+Math.floor(g.combo/18)*.2)*(1+g.rewardBonus)*(g.effects.double>0?2:1)*(g.effects.fortune>0?1.25:1)+g.rewardCarry;const v=Math.floor(earned+1e-9);g.rewardCarry=Math.max(0,earned-v);g.score+=v;return;}
  if(p.kind==='chip'){chip(g);return;}
  if(p.kind==='repair'){g.shield=Math.min(4,g.shield+1);g.invincible=Math.max(g.invincible,1.5);notice(g,'补给维修 · 重新罩好。');return;}
  if(p.kind==='clear'){for(const e of g.enemies)if(e.active)hitEnemy(g,e,e.boss?6:4);for(const b of g.hostile)b.active=false;notice(g,'净屏脉冲 · 清静一会儿。');return;}
@@ -206,9 +211,9 @@ export function stepGame(g,seconds,random=g.random){
   if(!bossActive&&g.elapsed>=g.nextBoss-3&&g.warningIndex!==g.bossIndex){g.pendingBossRoster=randomBoss(g);g.warningIndex=g.bossIndex;notice(g,'⚠ '+BOSS_NAMES[g.pendingBossRoster]+' 接近',3);}
   if(g.elapsed>=g.nextBoss&&!bossActive){if(spawnBoss(g,g.bossIndex,g.pendingBossRoster??randomBoss(g))){g.bossIndex++;g.pendingBossRoster=null;g.nextBoss=g.elapsed+120;}}
   if(g.elapsed>=g.nextEvent&&!g.groups.some(o=>o.active)){triggerEvent(g,['reverse','meteor','fog'][Math.floor(random()*3)]);g.nextEvent=g.elapsed+90;}
-  if(g.elapsed>=g.nextSupply){drop(g,'chip',g.x,-25);g.nextSupply+=45;}
+  if(g.elapsed>=g.nextSupply){dropEvolution(g,g.x,-25);g.nextSupply+=65;}
   if(g.elapsed>=g.eventUntil)g.event='';
-  g.spawn+=dt;const spawnInterval=d.interval*(bossActive?1.7:g.elapsed<g.reliefUntil?1.5:1);if(g.spawn>=spawnInterval){g.spawn-=spawnInterval;spawnWave(g);}
+  g.spawn+=dt;const spawnInterval=d.interval*(bossActive?1.45:g.elapsed<g.reliefUntil?1.5:1);if(g.spawn>=spawnInterval){g.spawn-=spawnInterval;spawnWave(g);}
   g.foodTimer+=dt;if(g.foodTimer>=2){g.foodTimer-=2;drop(g,'peanut',30+random()*(g.width-60),-25);}
   g.fireTimer-=dt;if(g.fireTimer<=0){fire(g);g.fireTimer+=1/firingRate(g);}
   const world=dt*(g.effects.slow>0?.35:1);let buff=1;

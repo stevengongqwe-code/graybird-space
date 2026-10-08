@@ -1,4 +1,4 @@
-import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate} from './game-core.mjs?v=4-armory';
+import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate} from './game-core.mjs?v=5-cartoon-balance';
 /* Independent Bird Nest: official images stay intact; personal progress stays local. */
 (() => {
  'use strict';
@@ -143,7 +143,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  function drawPeanut(x,y){ctx.save();ctx.translate(x,y);ctx.rotate(-.35);ctx.fillStyle='#e5bd7b';ctx.beginPath();ctx.ellipse(0,0,10,16,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9d6e37';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-12);ctx.quadraticCurveTo(-4,0,0,12);ctx.stroke();ctx.restore();}
  function sprite(text,color='#f1d1d2',box=false){const key=text+color+box;if(sprites.has(key))return sprites.get(key);const c=document.createElement('canvas'),g=c.getContext('2d');g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';c.width=Math.ceil(g.measureText(text).width)+20;c.height=42;g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';if(box){g.fillStyle='#633c41';g.fillRect(0,0,c.width,c.height);g.strokeStyle='#be848a';g.strokeRect(.5,.5,c.width-1,c.height-1);}g.fillStyle=color;g.textAlign='center';g.fillText(text,c.width/2,29);sprites.set(key,c);return c;}
  function label(text,x,y,color,box=false){const c=sprite(text,color,box);ctx.drawImage(c,x-c.width/2,y-c.height/2);}
- const monsterTextures=new Map();for(const key of [...ENEMY_TYPES,...BOSS_NAMES.map((_,i)=>'boss-'+i)]){const image=new Image();image.src='/assets/game/'+key+'.svg';image.addEventListener('load',()=>{if(!game.running||game.paused)gameDraw();});monsterTextures.set(key,image);}
+ const monsterTextures=new Map();for(const key of [...ENEMY_TYPES,...BOSS_NAMES.map((_,i)=>'boss-'+i)]){const image=new Image();image.src='/assets/game/'+key+'.webp?v=5-cartoon-balance';image.addEventListener('load',()=>{if(!game.running||game.paused)gameDraw();});monsterTextures.set(key,image);}
  const itemLabels={chip:'芯片',magnet:'磁',egg:'蛋',rage:'狂',slow:'慢',double:'×2',rapid:'快',repair:'修',clear:'净',fortune:'幸'};
  function gameDraw(){
   if(!ctx)return;const W=game.width,H=game.height;
@@ -158,7 +158,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
    const name=e.boss&&e.roster===4&&!e.flash?'精英':e.label;
    const texture=monsterTextures.get(e.boss?'boss-'+e.roster:e.type);
    ctx.globalAlpha=e.type==='ghost'?.65+.25*Math.sin(e.age*2):1;
-   if(texture?.complete&&texture.naturalWidth)ctx.drawImage(texture,e.x-e.r,e.y-e.r,e.r*2,e.r*2);else{ctx.fillStyle='#ad8994';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();}
+   if(texture?.complete&&texture.naturalWidth)ctx.drawImage(texture,e.x-e.r*1.14,e.y-e.r*1.14,e.r*2.28,e.r*2.28);else{ctx.fillStyle='#ad8994';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();}
    ctx.globalAlpha=1;
    ctx.save();ctx.translate(e.x,e.y+e.r+13);ctx.scale(.62,.62);label(name,0,0,e.flee?'#95a4ae':'#d9e1e7');ctx.restore();
    if(e.maxHp>1){const r=e.boss&&e.roster===4&&!e.flash?25:e.r;ctx.fillStyle='#20313f';ctx.fillRect(e.x-r,e.y+e.r+4,r*2,4);ctx.fillStyle='#be848a';ctx.fillRect(e.x-r,e.y+e.r+4,r*2*Math.max(0,e.hp/e.maxHp),4);}

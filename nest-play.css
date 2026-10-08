@@ -1,0 +1,119 @@
+/* A small room, built around the unchanged official bird. */
+.nest-play,.nest-passport { margin:48px 0 64px; scroll-margin-top:28px; }
+.nest-play-heading,.nest-passport-heading { display:flex; align-items:end; justify-content:space-between; gap:20px; }
+.nest-play .eyebrow,.nest-passport .eyebrow { color:#9cadb9; font:9px/1.8 var(--mono); letter-spacing:1.4px; }
+.nest-play h2,.nest-passport h2 { font-size:clamp(27px,3.2vw,42px); letter-spacing:-.035em; line-height:1.25; margin-top:14px; }
+.nest-play h2 span { margin-left:12px; color:#97a3ac; font-weight:400; }
+.nest-passport-link { display:inline-flex; gap:14px; min-height:44px; align-items:center; font-size:12px; color:#c1d0db; white-space:nowrap; }
+.nest-instructions { font-size:13px; color:#a9b3bb; margin:18px 0 24px; }
+.nest-room { position:relative; height:460px; overflow:hidden; isolation:isolate; border:1px solid #353c41; background:radial-gradient(ellipse at 75% 12%,#28343d50,transparent 60%),linear-gradient(155deg,#191e22,#13191e 68%); }
+.nest-room-coordinate { position:absolute; top:25px; left:28px; font:8px/1.8 var(--mono); letter-spacing:1.2px; color:#7f919d; }
+.nest-room-number { position:absolute; right:28px; bottom:24px; font:9px var(--mono); color:#7f919d; letter-spacing:1px; }
+.nest-wall-line { position:absolute; left:0; right:0; top:73%; height:1px; background:#6c788926; }
+.nest-floor { position:absolute; left:0; right:0; bottom:0; height:27%; background:linear-gradient(0deg,#0b101650,#26303828); }
+.nest-room-footnote { position:absolute; bottom:24px; left:28px; font:8px/1.8 var(--mono); color:#8c989f; letter-spacing:.8px; }
+.nest-shelf { position:absolute; left:9%; top:25%; width:25%; height:50px; border-bottom:6px solid #5d625e; display:flex; align-items:end; gap:5px; padding-left:10px; box-shadow:0 6px 0 #0003; }
+.nest-shelf i { height:37px; width:16px; background:#69716d; border-top:3px solid #8c978c; border-bottom:3px solid #464d49; }
+.nest-shelf i:nth-child(2) { height:45px; width:13px; background:#9a8b6c; border-color:#b5a584; }
+.nest-shelf i:nth-child(3) { height:40px; width:18px; background:#566b7a; border-color:#83909a; }
+.nest-shelf i:nth-child(4) { height:34px; transform:rotate(-10deg); background:#6e6460; border-color:#968c81; }
+.nest-shelf span { position:absolute; top:58px; left:10px; font:7px var(--mono); letter-spacing:1.2px; color:#7d8a91; }
+.nest-object { position:absolute; padding:0; min-width:44px; min-height:44px; z-index:2; color:#b4c1ca; }
+.nest-object:disabled,.nest-bird:disabled { cursor:default; }
+.nest-object-label { display:block; text-align:left; font:9px/1.6 var(--mono); letter-spacing:.6px; padding-top:9px; }
+.nest-object:hover:not(:disabled) .nest-object-label,.nest-object[aria-pressed=true] .nest-object-label { color:#f2f0e7; }
+.nest-object svg { width:100%; height:100%; overflow:visible; }
+.nest-window { right:10%; top:13%; width:27%; height:175px; }
+.nest-window-view { position:relative; display:block; height:147px; border:7px solid #4b555b; background:radial-gradient(ellipse at 50% 95%,#24425d55,transparent 70%),#090f16; box-shadow:0 0 0 1px #89969e50,inset 0 0 26px #0007; overflow:hidden; }
+.nest-window-view:after { content:''; position:absolute; top:0; bottom:0; left:50%; width:4px; background:#4b555b; }
+.nest-earth { position:absolute; width:58px; height:58px; right:17%; top:42px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#b4d0cd 0%,#607f90 32%,#324953 65%,#162a38 90%); box-shadow:0 0 20px #a6cbe319; }
+.nest-earth:before { content:''; position:absolute; left:7px; top:14px; width:19px; height:24px; background:#839b87; border-radius:64% 28% 40% 30%; transform:rotate(-24deg); opacity:.8; }
+.nest-window-star { position:absolute; background:#c2cfd5; width:2px; height:2px; }
+.nest-window-star.one { top:17px; left:23%; }.nest-window-star.two { top:80px; left:16%; }.nest-window-star.three { top:20px; right:19%; }
+.nest-moon { position:absolute; top:25px; left:37%; width:5px; height:5px; background:#d2cec1; border-radius:50%; }
+.nest-desk { position:absolute; width:40%; left:8%; top:61%; height:27%; }
+.nest-desk-top { width:100%; height:13px; background:#777061; border-top:2px solid #968b78; transform:skewX(-7deg); }
+.nest-desk-leg { position:absolute; top:13px; bottom:0; left:12%; width:8px; background:linear-gradient(#6c6659,#3c3e3b); }.nest-desk-leg.second { left:auto; right:12%; }
+.nest-journal { width:95px; height:102px; left:10%; top:46%; transform:rotate(-6deg); }
+.nest-journal svg { height:76px; }.nest-journal .nest-object-label { transform:rotate(6deg); }
+.nest-computer { width:122px; height:127px; left:28%; top:42%; }
+.nest-computer svg { height:99px; }
+.nest-paper { width:48px; height:48px; left:38%; top:60%; transform:rotate(-4deg); }
+.nest-paper-mark { position:absolute; top:11px; left:21px; color:#584f3b; font:18px var(--mono); }
+.nest-bird-area { position:absolute; right:10%; bottom:9%; width:26%; max-width:230px; }
+.nest-bird { display:block; position:relative; padding:0; width:100%; z-index:2; transition:transform .25s ease; border-radius:50%; }
+.nest-bird img { width:100%; aspect-ratio:1; object-fit:contain; user-select:none; -webkit-user-drag:none; }
+.nest-bird-shadow { position:absolute; bottom:5px; left:15%; right:15%; height:10px; background:#080a0bc2; border-radius:50%; filter:blur(4px); }
+.nest-bird-caption { position:absolute; bottom:-17px; left:0; right:0; color:#8a9da9; font:8px var(--mono); text-align:center; letter-spacing:1px; }
+.nest-bird.is-nodding { transform:translateY(5px) rotate(-3deg); }
+.nest-bird.is-ready { outline:1px dashed #cfba82; outline-offset:6px; }
+.nest-fed-peanut { position:absolute; z-index:3; color:#d4b580; font-size:22px; left:10%; top:52%; pointer-events:none; }
+.nest-interaction { display:grid; grid-template-columns:100px minmax(0,1fr); gap:16px; padding:22px 0; border-bottom:1px solid var(--line); min-height:90px; }
+.nest-speaker { font:9px/2.1 var(--mono); color:#9aafbd; letter-spacing:1px; padding-top:1px; }
+.nest-interaction p { font-size:15px; color:#d5d9d9; line-height:1.75; }
+.nest-inline-link { display:inline-flex; align-items:center; min-height:44px; font-size:12px; color:#b7cedd; }
+.nest-feeding { display:grid; grid-template-columns:205px minmax(0,1fr); align-items:center; gap:12px 24px; margin-top:20px; }
+.nest-peanut { display:flex; gap:12px; align-items:center; border:1px solid #6e65514d; background:#27251f; padding:9px 15px; min-height:56px; font-size:13px; color:#e0d2b4; touch-action:none; }
+.nest-peanut svg { width:23px; height:30px; flex-shrink:0; }.nest-peanut-action { margin-left:auto; font:19px var(--mono); color:#ae9d7c; }
+.nest-peanut[aria-pressed=true] { border-color:#cab58b; background:#353025; }
+.nest-feeding>p { font-size:12px; color:#a0adb6; line-height:1.7; }
+.nest-feed-count { grid-column:1/-1; color:#9f9684; font:10px var(--mono); }
+.nest-drag-ghost { position:fixed; z-index:99; left:0; top:0; font-size:32px; width:44px; height:44px; text-align:center; pointer-events:none; }
+.nest-passport { padding-top:36px; border-top:1px solid #3b464e; }
+.nest-passport-progress { color:#b9cbd7; font:11px/1.8 var(--mono); white-space:nowrap; }
+.passport-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1fr); gap:40px; align-items:start; margin-top:28px; }
+.passport-card { color:#2b333a; background:#dad8ce; border:1px solid #e1e0d4; padding:25px 27px 18px; position:relative; min-width:0; }
+.passport-card:before { content:''; position:absolute; top:8px; bottom:8px; left:8px; right:8px; border:1px solid #43515f40; pointer-events:none; }
+.passport-card-top { display:flex; justify-content:space-between; gap:12px; font:10px/1.7 var(--mono); letter-spacing:2px; border-bottom:1px solid #6a737448; padding-bottom:14px; }
+.passport-card-top>span:last-child { font-size:28px; line-height:1; color:#66747a; }
+.passport-identity { display:flex; justify-content:space-between; align-items:center; gap:16px; margin:16px 0; }
+.passport-identity>div { min-width:0; }.passport-identity img { width:90px; flex-shrink:0; }
+.passport-field-label { color:#68767c; font:8px var(--mono); letter-spacing:1px; }
+.passport-identity p { font-size:20px; font-weight:550; line-height:1.55; margin:7px 0; overflow-wrap:anywhere; }
+.passport-id { display:block; font:9px var(--mono); color:#58686e; letter-spacing:1px; }
+.passport-stamps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px 10px; margin:20px 0 24px; }
+.passport-stamps>span { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; min-height:82px; padding:8px 2px; border:1px dashed #66747b55; font-size:9px; color:#778088; }
+.passport-stamps b { font:26px/1 var(--mono); opacity:.5; }
+.passport-stamps>span.is-earned { color:#395767; border:1px solid #557684a0; background:#a7bdc218; transform:rotate(-2deg); }.passport-stamps>span.is-earned:nth-child(even) { transform:rotate(2deg); }
+.passport-stamps>span.is-earned b { opacity:1; }
+.passport-card-bottom { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font:8px/1.8 var(--mono); color:#5d6d73; border-top:1px solid #6a737448; padding-top:14px; }
+.passport-controls { padding-top:5px; min-width:0; }
+#passport-form label { display:block; color:#c1c9ce; font-size:13px; margin-bottom:12px; }
+#passport-form>div { display:flex; gap:10px; flex-wrap:wrap; }
+#passport-nickname { width:100%; min-width:0; flex:1 1 150px; border:1px solid #49535c; background:#151b20; padding:12px; color:var(--ink); font-size:14px; font-family:inherit; min-height:46px; border-radius:0; }
+#passport-nickname:focus-visible { outline:2px solid var(--blue); outline-offset:3px; }
+#passport-form button { min-height:46px; padding:10px 12px; color:#c8d4db; border:1px solid #455462; font-size:12px; }
+#passport-hint { font-size:13px; color:#a9b7c0; line-height:1.9; margin:23px 0; }
+.passport-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.passport-actions button { display:flex; align-items:center; justify-content:space-between; gap:14px; min-height:46px; padding:10px 14px; border:1px solid #46545e; color:#c9d8e2; font-size:12px; }
+.passport-actions button:first-child { background:#d3dde3; color:#17252e; border-color:#d3dde3; }
+.passport-actions button:disabled { opacity:.6; cursor:wait; }
+#passport-status { font-size:12px; color:#c2d2dd; line-height:1.8; min-height:30px; margin-top:12px; }
+#passport-copy-fallback { width:100%; min-height:44px; background:#151b20; border:1px solid #49535c; color:var(--ink); padding:10px; }
+.nest-local-note { font-size:11px; line-height:1.9; color:#97a7b2; margin-top:10px; }
+.passport-export { margin-top:30px; max-width:420px; }.passport-export img { width:100%; height:auto; border:1px solid var(--line); }.passport-export figcaption { font-size:11px; color:var(--muted); margin-top:12px; line-height:1.8; }
+.nest-play [hidden],.nest-passport [hidden] { display:none!important; }
+@media(max-width:900px) {
+ .nest-room { height:415px; }.nest-window { right:8%; width:29%; }.nest-bird-area { right:7%; width:30%; }.nest-computer { left:27%; top:40%; width:102px; }.nest-journal { top:44%; width:79px; }.nest-desk { width:42%; }
+ .passport-layout { grid-template-columns:1fr; gap:24px; }.passport-card { max-width:490px; }.passport-controls { max-width:590px; }
+}
+@media(max-width:600px) {
+ .nest-play,.nest-passport { margin-top:34px; margin-bottom:42px; }.nest-play-heading,.nest-passport-heading { align-items:start; flex-direction:column; gap:8px; }
+ .nest-play h2,.nest-passport h2 { font-size:28px; }.nest-play h2 span { margin-left:8px; }.nest-play-heading .nest-passport-link { margin-top:0; }
+ .nest-instructions { font-size:12px; margin:8px 0 18px; }
+ .nest-room { height:422px; }.nest-room-coordinate { top:16px; left:17px; font-size:7px; }.nest-room-number { bottom:18px; right:16px; font-size:7px; }
+ .nest-room-footnote { bottom:18px; left:17px; font-size:7px; letter-spacing:0; }
+ .nest-shelf { left:7%; top:26%; width:37%; height:43px; gap:3px; padding-left:5px; }.nest-shelf i { width:13px; height:29px; }.nest-shelf i:nth-child(2) { height:35px; width:11px; }.nest-shelf i:nth-child(3) { height:31px; width:14px; }.nest-shelf i:nth-child(4) { height:27px; width:12px; }.nest-shelf span { top:50px; left:5px; font-size:6px; }
+ .nest-window { top:13%; right:6%; width:40%; height:146px; }.nest-window-view { height:120px; border-width:5px; }.nest-earth { width:42px; height:42px; right:14%; top:45px; }.nest-earth:before { width:13px; height:17px; top:11px; left:6px; }
+ .nest-desk { top:62%; left:6%; width:51%; height:26%; }.nest-desk-top { height:11px; }.nest-desk-leg { top:11px; width:6px; }
+ .nest-journal { left:5%; top:48%; width:73px; height:90px; }.nest-journal svg { height:65px; }
+ .nest-computer { left:28%; top:45%; width:88px; height:106px; }.nest-computer svg { height:80px; }
+ .nest-object-label { font-size:8px; padding-top:5px; }.nest-paper { left:38%; top:61%; }
+ .nest-bird-area { width:43%; right:1%; bottom:14%; }.nest-bird-caption { font-size:7px; bottom:-13px; letter-spacing:.4px; }
+ .nest-interaction { grid-template-columns:65px minmax(0,1fr); gap:12px; padding:18px 0; min-height:86px; }.nest-speaker { font-size:8px; }.nest-interaction p { font-size:13px; }
+ .nest-feeding { grid-template-columns:1fr; gap:12px; }.nest-peanut { width:100%; max-width:260px; min-height:54px; }.nest-feeding>p { font-size:11px; }.nest-feed-count { font-size:9px; }
+ .nest-passport-progress { font-size:10px; margin-top:8px; }.passport-layout { margin-top:20px; gap:25px; }.passport-card { padding:22px 21px 17px; }
+ .passport-identity img { width:76px; }.passport-identity p { font-size:19px; }.passport-stamps { gap:11px 7px; }.passport-stamps>span { font-size:9px; min-height:78px; }.passport-card-top { font-size:9px; }
+ #passport-form>div { gap:8px; }#passport-nickname { flex-basis:170px; }.passport-actions { gap:8px; }.passport-actions button { font-size:11px; padding:10px 12px; gap:10px; }
+}
+@media(prefers-reduced-motion:reduce) { .nest-bird { transition:none; }.nest-bird.is-nodding,.passport-stamps>span.is-earned { transform:none; } }

@@ -71,7 +71,8 @@ def intro(kicker,title,body):
 
 def write_page(path,title,description,content,current,og_type='website'):
  target=ROOT/path.lstrip('/')/'index.html';target.parent.mkdir(parents=True,exist_ok=True)
- target.write_text(TEMPLATE.substitute(title=e(title),description=e(description),path=e(path),content=content,header=GarybirdHeader(current),og_type=og_type))
+ extras='<link rel="stylesheet" href="/nest-play.css?v=1">' if path=='/nest/' else ''
+ target.write_text(TEMPLATE.substitute(title=e(title),description=e(description),path=e(path),content=content,header=GarybirdHeader(current),og_type=og_type,extras=extras))
 
 def main():
  validate()
@@ -92,6 +93,7 @@ def main():
   groups+=''.join(TopicCard(t) for t in records) if records else '<p class="community-empty">这里先留空。投稿入口暂未开放，也还没有收录鸟友内容。</p>'
   groups+='</section>'
  content=intro('GRAYBIRD / BIRD NEST','鸟窝。<span>互联网里的一小块地方。</span>','问题可以留下来，不急着有答案。认识一只鸟，再看看它最近在想什么。')
+ content+=(ROOT/'templates/nest-play.html').read_text()
  content+='<p class="community-status">X 账号申诉中。现阶段可以阅读和保存话题，评论现场暂未开放。</p><nav class="forum-rooms" aria-label="鸟窝栏目">'+room_content+'</nav>'
  content+='<div class="community-records" data-filter-scope="room">'+SearchRecords('在鸟窝里找一找')+filters('按栏目浏览',{k:r['name'] for k,r in ROOMS.items()})+'<p class="filter-summary" role="status" aria-live="polite"></p><div id="search-results">'+groups+'</div></div>'
  content+='<a class="community-text-link" href="/archive/">去档案馆慢慢翻 →</a>'

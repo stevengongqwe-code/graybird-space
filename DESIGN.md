@@ -27,6 +27,8 @@ archive: archive identity → search / type filters → records → full entry �
 
 Keep article text at a readable maximum width; use horizontal editorial rows, not a rounded SaaS card wall. Existing small bird avatars are the author cue. No fictional votes, online users or comment counts. Pending discussion states remain explicit. New topics should be maintained through data, not layout edits.
 
+The owner-approved interactive nest now sits between the nest introduction and the existing forum rooms: a quiet room with window, journal, computer and paper-note hotspots, the unchanged original bird, optional peanut feeding, then an earth visitor passport. The room uses code-native scenery, muted wood/paper accents and the existing dark palette. The passport is warm paper with six earned/locked personal exploration stamps. Its nickname and progress are local to the visitor's browser; it is not a public membership system. Mobile uses the same scene with larger relative bird proportions and stacked passport controls. Two-tap and keyboard feeding are equivalent to dragging. The original homepage, editorial forum, archive and account notice remain intact.
+
 ## Motion and feedback
 
 Native scrolling remains intact. Transform/opacity only for spatial movement; brief focus/press feedback on controls; no animation delays before reading. Reduced motion is a fully visible static state. No background loops for search/filter UI. The removed rotating globe stays absent; no Three.js/GSAP/Lenis dependency is necessary for the present product.

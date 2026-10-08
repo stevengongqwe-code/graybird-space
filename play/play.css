@@ -117,3 +117,17 @@
 #game #game-build { color:#a6cbe3; }
 #game #game-effects { color:#d9bb86; }
 #game #game-announcement { min-height:22px; white-space:pre-line; }
+
+/* Small local armory; no account, API or real-money purchases. */
+.game-shop { margin:24px 0; border:1px solid var(--line); border-radius:12px; padding:16px; }
+.game-shop summary { min-height:44px; cursor:pointer; font-size:16px; line-height:1.7; }
+.game-shop h3 { margin:24px 0 16px; font-size:20px; }
+.shop-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.shop-item { min-width:0; padding:18px; border:1px solid #ffffff1c; background:#111920; border-radius:8px; }
+.shop-item h4 { font-size:15px; margin:0 0 10px; line-height:1.6; }
+.shop-item p { font-size:13px; color:#aab8c2; line-height:1.8; }
+.shop-item-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+.shop-item-actions button { padding:10px 12px; border:1px solid #596a77; border-radius:6px; font-size:13px; }
+.shop-item-actions button[aria-pressed=true] { background:#cad9e2; color:#111a22; }
+#shop-status { min-height:26px; font-size:13px; color:#bfcfdb; margin-top:16px; }
+@media(max-width:600px) { .shop-grid { grid-template-columns:1fr; }.game-shop { padding:14px; }.shop-item { padding:16px; } }

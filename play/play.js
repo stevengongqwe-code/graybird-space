@@ -1,4 +1,4 @@
-import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame} from './game-core.mjs?v=3-endless';
+import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate} from './game-core.mjs?v=4-armory';
 /* Independent Bird Nest: official images stay intact; personal progress stays local. */
 (() => {
  'use strict';
@@ -14,7 +14,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  const number = n => Number.isSafeInteger(n) && n >= 0 ? Math.min(n,999999) : 0;
  function newVisitor() {
   const bytes = new Uint8Array(4); crypto.getRandomValues(bytes);
-  return {version:2,id:'G-'+[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('').toUpperCase(),name:'',first:today(),stamps:{},worms:0,best:0,peanutBest:0,peanuts:0,letters:{},night:false};
+  return {version:2,id:'G-'+[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('').toUpperCase(),name:'',first:today(),stamps:{},worms:0,best:0,peanutBest:0,peanuts:0,letters:{},night:false,armory:cleanLoadout()};
  }
  let visitor = newVisitor(), storageOK = true;
  try {
@@ -25,7 +25,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
    visitor.name = clean(old.name);
    if (dateValid(old.first)) visitor.first = old.first;
    for (const key of Object.keys(stampInfo)) if (dateValid(old.stamps?.[key])) visitor.stamps[key] = old.stamps[key];
-   if (s?.version === 2) {visitor.worms=number(s.worms);visitor.best=number(s.best);visitor.peanutBest=number(s.peanutBest);visitor.peanuts=number(s.peanuts);visitor.night=s.night===true;}
+   if (s?.version === 2) {visitor.worms=number(s.worms);visitor.best=number(s.best);visitor.peanutBest=number(s.peanutBest);visitor.peanuts=number(s.peanuts);visitor.night=s.night===true;visitor.armory=cleanLoadout(s.armory);}
    if (s?.letters && typeof s.letters === 'object') Object.entries(s.letters).slice(-365).forEach(([d,i])=>{if(dateValid(d)&&Number.isSafeInteger(i)&&i>=0)visitor.letters[d]=i;});
   }
  } catch (_) { storageOK=false; }
@@ -138,12 +138,13 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  gameBird.src='/assets/bird.webp';gameWorm.src='/assets/icons/worm.svg';
  let game=createGame(),lastResult=null,leftHeld=false,rightHeld=false,upHeld=false,downHeld=false,pointer=null,settledScore=0,lastHud=-1,noticeSerial=-1;
  const sprites=new Map(),bossBar=$('game-boss-bar'),choicePanel=$('game-evolution');
- function fitGame(){const mobile=matchMedia('(max-width:600px)').matches;game=createGame(mobile?600:900,mobile?760:600);canvas.width=game.width;canvas.height=game.height;canvas.parentElement.style.aspectRatio=`${game.width} / ${game.height}`;}
+ function fitGame(){const mobile=matchMedia('(max-width:600px)').matches;game=createGame(mobile?600:900,mobile?760:600);applyLoadout(game,visitor.armory);canvas.width=game.width;canvas.height=game.height;canvas.parentElement.style.aspectRatio=`${game.width} / ${game.height}`;}
  fitGame();
  function drawPeanut(x,y){ctx.save();ctx.translate(x,y);ctx.rotate(-.35);ctx.fillStyle='#e5bd7b';ctx.beginPath();ctx.ellipse(0,0,10,16,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9d6e37';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-12);ctx.quadraticCurveTo(-4,0,0,12);ctx.stroke();ctx.restore();}
  function sprite(text,color='#f1d1d2',box=false){const key=text+color+box;if(sprites.has(key))return sprites.get(key);const c=document.createElement('canvas'),g=c.getContext('2d');g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';c.width=Math.ceil(g.measureText(text).width)+20;c.height=42;g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';if(box){g.fillStyle='#633c41';g.fillRect(0,0,c.width,c.height);g.strokeStyle='#be848a';g.strokeRect(.5,.5,c.width-1,c.height-1);}g.fillStyle=color;g.textAlign='center';g.fillText(text,c.width/2,29);sprites.set(key,c);return c;}
  function label(text,x,y,color,box=false){const c=sprite(text,color,box);ctx.drawImage(c,x-c.width/2,y-c.height/2);}
- const itemLabels={chip:'芯片',magnet:'磁',egg:'蛋',rage:'狂',slow:'慢'};
+ const monsterTextures=new Map();for(const key of [...ENEMY_TYPES,...BOSS_NAMES.map((_,i)=>'boss-'+i)]){const image=new Image();image.src='/assets/game/'+key+'.svg';image.addEventListener('load',()=>{if(!game.running||game.paused)gameDraw();});monsterTextures.set(key,image);}
+ const itemLabels={chip:'芯片',magnet:'磁',egg:'蛋',rage:'狂',slow:'慢',double:'×2',rapid:'快',repair:'修',clear:'净',fortune:'幸'};
  function gameDraw(){
   if(!ctx)return;const W=game.width,H=game.height;
   ctx.fillStyle='#0c151e';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#20313f';ctx.lineWidth=1;
@@ -155,30 +156,34 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
    if(e.phase==='warn'){ctx.strokeStyle='#be848a';ctx.lineWidth=3;ctx.setLineDash([12,9]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+e.vx*3,e.y+e.vy*3);ctx.stroke();ctx.setLineDash([]);}
    if(e.boss&&!(e.roster===4&&!e.flash)){ctx.strokeStyle=e.group.rage?'#be848a':'#a6cbe3';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.stroke();}
    const name=e.boss&&e.roster===4&&!e.flash?'精英':e.label;
-   label(name,e.x,e.y,e.flash?'#eeefed':e.flee?'#95a4ae':'#f1d1d2',true);
-   if(e.maxHp>1){const r=e.boss&&e.roster===4&&!e.flash?25:e.r;ctx.fillStyle='#20313f';ctx.fillRect(e.x-r,e.y+25,r*2,4);ctx.fillStyle='#be848a';ctx.fillRect(e.x-r,e.y+25,r*2*Math.max(0,e.hp/e.maxHp),4);}
+   const texture=monsterTextures.get(e.boss?'boss-'+e.roster:e.type);
+   ctx.globalAlpha=e.type==='ghost'?.65+.25*Math.sin(e.age*2):1;
+   if(texture?.complete&&texture.naturalWidth)ctx.drawImage(texture,e.x-e.r,e.y-e.r,e.r*2,e.r*2);else{ctx.fillStyle='#ad8994';ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();}
+   ctx.globalAlpha=1;
+   ctx.save();ctx.translate(e.x,e.y+e.r+13);ctx.scale(.62,.62);label(name,0,0,e.flee?'#95a4ae':'#d9e1e7');ctx.restore();
+   if(e.maxHp>1){const r=e.boss&&e.roster===4&&!e.flash?25:e.r;ctx.fillStyle='#20313f';ctx.fillRect(e.x-r,e.y+e.r+4,r*2,4);ctx.fillStyle='#be848a';ctx.fillRect(e.x-r,e.y+e.r+4,r*2*Math.max(0,e.hp/e.maxHp),4);}
    if(e.shield>0){ctx.strokeStyle='#a6cbe3';ctx.beginPath();ctx.arc(e.x,e.y,e.r+7,0,Math.PI*2);ctx.stroke();}
    if(e.affix)label({shield:'盾',swift:'疾',split:'裂'}[e.affix],e.x,e.y-33,'#a6cbe3');
    if(e.boss&&e.roster===4&&e.flash)label('真身',e.x,e.y-46,'#eeefed');
   }
-  for(const b of game.bullets)if(b.active){if(gameWorm.complete&&gameWorm.naturalWidth)ctx.drawImage(gameWorm,b.x-10,b.y-15,20,30);else{ctx.fillStyle='#b7d66d';ctx.fillRect(b.x-5,b.y-12,10,24);}}
+  for(const b of game.bullets)if(b.active){if(b.weapon==='worm'&&gameWorm.complete&&gameWorm.naturalWidth)ctx.drawImage(gameWorm,b.x-10,b.y-15,20,30);else{ctx.fillStyle={scatter:'#d8b67a',seeker:'#b9d497',beam:'#b7cce2',bomb:'#bba185',frost:'#92c8df'}[b.weapon]||'#b7d66d';ctx.beginPath();if(b.weapon==='beam'){ctx.fillRect(b.x-3,b.y-19,6,38);}else{ctx.ellipse(b.x,b.y,b.weapon==='bomb'?10:6,b.weapon==='bomb'?12:10,0,0,Math.PI*2);ctx.fill();}}}
   for(const b of game.hostile)if(b.active&&b.age>=b.delay)label(b.label,b.x,b.y,'#f1d1d2');
   for(const p of game.particles)if(p.active){ctx.fillStyle='#e5bd7b';ctx.fillRect(p.x-2,p.y-2,4,4);}
   if(gameBird.complete&&gameBird.naturalWidth){ctx.globalAlpha=game.invincible>0&&Math.floor(game.elapsed*12)%2?.45:1;ctx.drawImage(gameBird,game.x-42,game.y-42,84,84);ctx.globalAlpha=1;}
   if(game.shield>0){ctx.strokeStyle='#a6cbe3';ctx.lineWidth=2;ctx.beginPath();ctx.arc(game.x,game.y,39,0,Math.PI*2);ctx.stroke();}
   for(const p of game.texts)if(p.active)label(p.label,p.x,p.y,p.color);
   if(game.event==='fog'){ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.arc(game.x,game.y,125,0,Math.PI*2,true);ctx.fillStyle='#000';ctx.fill('evenodd');ctx.restore();}
-  if(game.noticeTime>0&&game.notice.startsWith('⚠')){ctx.fillStyle='#0c151eaa';ctx.fillRect(0,0,W,H);ctx.font='28px Arial,"PingFang SC","Microsoft YaHei",sans-serif';ctx.fillStyle='#f1d1d2';ctx.textAlign='center';ctx.fillText(game.notice,W/2,H/2,W-30);ctx.textAlign='left';}
+  if(game.noticeTime>0&&game.notice.startsWith('⚠')){ctx.fillStyle='#0c151eaa';ctx.fillRect(0,40,W,64);ctx.font='24px Arial,"PingFang SC","Microsoft YaHei",sans-serif';ctx.fillStyle='#f1d1d2';ctx.textAlign='center';ctx.fillText(game.notice,W/2,80,W-30);ctx.textAlign='left';}
   else if(game.noticeTime>0){const lines=game.notice.split('\n');if(game.event&&game.noticeTime>2.1){ctx.fillStyle='#0c151e88';ctx.fillRect(0,0,W,H);}ctx.fillStyle='#0c151ee8';ctx.fillRect(0,40,W,lines.length*34+20);ctx.fillStyle='#d5e8f3';ctx.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';ctx.textAlign='center';lines.forEach((line,i)=>ctx.fillText(line,W/2,72+i*34,W-28));ctx.textAlign='left';}
  }
  function hud(force=false){
   if(!force&&game.elapsed-lastHud<.1)return;lastHud=game.elapsed;
-  $('game-time').textContent=Math.floor(game.elapsed);$('game-score').textContent=game.score;$('game-rate').textContent=FIRE_RATES[game.gun-1]*(game.effects.rage>0?2:1);$('game-level').textContent=difficulty(game.elapsed).level;
-  $('game-kills').textContent=game.kills;$('game-combo').textContent=game.combo;$('game-shield').textContent=game.shield;
+  $('game-time').textContent=Math.floor(game.elapsed);$('game-score').textContent=game.score;$('game-rate').textContent=Number(firingRate(game).toFixed(1));$('game-level').textContent=difficulty(game.elapsed).level;
+  $('game-weapon').textContent=(WEAPONS.find(w=>w.id===game.weapon)?.name||'毛毛虫机炮')+' Lv.'+game.weaponLevel;$('game-kills').textContent=game.kills;$('game-combo').textContent=game.combo;$('game-shield').textContent=game.shield;
   $('game-build').textContent=`↟ 穿 ${game.build.pierce}/3 · ⋔ 散 ${game.build.spread}/3 · ⌖ 追 ${game.build.track}/3`;
-  const effects=[];for(const key in game.effects)if(game.effects[key]>0)effects.push({magnet:'磁铁',rage:'狂暴',slow:'慢动作'}[key]+' '+Math.ceil(game.effects[key])+'s');$('game-effects').textContent=effects.join(' · ');
+  const effects=[];for(const key in game.effects)if(game.effects[key]>0)effects.push({magnet:'磁铁',rage:'狂暴',slow:'慢动作',double:'双倍',rapid:'装填',fortune:'幸运'}[key]+' '+Math.ceil(game.effects[key])+'s');$('game-effects').textContent=effects.join(' · ');
   let hp=0,max=0,names=[];for(const e of game.enemies)if(e.active&&e.boss){hp+=Math.max(0,e.hp);max+=e.maxHp;if(!names.includes(BOSS_NAMES[e.roster]))names.push(BOSS_NAMES[e.roster]);}
-  bossBar.hidden=!max;$('game-boss-name').textContent=names.join(' / ');$('game-boss-health').max=max||1;$('game-boss-health').value=hp;$('game-boss-hp').textContent=`${hp} / ${max}`;
+  bossBar.hidden=!max;$('game-boss-name').textContent=names.join(' / ');$('game-boss-health').max=max||1;$('game-boss-health').value=hp;$('game-boss-hp').textContent=`${Math.ceil(hp)} / ${Math.ceil(max)}`;
   if(noticeSerial!==game.noticeSerial){noticeSerial=game.noticeSerial;$('game-announcement').textContent=game.notice;}
  }
  function settle(){const reward=Math.max(0,game.score-settledScore);visitor.peanutBest=Math.max(visitor.peanutBest,game.score);visitor.peanuts=number(visitor.peanuts+reward);settledScore=game.score;award('game');persist();return reward;}
@@ -190,7 +195,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
   $('game-start').textContent='重新开始';$('game-pause').disabled=true;$('game-pause').textContent='暂停';$('game-result').hidden=false;
   $('game-result-text').textContent=`存活 ${lastResult.seconds} 秒 · 花生 ${game.score} 粒 · 击杀 ${game.kills} · 最高连击 ${game.maxCombo} · Boss ${game.bossesDefeated} · 擦弹 ${game.grazes} 次。此次入库 ${reward} 粒。`;
   const cost=reviveCost();$('game-revive').hidden=false;$('game-revive').disabled=visitor.peanuts<cost;$('game-revive').textContent=`花生买命 · ${cost} 粒${visitor.peanuts<cost?'（粮仓不足）':''}`;
-  hud(true);gameDraw();
+  renderShop();hud(true);gameDraw();
  }
  function evolution(){
   cancelAnimationFrame(game.frame);game.frame=0;$('game-overlay').hidden=true;choicePanel.hidden=false;$('game-pause').disabled=true;
@@ -200,11 +205,11 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  function tick(time){
   if(!game.running||game.paused||game.choice)return;const dt=Math.max(0,(time-game.last)/1000||0);game.last=time;
   if(dt>.3){pauseGame(true);$('game-message').textContent='刚才卡了一下。准备好再继续。';return;}
-  const reverse=game.event==='reverse'?-1:1;if(leftHeld)game.target-=520*dt*reverse;if(rightHeld)game.target+=520*dt*reverse;if(upHeld)game.targetY-=440*dt;if(downHeld)game.targetY+=440*dt;
+  const reverse=game.event==='reverse'?-1:1;if(leftHeld)game.target-=520*game.moveSpeed*dt*reverse;if(rightHeld)game.target+=520*game.moveSpeed*dt*reverse;if(upHeld)game.targetY-=440*game.moveSpeed*dt;if(downHeld)game.targetY+=440*game.moveSpeed*dt;
   const result=stepGame(game,dt);hud();gameDraw();if(result==='hit'){finish();return;}if(result==='choice'){evolution();return;}game.frame=requestAnimationFrame(tick);
  }
  function resumeFrame(){game.last=performance.now();game.frame=requestAnimationFrame(tick);}
- function startGame(){if(!ctx)return;cancelAnimationFrame(game.frame);fitGame();game.running=true;settledScore=0;lastHud=-1;leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;lastResult=null;$('game-overlay').hidden=true;choicePanel.hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';canvas.focus({preventScroll:true});hud(true);gameDraw();resumeFrame();}
+ function startGame(){if(!ctx)return;cancelAnimationFrame(game.frame);fitGame();game.running=true;settledScore=0;lastHud=-1;leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;lastResult=null;$('game-overlay').hidden=true;choicePanel.hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';$('game-shop').open=false;renderShop();canvas.focus({preventScroll:true});hud(true);gameDraw();resumeFrame();}
  function pauseGame(on){if(!game.running||game.choice)return;game.paused=on;cancelAnimationFrame(game.frame);game.frame=0;$('game-pause').textContent=on?'继续':'暂停';leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;if(on){$('game-overlay').hidden=false;$('game-message').textContent='先停一下。花生等你回来。';$('game-start').textContent='继续这轮';}else{$('game-overlay').hidden=true;resumeFrame();}}
  $('game-start').disabled=!ctx;$('game-start').addEventListener('click',()=>{if(game.running&&game.paused)pauseGame(false);else startGame();});$('game-pause').addEventListener('click',()=>pauseGame(!game.paused));
  $('game-revive').addEventListener('click',()=>{const cost=reviveCost();if(game.running||!lastResult||visitor.peanuts<cost)return;visitor.peanuts-=cost;persist();reviveGame(game);lastResult=null;$('game-overlay').hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('game-pause').disabled=false;hud(true);canvas.focus({preventScroll:true});resumeFrame();});
@@ -216,6 +221,32 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  canvas.addEventListener('pointerdown',e=>{if(!game.running||game.paused||game.choice)return;pointer=e.pointerId;canvas.setPointerCapture(pointer);point(e);});canvas.addEventListener('pointermove',e=>{if(game.running&&!game.paused&&!game.choice&&e.pointerId===pointer)point(e);});canvas.addEventListener('pointerup',()=>pointer=null);canvas.addEventListener('pointercancel',()=>pointer=null);
  [['game-left','left'],['game-right','right']].forEach(([id,d])=>{const b=$(id);const set=on=>{if(d==='left')leftHeld=on;else rightHeld=on;};b.addEventListener('pointerdown',e=>{set(true);b.setPointerCapture(e.pointerId);});b.addEventListener('pointerup',()=>set(false));b.addEventListener('pointercancel',()=>set(false));b.addEventListener('lostpointercapture',()=>set(false));b.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();set(true);}});b.addEventListener('keyup',()=>set(false));});
  gameBird.addEventListener('load',gameDraw);gameWorm.addEventListener('load',gameDraw);hud(true);gameDraw();
+ // Permanent local armory: spending only settled peanuts, never the run's score.
+ function renderShop(){
+  if(lastResult&&!game.running){const cost=reviveCost();$('game-revive').disabled=visitor.peanuts<cost;$('game-revive').textContent=`花生买命 · ${cost} 粒${visitor.peanuts<cost?'（粮仓不足）':''}`;}
+  for(const [id,items] of [['shop-weapons',WEAPONS],['shop-equipment',EQUIPMENT]]){
+   const list=$(id);list.replaceChildren();
+   for(const item of items){
+    const level=visitor.armory.levels[item.id],price=item.prices[level],article=document.createElement('article');article.className='shop-item';
+    const h=document.createElement('h4');h.textContent=item.name+' · '+(level?'Lv.'+level:'未解锁');
+    const p=document.createElement('p');p.textContent=item.description;
+    const actions=document.createElement('div');actions.className='shop-item-actions';
+    const buy=document.createElement('button');buy.type='button';buy.dataset.shopBuy=item.id;
+    buy.textContent=price===undefined?'已满级':(level?'升级':'解锁')+' · '+price+' 粒';buy.disabled=price===undefined||visitor.peanuts<price||(game.running&&!game.paused)||game.choice;
+    buy.addEventListener('click',()=>{
+     if((game.running&&!game.paused)||game.choice)return;
+     const result=purchaseUpgrade(visitor.armory,visitor.peanuts,item.id);if(!result.ok)return;
+     visitor.armory=result.loadout;visitor.peanuts=result.balance;persist();renderShop();$('shop-status').textContent=item.name+'已升级，下一轮生效。';
+    });actions.append(buy);
+    if(id==='shop-weapons'){
+     const equip=document.createElement('button');equip.type='button';equip.dataset.shopEquip=item.id;equip.textContent=visitor.armory.selected===item.id?'已装备':'装备';equip.setAttribute('aria-pressed',String(visitor.armory.selected===item.id));equip.disabled=!level||(game.running&&!game.paused)||game.choice;
+     equip.addEventListener('click',()=>{if(!level||(game.running&&!game.paused)||game.choice)return;visitor.armory.selected=item.id;persist();renderShop();$('shop-status').textContent=item.name+'已装备，下一轮使用。';});actions.append(equip);
+    }
+    article.append(h,p,actions);list.append(article);
+   }
+  }
+ }
+ $('game-shop').addEventListener('toggle',()=>{if($('game-shop').open&&game.running&&!game.paused&&!game.choice)pauseGame(true);renderShop();});renderShop();
  // Canvas is used for exact personal cards, never to redraw the bird.
  const exports=new Map();let passportFile=null;
  function cardBase(width,height){const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');if(!g)throw Error('canvas');g.fillStyle='#dbe1dd';g.fillRect(0,0,width,height);g.strokeStyle='#728c97';g.lineWidth=2;g.strokeRect(30,30,width-60,height-60);g.fillStyle='#283e4a';g.font='30px monospace';g.fillText('GRAYBIRD',70,100);return [c,g];}

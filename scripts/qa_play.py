@@ -17,7 +17,7 @@ async def main():
    await page.clock.install(time=datetime.datetime(2026,10,8,4,0,tzinfo=datetime.timezone.utc))
    await page.goto(BASE+'/play/',wait_until='networkidle')
    assert await page.locator('#stamp-progress').inner_text()=='1 / 9 枚印章'
-   assert await page.locator('#room-scene img').evaluate('(e)=>e.complete&&e.naturalWidth===1536')
+   assert await page.locator('.room-picture').evaluate('(e)=>e.complete&&e.naturalWidth===1536')
    assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth'),w
    assert await page.locator('#sound-toggle').get_attribute('aria-pressed')=='false'
    await page.screenshot(path=str(OUT/f'room-{w}.png'))
@@ -65,21 +65,44 @@ async def main():
    await page.locator('#game-start').click()
    await page.locator('#signal-game').press('ArrowLeft')
    await page.locator('#signal-game').focus();await page.keyboard.down('ArrowLeft');await page.clock.run_for(1100);await page.keyboard.up('ArrowLeft')
+   await page.clock.run_for(7000)
+   await page.locator('#game').screenshot(path=str(OUT/f'game-active-{w}.png'))
    await page.locator('#game-pause').click();time=await page.locator('#game-time').inner_text();await page.clock.run_for(4000);assert await page.locator('#game-time').inner_text()==time
    await page.locator('#game-pause').click();await page.clock.run_for(30050)
    assert await page.locator('#game-result').is_visible();assert int(await page.locator('#game-score').inner_text())>0
-   assert '30 秒' in await page.locator('#game-result-text').inner_text()
+   assert '30 秒通关' in await page.locator('#game-result-text').inner_text()
+   score=int(await page.locator('#game-score').inner_text());bank=int(await page.locator('#peanut-bank').inner_text())
+   assert bank==score+10
+   assert await page.locator('#game-rate').inner_text()=='8'
+   assert await page.locator('#game-level').inner_text()=='5'
+   await page.clock.run_for(1000);assert int(await page.locator('#peanut-bank').inner_text())==bank
    assert await page.locator('[data-stamp="game"]').get_attribute('class')=='is-earned'
    await page.locator('#save-score').click()
    await page.locator('#score-export').wait_for(state='visible');await page.locator('#score-image').evaluate('(e)=>e.decode()');assert await page.locator('#score-image').evaluate('(e)=>e.naturalWidth===1000')
    await page.locator('#game').screenshot(path=str(OUT/f'game-{w}.png'))
    assert await page.locator('#stamp-progress').inner_text()=='9 / 9 枚印章'
+   # Move into an already descended obstacle: one contact, immediate failure.
+   await page.locator('#game-start').click();assert await page.locator('#game-rate').inner_text()=='2.5'
+   assert await page.locator('#game-score').inner_text()=='0'
+   await page.clock.run_for(6000)
+   box=await page.locator('#signal-game').bounding_box();logical=600 if w<=600 else 900
+   target={'x':box['width']*38/logical,'y':box['height']*.9}
+   if w<600:await page.locator('#signal-game').tap(position=target)
+   else:await page.locator('#signal-game').click(position=target)
+   await page.clock.run_for(400)
+   assert await page.locator('#game-result').is_visible()
+   assert '阵亡' in await page.locator('#game-message').inner_text()
+   assert '通关奖励 0 粒' in await page.locator('#game-result-text').inner_text()
+   assert int(await page.locator('#peanut-bank').inner_text())==bank
+   await page.reload(wait_until='networkidle');assert int(await page.locator('#peanut-bank').inner_text())==bank
+   assert int(await page.locator('#game-best').inner_text())==bank
+   assert await page.locator('#game-rate').inner_text()=='2.5'
    assert await page.locator('#wall-load').is_hidden();assert await page.locator('.giscus iframe').count()==0
    assert await page.evaluate('document.documentElement.scrollWidth<=innerWidth'),w
    targets=await page.locator('.room-scene button,.room-tools button,#worm,.passport-controls button,.passport-controls input,.play-tabs a,.game-controls button').evaluate_all('(els)=>els.filter(e=>!e.hidden&&!e.disabled&&e.getBoundingClientRect().width>0).map(e=>[e.getBoundingClientRect().width,e.getBoundingClientRect().height])')
    assert all(x>=44 and y>=44 for x,y in targets),(w,targets)
    assert not errors and not failed,(w,errors,failed)
-   results.append({'width':w,'dragOrTouch':'PASS','nineStamps':'PASS','twoAudioModes':'PASS','dailyLetterAndPersistence':'PASS','real30SecondGameAndPause':'PASS','PNGCards':'PASS','overflow':False,'pageErrors':errors})
+   results.append({'width':w,'dragOrTouch':'PASS','nineStamps':'PASS','twoAudioModes':'PASS','dailyLetterAndPersistence':'PASS','shooterUpgradesOneHitRestartAndReward':'PASS','real30SecondGameAndPause':'PASS','PNGCards':'PASS','overflow':False,'pageErrors':errors})
    await context.close()
   # Denied local storage still leaves a working in-memory experience.
   context=await browser.new_context(viewport={'width':390,'height':900})

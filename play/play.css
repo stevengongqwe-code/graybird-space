@@ -99,3 +99,8 @@
  .play-tabs a { font-size:12px; }
  .play-section-heading { gap:12px; margin-bottom:16px; }
 }
+
+/* Peanuts are earned in-game; bank and best remain browser-local. */
+.game-rewards { display:flex; flex-wrap:wrap; gap:12px 28px; border-top:1px solid var(--line); margin-top:20px; padding:18px 0 8px; color:#d9bb86; font:14px/1.8 var(--mono); }
+.game-rewards b { margin:0 4px; }
+.game-section .small-note { margin:12px 0; }

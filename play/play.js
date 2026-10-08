@@ -1,3 +1,4 @@
+import {createGame, stepGame, difficulty, FIRE_RATES} from './game-core.mjs?v=2';
 /* Independent Bird Nest: official images stay intact; personal progress stays local. */
 (() => {
  'use strict';
@@ -5,7 +6,7 @@
  const motion = matchMedia('(prefers-reduced-motion: reduce)');
  const KEY = 'graybird.explorer.v2';
  const stampInfo = {
-  arrival:['到访鸟窝','＋'],journal:['翻过日记','≡'],earth:['望向地球','○'],feed:['虫虫外交','✦'],archive:['打开档案','▤'],mail:['宇宙来信','✉'],night:['夜间留宿','☾'],game:['信号猎人','⌁'],secret:['隐藏信号','?']
+  arrival:['到访鸟窝','＋'],journal:['翻过日记','≡'],earth:['望向地球','○'],feed:['虫虫外交','✦'],archive:['打开档案','▤'],mail:['宇宙来信','✉'],night:['夜间留宿','☾'],game:['花生猎人','⌁'],secret:['隐藏信号','?']
  };
  const clean = s => typeof s === 'string' ? Array.from(s.replace(/[\u0000-\u001f\u007f-\u009f]/g,'').trim()).slice(0,16).join('') : '';
  const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -13,7 +14,7 @@
  const number = n => Number.isSafeInteger(n) && n >= 0 ? Math.min(n,999999) : 0;
  function newVisitor() {
   const bytes = new Uint8Array(4); crypto.getRandomValues(bytes);
-  return {version:2,id:'G-'+[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('').toUpperCase(),name:'',first:today(),stamps:{},worms:0,best:0,letters:{},night:false};
+  return {version:2,id:'G-'+[...bytes].map(n=>n.toString(16).padStart(2,'0')).join('').toUpperCase(),name:'',first:today(),stamps:{},worms:0,best:0,peanutBest:0,peanuts:0,letters:{},night:false};
  }
  let visitor = newVisitor(), storageOK = true;
  try {
@@ -24,7 +25,7 @@
    visitor.name = clean(old.name);
    if (dateValid(old.first)) visitor.first = old.first;
    for (const key of Object.keys(stampInfo)) if (dateValid(old.stamps?.[key])) visitor.stamps[key] = old.stamps[key];
-   if (s?.version === 2) {visitor.worms=number(s.worms);visitor.best=number(s.best);visitor.night=s.night===true;}
+   if (s?.version === 2) {visitor.worms=number(s.worms);visitor.best=number(s.best);visitor.peanutBest=number(s.peanutBest);visitor.peanuts=number(s.peanuts);visitor.night=s.night===true;}
    if (s?.letters && typeof s.letters === 'object') Object.entries(s.letters).slice(-365).forEach(([d,i])=>{if(dateValid(d)&&Number.isSafeInteger(i)&&i>=0)visitor.letters[d]=i;});
   }
  } catch (_) { storageOK=false; }
@@ -35,7 +36,7 @@
   document.querySelectorAll('[data-stamp]').forEach(el=>{const key=el.dataset.stamp,d=visitor.stamps[key];el.classList.toggle('is-earned',Boolean(d));el.setAttribute('aria-label',stampInfo[key][0]+(d?'：已获得，'+d:'：等待探索'));});
   $('storage-note').textContent=storageOK?'昵称、印章与成绩只保存在当前浏览器。换设备或清除浏览数据后可能丢失。':'这个浏览器暂时无法保存进度。你仍可探索和生成访客卡，离开后进度可能丢失。';
   $('feed-count').textContent=visitor.worms?`这本护照下，已收下 ${visitor.worms} 条毛毛虫`:'还没收下毛毛虫';
-  $('game-best').textContent=visitor.best;
+  $('game-best').textContent=visitor.peanutBest;$('peanut-bank').textContent=visitor.peanuts;
  }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(visitor));storageOK=true;}catch(_){storageOK=false;}renderVisitor();}
  function award(key){if(visitor.stamps[key])return;visitor.stamps[key]=today();persist();}
@@ -132,23 +133,53 @@
  function stopAudio(){clearInterval(radioTimer);radioTimer=0;nodes.forEach(n=>{try{n.stop?.();n.disconnect();}catch(_){}});nodes=[];if(master){master.disconnect();master=null;}if(audio&&audio.state==='running')audio.suspend();audioOn=false;$('sound-toggle').textContent='打开声音';$('sound-toggle').setAttribute('aria-pressed','false');$('sound-status').textContent='声音已关闭。';}
  async function startAudio(){stopAudio();const Context=window.AudioContext||window.webkitAudioContext;if(!Context){$('sound-status').textContent='这个浏览器暂时不能播放环境声。';return;}try{audio=audio||new Context();await audio.resume();master=audio.createGain();master.gain.value=Number($('sound-volume').value)/100;master.connect(audio.destination);if($('sound-mode').value==='rain'){const length=audio.sampleRate*4,buffer=audio.createBuffer(1,length,audio.sampleRate),data=buffer.getChannelData(0);let sample=0;for(let i=0;i<length;i++){sample=(sample+Math.random()*2-1)/1.025;data[i]=sample*.11;}const source=audio.createBufferSource();source.buffer=buffer;source.loop=true;const filter=audio.createBiquadFilter();filter.type='lowpass';filter.frequency.value=2100;source.connect(filter);filter.connect(master);source.start();nodes.push(source,filter);}else{const base=audio.createOscillator();base.frequency.value=75;const low=audio.createGain();low.gain.value=.04;base.connect(low);low.connect(master);base.start();nodes.push(base,low);const chime=()=>{if(!audioOn||document.hidden||!master)return;const osc=audio.createOscillator(),gain=audio.createGain(),t=audio.currentTime;osc.type='sine';osc.frequency.value=[220,293.66,329.63,440][Math.floor(Math.random()*4)];gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.07,t+.1);gain.gain.exponentialRampToValueAtTime(.001,t+1.2);osc.connect(gain);gain.connect(master);osc.start(t);osc.stop(t+1.25);osc.onended=()=>{osc.disconnect();gain.disconnect();};};radioTimer=setInterval(chime,3000);setTimeout(chime,400);}audioOn=true;$('sound-toggle').textContent='关闭声音';$('sound-toggle').setAttribute('aria-pressed','true');$('sound-status').textContent=$('sound-mode').value==='rain'?'窗外的雨。小声一点就好。':'太空电台：本机合成的环境信号。';}catch(_){stopAudio();$('sound-status').textContent='声音没能打开。可以再点一次，或安静地坐坐。';}}
  $('sound-toggle').addEventListener('click',()=>{$('sound-controls').hidden=false;if(audioOn)stopAudio();else startAudio();});$('sound-mode').addEventListener('change',()=>{if(audioOn)startAudio();});$('sound-volume').addEventListener('input',()=>{if(master&&audio)master.gain.setTargetAtTime(Number($('sound-volume').value)/100,audio.currentTime,.1);});
- // A real 30-second game. The official bird is drawn from its unchanged asset.
- const canvas=$('signal-game'),ctx=canvas.getContext('2d'),gameBird=new Image();gameBird.src='/assets/bird.webp';
- let game={running:false,paused:false,score:0,hits:0,lives:3,elapsed:0,x:450,target:450,items:[],spawn:0,frame:0,last:0,invincible:0},lastResult=null;
- let leftHeld=false,rightHeld=false,pointer=null;
- const W=900,H=600,birdY=H-78;
- function gameDraw(){if(!ctx)return;ctx.fillStyle='#0c151e';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#20313f';ctx.lineWidth=1;for(let x=0;x<W;x+=90){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=90){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}for(const item of game.items){if(item.good){ctx.fillStyle='#afdef9';ctx.fillRect(item.x-20,item.y-20,40,40);ctx.fillStyle='#123349';ctx.font='24px sans-serif';ctx.textAlign='center';ctx.fillText('＋',item.x,item.y+8);}else{ctx.fillStyle='#633c41';ctx.fillRect(item.x-60,item.y-24,120,48);ctx.strokeStyle='#be848a';ctx.strokeRect(item.x-60,item.y-24,120,48);ctx.fillStyle='#f1d1d2';ctx.font='22px sans-serif';ctx.textAlign='center';ctx.fillText(item.label,item.x,item.y+8);}}ctx.globalAlpha=game.invincible>0&&!motion.matches?.5:1;if(gameBird.complete&&gameBird.naturalWidth)ctx.drawImage(gameBird,game.x-38,birdY-38,76,76);ctx.globalAlpha=1;ctx.textAlign='left';}
- function hud(){$('game-time').textContent=Math.max(0,Math.ceil(30-game.elapsed));$('game-score').textContent=game.score;$('game-lives').textContent=game.lives;}
- function finish(){cancelAnimationFrame(game.frame);game.frame=0;game.running=false;game.paused=false;leftHeld=rightHeld=false;pointer=null;lastResult={score:game.score,hits:game.hits,lives:game.lives,seconds:Math.min(30,Math.floor(game.elapsed)),date:today(),finished:game.elapsed>=30};visitor.best=Math.max(visitor.best,game.score);award('game');persist();$('game-overlay').hidden=false;$('game-message').textContent=game.lives?`收下 ${game.score} 个信号。剩下的，不看了。`:'广告太多。鸟先下线了。';$('game-start').textContent='再来 30 秒';$('game-pause').disabled=true;$('game-pause').textContent='暂停';$('game-result').hidden=false;$('game-result-text').textContent=`本轮 ${lastResult.seconds} 秒 · ${game.score} 个有用信号 · 撞到 ${game.hits} 次干扰。${lastResult.finished?'完成观测。':'耐心耗尽，本轮结束。'}`;gameDraw();}
- function tick(time){if(!game.running||game.paused)return;const rawDelta=Math.max(0,(time-game.last)/1000||0),dt=Math.min(.06,rawDelta);game.last=time;game.elapsed+=rawDelta;game.spawn+=dt;game.invincible=Math.max(0,game.invincible-dt);if(leftHeld)game.target-=520*dt;if(rightHeld)game.target+=520*dt;game.target=Math.max(38,Math.min(W-38,game.target));game.x+=(game.target-game.x)*Math.min(1,dt*20);if(game.spawn>=.52){game.spawn=0;const good=Math.random()<.42;game.items.push({x:good?40+Math.random()*(W-80):75+Math.random()*(W-150),y:-40,good,label:['广告','弹窗','无效信息'][Math.floor(Math.random()*3)],speed:good?200:175+Math.random()*65});}for(const item of game.items){item.y+=item.speed*dt;const half=item.good?20:60;if(Math.abs(item.x-game.x)<half+25&&Math.abs(item.y-birdY)<40){if(item.good){game.score++;item.dead=true;}else if(game.invincible===0){game.hits++;game.lives--;game.invincible=.9;item.dead=true;}}}game.items=game.items.filter(i=>!i.dead&&i.y<H+60);hud();gameDraw();if(game.elapsed>=30||game.lives<=0){finish();return;}game.frame=requestAnimationFrame(tick);}
- function startGame(){if(!ctx)return;cancelAnimationFrame(game.frame);game={running:true,paused:false,score:0,hits:0,lives:3,elapsed:0,x:450,target:450,items:[],spawn:0,frame:0,last:performance.now(),invincible:0};leftHeld=rightHeld=false;lastResult=null;$('game-overlay').hidden=true;$('game-result').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';canvas.focus({preventScroll:true});hud();gameDraw();game.frame=requestAnimationFrame(tick);}
- function pauseGame(on){if(!game.running)return;game.paused=on;cancelAnimationFrame(game.frame);game.frame=0;$('game-pause').textContent=on?'继续':'暂停';leftHeld=rightHeld=false;if(on){$('game-overlay').hidden=false;$('game-message').textContent='先停一下。信号等你回来。';$('game-start').textContent='继续这轮';}else{$('game-overlay').hidden=true;game.last=performance.now();game.frame=requestAnimationFrame(tick);}}
+ // Caterpillar shooter: original bird artwork, automatic fire and one-hit failure.
+ const canvas=$('signal-game'),ctx=canvas.getContext('2d'),gameBird=new Image(),gameWorm=new Image();
+ gameBird.src='/assets/bird.webp';gameWorm.src='/assets/icons/worm.svg';
+ let game=createGame(),lastResult=null,leftHeld=false,rightHeld=false,pointer=null;
+ function fitGame(){const mobile=matchMedia('(max-width:600px)').matches;game=createGame(mobile?600:900,mobile?760:600);canvas.width=game.width;canvas.height=game.height;canvas.parentElement.style.aspectRatio=`${game.width} / ${game.height}`;}
+ fitGame();
+ function drawPeanut(x,y){ctx.save();ctx.translate(x,y);ctx.rotate(-.35);ctx.fillStyle='#e5bd7b';ctx.beginPath();ctx.ellipse(0,0,14,22,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9d6e37';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-16);ctx.quadraticCurveTo(-5,0,0,16);ctx.stroke();ctx.restore();}
+ function gameDraw(){
+  if(!ctx)return;const W=game.width,H=game.height;
+  ctx.fillStyle='#0c151e';ctx.fillRect(0,0,W,H);ctx.strokeStyle='#20313f';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=90){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=90){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  for(const bullet of game.bullets){if(gameWorm.complete&&gameWorm.naturalWidth)ctx.drawImage(gameWorm,bullet.x-14,bullet.y-20,28,40);else{ctx.fillStyle='#b7d66d';ctx.fillRect(bullet.x-5,bullet.y-16,10,32);}}
+  for(const item of game.items){
+   if(item.kind==='peanut')drawPeanut(item.x,item.y);
+   else if(item.kind==='boost'){ctx.fillStyle='#a6cbe3';ctx.fillRect(item.x-25,item.y-25,50,50);ctx.fillStyle='#123349';ctx.font='bold 28px sans-serif';ctx.textAlign='center';ctx.fillText('速',item.x,item.y+10);}
+   else{ctx.fillStyle='#633c41';ctx.fillRect(item.x-65,item.y-26,130,52);ctx.strokeStyle='#be848a';ctx.strokeRect(item.x-65,item.y-26,130,52);ctx.fillStyle='#f1d1d2';ctx.font='26px sans-serif';ctx.textAlign='center';ctx.fillText(item.label,item.x,item.y+9);}
+  }
+  if(gameBird.complete&&gameBird.naturalWidth)ctx.drawImage(gameBird,game.x-46,H-118,92,92);
+  ctx.textAlign='left';ctx.fillStyle='#a0b2bf';ctx.font='22px monospace';ctx.fillText(`LV.${difficulty(game.elapsed).level}`,22,35);
+  if(game.noticeTime>0){ctx.fillStyle='#d5e8f3';ctx.font='22px sans-serif';ctx.textAlign='center';ctx.fillText(game.notice,W/2,70);ctx.textAlign='left';}
+ }
+ function hud(){$('game-time').textContent=Math.max(0,Math.ceil(30-game.elapsed));$('game-score').textContent=game.score;$('game-rate').textContent=FIRE_RATES[game.gun-1];$('game-level').textContent=difficulty(game.elapsed).level;}
+ function finish(reason){
+  if(lastResult)return;cancelAnimationFrame(game.frame);game.frame=0;game.running=false;game.paused=false;leftHeld=rightHeld=false;pointer=null;
+  const bonus=reason==='clear'?10:0;
+  lastResult={score:game.score,bonus,reward:game.score+bonus,kills:game.kills,gun:game.gun,seconds:Math.min(30,Math.floor(game.elapsed)),date:today(),finished:reason==='clear',cause:game.cause};
+  visitor.peanutBest=Math.max(visitor.peanutBest,lastResult.reward);visitor.peanuts=number(visitor.peanuts+lastResult.reward);award('game');persist();
+  $('game-overlay').hidden=false;$('game-message').textContent=lastResult.finished?'活着回来了。加餐 10 粒。':`撞到${game.cause}。鸟阵亡了，重来。`;
+  $('game-start').textContent='重新开始';$('game-pause').disabled=true;$('game-pause').textContent='暂停';$('game-result').hidden=false;
+  $('game-result-text').textContent=`${lastResult.finished?'30 秒通关':'本轮 '+lastResult.seconds+' 秒'} · 捡到 ${game.score} 粒花生 + 通关奖励 ${bonus} 粒 = 入库 ${lastResult.reward} 粒。打掉 ${game.kills} 个干扰。`;
+  hud();gameDraw();
+ }
+ function tick(time){
+  if(!game.running||game.paused)return;const dt=Math.max(0,(time-game.last)/1000||0);game.last=time;
+  if(dt>.3){pauseGame(true);$('game-message').textContent='刚才卡了一下。准备好再继续。';return;}
+  if(leftHeld)game.target-=520*dt;if(rightHeld)game.target+=520*dt;
+  const result=stepGame(game,dt);hud();gameDraw();if(result){finish(result);return;}game.frame=requestAnimationFrame(tick);
+ }
+ function startGame(){if(!ctx)return;cancelAnimationFrame(game.frame);fitGame();game.running=true;game.last=performance.now();leftHeld=rightHeld=false;pointer=null;lastResult=null;$('game-overlay').hidden=true;$('game-result').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';canvas.focus({preventScroll:true});hud();gameDraw();game.frame=requestAnimationFrame(tick);}
+ function pauseGame(on){if(!game.running)return;game.paused=on;cancelAnimationFrame(game.frame);game.frame=0;$('game-pause').textContent=on?'继续':'暂停';leftHeld=rightHeld=false;pointer=null;if(on){$('game-overlay').hidden=false;$('game-message').textContent='先停一下。花生等你回来。';$('game-start').textContent='继续这轮';}else{$('game-overlay').hidden=true;game.last=performance.now();game.frame=requestAnimationFrame(tick);}}
  $('game-start').disabled=!ctx;$('game-start').addEventListener('click',()=>{if(game.running&&game.paused)pauseGame(false);else startGame();});$('game-pause').addEventListener('click',()=>pauseGame(!game.paused));
  canvas.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();if(e.key==='ArrowLeft')leftHeld=true;else rightHeld=true;}if(e.code==='Space'&&game.running){e.preventDefault();pauseGame(!game.paused);}});canvas.addEventListener('keyup',e=>{if(e.key==='ArrowLeft')leftHeld=false;if(e.key==='ArrowRight')rightHeld=false;});canvas.addEventListener('blur',()=>{leftHeld=rightHeld=false;});
- function point(e){const b=canvas.getBoundingClientRect();game.target=Math.max(38,Math.min(W-38,(e.clientX-b.left)/b.width*W));}
+ function point(e){const b=canvas.getBoundingClientRect();game.target=Math.max(38,Math.min(game.width-38,(e.clientX-b.left)/b.width*game.width));}
  canvas.addEventListener('pointerdown',e=>{if(!game.running||game.paused)return;pointer=e.pointerId;canvas.setPointerCapture(pointer);point(e);});canvas.addEventListener('pointermove',e=>{if(game.running&&!game.paused&&(e.pointerType==='mouse'||e.pointerId===pointer))point(e);});canvas.addEventListener('pointerup',()=>pointer=null);canvas.addEventListener('pointercancel',()=>pointer=null);
  [['game-left','left'],['game-right','right']].forEach(([id,d])=>{const b=$(id);const set=on=>{if(d==='left')leftHeld=on;else rightHeld=on;};b.addEventListener('pointerdown',e=>{set(true);b.setPointerCapture(e.pointerId);});b.addEventListener('pointerup',()=>set(false));b.addEventListener('pointercancel',()=>set(false));b.addEventListener('lostpointercapture',()=>set(false));b.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();set(true);}});b.addEventListener('keyup',()=>set(false));});
- gameBird.addEventListener('load',gameDraw);gameDraw();
+ gameBird.addEventListener('load',gameDraw);gameWorm.addEventListener('load',gameDraw);gameDraw();
  // Canvas is used for exact personal cards, never to redraw the bird.
  const exports=new Map();let passportFile=null;
  function cardBase(width,height){const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');if(!g)throw Error('canvas');g.fillStyle='#dbe1dd';g.fillRect(0,0,width,height);g.strokeStyle='#728c97';g.lineWidth=2;g.strokeRect(30,30,width-60,height-60);g.fillStyle='#283e4a';g.font='30px monospace';g.fillText('GRAYBIRD',70,100);return [c,g];}
@@ -157,7 +188,7 @@
  async function exportPNG(c,key,imageId,previewId,downloadId,filename){const blob=await new Promise(r=>c.toBlob(r,'image/png'));if(!blob)throw Error('export');if(exports.has(key))URL.revokeObjectURL(exports.get(key));const url=URL.createObjectURL(blob);exports.set(key,url);$(imageId).src=url;$(previewId).hidden=false;$(downloadId).href=url;$(downloadId).download=filename;return new File([blob],filename,{type:'image/png'});}
  $('save-passport').addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;$('passport-status').textContent='盖章中。';try{await gameBird.decode();const [c,g]=cardBase(1000,1320);g.font='22px monospace';g.fillText('EARTH VISITOR PASSPORT',70,145);g.strokeStyle='#93a5ac';g.beginPath();g.moveTo(70,180);g.lineTo(930,180);g.stroke();g.font=`22px ${font}`;g.fillStyle='#5c7582';g.fillText('访客 / VISITOR',70,235);g.fillStyle='#283e4a';g.font=`bold 46px ${font}`;wrap(g,visitor.name||'路过的地球人',70,310,550,60);g.font='22px monospace';g.fillText(visitor.id,70,425);g.drawImage(gameBird,700,225,210,210);g.font=`24px ${font}`;g.fillText('探索记录 / '+Object.keys(visitor.stamps).length+' OF 9',70,510);Object.entries(stampInfo).forEach(([key,[label,symbol]],i)=>{const x=70+i%3*290,y=550+Math.floor(i/3)*185,earned=Boolean(visitor.stamps[key]);g.strokeStyle=earned?'#4f778a':'#9aaeb4';g.lineWidth=earned?3:1;g.setLineDash(earned?[]:[7,6]);g.strokeRect(x,y,260,160);g.setLineDash([]);g.fillStyle=earned?'#335a70':'#8d9fa7';g.textAlign='center';g.font='42px monospace';g.fillText(symbol,x+130,y+53);g.font=`22px ${font}`;g.fillText(label,x+130,y+98);g.font=`16px ${font}`;g.fillText(visitor.stamps[key]||'等你探索',x+130,y+132);g.textAlign='left';});g.fillStyle='#506f7e';g.font=`22px ${font}`;g.fillText('首次到访 · '+visitor.first,70,1150);g.fillText('门没锁。下次再来。',70,1210);g.font='20px monospace';g.fillText('graybird.space/play/',70,1265);passportFile=await exportPNG(c,'passport','passport-image','passport-export','passport-download','Graybird-Visitor-'+visitor.id+'.png');$('share-passport').hidden=false;$('passport-status').textContent='卡片好了。点下载，或者长按图片保存。';}catch(_){$('passport-status').textContent='图片暂时没生成成功，可以先截图保存护照。';}finally{b.disabled=false;}});
  $('share-passport').addEventListener('click',async()=>{try{if(passportFile&&navigator.canShare?.({files:[passportFile]})){await navigator.share({files:[passportFile],title:'Graybird 地球访客卡'});return;}if(navigator.share){await navigator.share({title:'来 Graybird 鸟窝坐坐',url:'https://graybird.space/play/'});return;}await navigator.clipboard.writeText('https://graybird.space/play/');$('passport-status').textContent='鸟窝链接已复制。图片可以单独保存分享。';}catch(e){if(e.name!=='AbortError')$('passport-status').textContent='可以长按图片保存，再分享给朋友。';}});
- $('save-score').addEventListener('click',async e=>{if(!lastResult)return;const b=e.currentTarget;b.disabled=true;try{await gameBird.decode();const r=lastResult,[c,g]=cardBase(1000,1100);g.font='22px monospace';g.fillText('SIGNAL HUNTER / 30 SECONDS',70,150);g.drawImage(gameBird,670,205,250,250);g.font=`28px ${font}`;g.fillText('有用的信号',70,260);g.font='bold 130px monospace';g.fillText(String(r.score),65,415);g.font=`28px ${font}`;g.fillText(visitor.name||'路过的地球人',70,545);g.font=`24px ${font}`;g.fillText('实际观测 · '+r.seconds+' 秒',70,625);g.fillText('撞到干扰 · '+r.hits+' 次',70,685);g.fillText(r.finished?'完成这一轮。':'鸟的耐心耗尽了。',70,745);g.font=`22px ${font}`;g.fillText(r.score>5?'这些，够用了。':'只要有用的。别什么都捡。',70,880);g.fillText('地球日期 · '+r.date,70,950);g.font='22px monospace';g.fillText('graybird.space/play/',70,1025);await exportPNG(c,'score','score-image','score-export','score-download','Graybird-Signal-'+r.date+'.png');}catch(_){$('game-result-text').textContent+=' 成绩卡暂时无法生成，可以截图保存。';}finally{b.disabled=false;}});
+ $('save-score').addEventListener('click',async e=>{if(!lastResult)return;const b=e.currentTarget;b.disabled=true;try{await gameBird.decode();const r=lastResult,[c,g]=cardBase(1000,1100);g.font='22px monospace';g.fillText('PEANUT PATROL / 30 SECONDS',70,150);g.drawImage(gameBird,670,205,250,250);g.font=`28px ${font}`;g.fillText('本轮花生奖励',70,260);g.font='bold 130px monospace';g.fillText(String(r.reward),65,415);g.font=`28px ${font}`;g.fillText(visitor.name||'路过的地球人',70,545);g.font=`24px ${font}`;g.fillText('存活时间 · '+r.seconds+' 秒',70,625);g.fillText('捡到 '+r.score+' 粒 · 通关加餐 '+r.bonus+' 粒',70,685);g.fillText(r.finished?'30 秒通关。':'撞到'+r.cause+'，下次再来。',70,745);g.font=`22px ${font}`;g.fillText('打掉 '+r.kills+' 个干扰 · 射速 '+FIRE_RATES[r.gun-1]+' 发/秒',70,880);g.fillText('地球日期 · '+r.date,70,950);g.font='22px monospace';g.fillText('graybird.space/play/',70,1025);await exportPNG(c,'score','score-image','score-export','score-download','Graybird-Peanuts-'+r.date+'.png');}catch(_){$('game-result-text').textContent+=' 成绩卡暂时无法生成，可以截图保存。';}finally{b.disabled=false;}});
  // Real giscus is enabled only after the repository and app grant are ready.
  let wallConfig=null,wallLoaded=false,wallTimeout=0;
  fetch('/data/giscus.json?v=1').then(r=>{if(!r.ok)throw Error('config');return r.json();}).then(c=>{if(c.enabled===true&&typeof c.repo==='string'&&/^[\w.-]+\/[\w.-]+$/.test(c.repo)&&c.repoId&&c.categoryId){wallConfig=c;$('wall-status').textContent='留言墙已开放。点下方加载真实留言。';$('wall-load').hidden=false;}}).catch(()=>{$('wall-status').textContent='留言服务暂时无法连接。其他区域照常开放。';});

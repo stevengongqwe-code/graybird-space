@@ -4,7 +4,7 @@ A quiet, framework-free Earth observation experience at https://graybird.space, 
 
 ## Development
 
-Run `python3 -m http.server 8000 --bind 127.0.0.1` from the repository root. No build, install, WebGL, remote font or external JavaScript dependency is required.
+Run `python3 -m http.server 8000 --bind 127.0.0.1` from the repository root. No build, install, WebGL or remote font is required. The optional, asynchronous GoatCounter script is the only external JavaScript dependency; the site remains usable if it is blocked or unavailable.
 
 ## Experience
 
@@ -56,7 +56,13 @@ To add or update content:
 
 `TopicCard`, `ForumSection` and `GarybirdHeader` are small serverless build functions in `scripts/build_content.py`; `templates/community.html` is the shared page shell. `community.css` follows the original palette. `community.js` only enhances filters/history/keyboard navigation; all records remain readable without it. Homepage generated content sits between the `BIRD NEST START/END` comments; everything outside that region is retained by the builder.
 
-Maintenance limits: the initial opening topics are editorial prompts, not active X conversations. Submissions and comments remain unopened. Data edits require rerunning the builder before pushing; GitHub Pages does not run Python. Removing a topic from the data intentionally leaves its old generated entry available to avoid destroying a shared URL; retire records manually only with a deliberate content decision. Old entries' original publication dates are unknown and shown honestly as collection dates. No database, authentication, third-party runtime service or new account is required.
+Maintenance limits: the initial opening topics are editorial prompts, not active X conversations. Submissions and comments remain unopened. Data edits require rerunning the builder before pushing; GitHub Pages does not run Python. Removing a topic from the data intentionally leaves its old generated entry available to avoid destroying a shared URL; retire records manually only with a deliberate content decision. Old entries' original publication dates are unknown and shown honestly as collection dates. Content features need no database or authentication. Analytics uses the owner's separate GoatCounter account.
+
+## Visitor analytics
+
+The homepage and the shared `templates/community.html` page shell load GoatCounter asynchronously from `https://gc.zgo.at/count.js`, with endpoint `https://graybird-space.goatcounter.com/count`. Run the content builder after template changes so Bird Nest, archive and all article pages receive the same integration. Only pageviews are collected; no custom interaction events are configured. Existing canonical URLs keep archive searches and hash filters grouped under the page's canonical path. The 404 page is intentionally excluded.
+
+The private dashboard is `https://graybird-space.goatcounter.com/`; sign in to choose a date range and daily grouping. Unique visitors are estimates, distinct from total pageviews, and neither metric reconstructs visits before installation. Ad blockers or disabled JavaScript can prevent collection. No passwords or API tokens belong in the repository. Preserve this integration when editing the homepage; future generated pages inherit it from the template.
 
 ## Frontend capability pack (adapted)
 

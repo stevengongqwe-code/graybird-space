@@ -18,7 +18,7 @@ async def main():
    # Expose the controller only in this intercepted QA response; production has no debug API.
    async def instrument(route):
     response=await route.fetch();body=await response.text()
-    body=body.replace(' // Canvas is used for exact personal cards, never to redraw the bird.', ' window.__gameQA={get game(){return game},hud,gameDraw};\n // Canvas is used for exact personal cards, never to redraw the bird.')
+    body=body.replace(' // Canvas is used for exact personal cards, never to redraw the bird.', ' window.__gameQA={get game(){return game},hud,gameDraw,finish};\n // Canvas is used for exact personal cards, never to redraw the bird.')
     await route.fulfill(response=response,body=body)
    await context.route('**/play/play.js*',instrument)
    await page.goto(BASE+'/play/',wait_until='networkidle')
@@ -77,8 +77,8 @@ async def main():
    assert await page.locator('[data-shop-buy]').count()==11
    assert await page.locator('[data-shop-buy="beam"]').is_disabled()
    # Exactly-once settlement with deterministic contact, then real spending and revival.
-   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=6-flight'),g=window.__gameQA.game;g.score=200;g.shield=0;g.invincible=0;m.spawnEnemy(g,'ad',{x:g.x,y:g.y});}")
-   await page.locator('#game-start').click();await page.clock.run_for(100)
+   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=7-counter'),g=window.__gameQA.game;g.score=200;g.shield=0;g.invincible=0;m.damage(g,'广告');window.__gameQA.finish();}")
+   await page.clock.run_for(100)
    assert await page.locator('#game-result').is_visible()
    assert int(await page.locator('#peanut-bank').inner_text())==200
    await page.clock.run_for(1000);assert int(await page.locator('#peanut-bank').inner_text())==200
@@ -93,10 +93,10 @@ async def main():
    await page.reload(wait_until='networkidle');assert int(await page.locator('#peanut-bank').inner_text())==35
    await page.locator('#game-start').click();assert '针叶穿透炮' in await page.locator('#game-weapon').inner_text();assert await page.locator('#game-shield').inner_text()=='2'
    # Render every real sprite in an active arena; verify image network loads, not placeholders.
-   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=6-flight'),g=window.__gameQA.game;g.enemies.forEach(e=>e.active=false);m.ENEMY_TYPES.forEach((type,i)=>m.spawnEnemy(g,type,{x:55+i%5*(g.width-110)/4,y:80+Math.floor(i/5)*85},true));g.invincible=5;window.__gameQA.gameDraw();}")
+   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=7-counter'),g=window.__gameQA.game;g.enemies.forEach(e=>e.active=false);m.ENEMY_TYPES.forEach((type,i)=>m.spawnEnemy(g,type,{x:55+i%5*(g.width-110)/4,y:80+Math.floor(i/5)*85},true));g.invincible=5;window.__gameQA.gameDraw();}")
    await page.locator('#game').screenshot(path=str(OUT/f'game-active-{w}.png'))
    await page.locator('#game-pause').click()
-   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=6-flight'),g=window.__gameQA.game;g.enemies.forEach(e=>e.active=false);g.groups.forEach(e=>e.active=false);g.elapsed=119.99;g.nextBoss=120;g.pendingBossRoster=8;g.warningIndex=0;g.nextEvent=g.nextSupply=999;g.invincible=5;g.paused=false;m.stepGame(g,.03);g.paused=true;window.__gameQA.hud(true);window.__gameQA.gameDraw();}")
+   await page.evaluate("async()=>{const m=await import('/play/game-core.mjs?v=7-counter'),g=window.__gameQA.game;g.enemies.forEach(e=>e.active=false);g.groups.forEach(e=>e.active=false);g.elapsed=119.99;g.nextBoss=120;g.pendingBossRoster=8;g.warningIndex=0;g.nextEvent=g.nextSupply=999;g.invincible=5;g.paused=false;m.stepGame(g,.03);g.paused=true;window.__gameQA.hud(true);window.__gameQA.gameDraw();}")
    assert '时钟螃蟹' in await page.locator('#game-boss-name').inner_text()
    await page.locator('#game').screenshot(path=str(OUT/f'game-boss-{w}.png'))
    assert await page.locator('#wall-load').is_hidden();assert await page.locator('.giscus iframe').count()==0

@@ -104,3 +104,16 @@
 .game-rewards { display:flex; flex-wrap:wrap; gap:12px 28px; border-top:1px solid var(--line); margin-top:20px; padding:18px 0 8px; color:#d9bb86; font:14px/1.8 var(--mono); }
 .game-rewards b { margin:0 4px; }
 .game-section .small-note { margin:12px 0; }
+
+/* Section 04 only: preserve the page's existing type, palette and outer layout. */
+#game #game-boss-bar { position:absolute; top:0; left:0; right:0; display:flex; gap:10px; align-items:center; flex-wrap:wrap; padding:8px 12px; background:#0c151ee8; color:#f1d1d2; font:14px/1.5 var(--mono); pointer-events:none; }
+#game #game-boss-health { flex:1; min-width:80px; height:10px; accent-color:#be848a; }
+#game #game-evolution button,#game #game-revive { min-height:44px; padding:10px 16px; border:1px solid #596a77; background:#111b24; color:#dbe6ed; }
+#game #game-evolution button { width:min(100%,380px); text-align:left; }
+#game #game-evolution b { float:right; color:#a6cbe3; }
+#game #game-evolution small { display:block; font-size:12px; line-height:1.5; color:#95a4ae; }
+#game button:disabled { opacity:.5; cursor:default; }
+#game .game-hud { gap:8px 18px; }
+#game #game-build { color:#a6cbe3; }
+#game #game-effects { color:#d9bb86; }
+#game #game-announcement { min-height:22px; white-space:pre-line; }

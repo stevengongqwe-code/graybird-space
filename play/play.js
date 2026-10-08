@@ -246,6 +246,7 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter
  $('game-counter').addEventListener('pointerdown',e=>{e.preventDefault();soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);});
  $('game-counter').addEventListener('click',()=>{soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);});
  $('game-counter').addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);}});
+ document.querySelector('.game-settings').addEventListener('toggle',()=>{if(document.querySelector('.game-settings').open&&game.running&&!game.paused&&!game.choice&&!game.supplyChoice)pauseGame(true);});
  const settings=[['combat-sound','sound'],['combat-shake','shake'],['combat-flash','flash']];for(const [id,key]of settings){$(id).checked=preferences[key];$(id).addEventListener('change',()=>{preferences[key]=$(id).checked;visitor.combat={...preferences};persist();soundFX.unlock();});}
  $('combat-volume').value=preferences.volume*100;$('combat-volume').addEventListener('input',()=>{preferences.volume=+$('combat-volume').value/100;visitor.combat={...preferences};persist();});
  $('combat-key').value=preferences.counterKey;$('combat-key').addEventListener('change',()=>{preferences.counterKey=$('combat-key').value;visitor.combat={...preferences};persist();});

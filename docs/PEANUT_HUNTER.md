@@ -26,11 +26,11 @@ Enemy speeds and health increase gradually. Types unlock at 20/40/65/85/95 secon
 ## Owner feedback pass: slower progression, stronger opening
 
 - Homepage has a dedicated entrance directly below navigation, above the original appeal notice. The full existing notice, hero and all sections remain intact. One tap opens the game anchor; all game entry URLs and game assets carry a new cache version.
-- First scheduled evolution chip: 55s, then every 65s (formerly 30s / 45s). Ordinary kill chips require 24 kills (formerly 12), cannot appear before 35s and share a 24s drop cooldown with elite/supply chips. Boss victory still awards a chip; no changes to existing earned peanuts/equipment.
+- First scheduled evolution chip: 65s, then every 90s. Ordinary kill chips require 36 kills, cannot appear before 50s and share a 60s drop cooldown with elite/supply chips. Only one uncollected chip can be active; completed builds no longer spawn chips. Boss victory still awards a chip; no changes to existing earned peanuts/equipment.
 - Fire-rate progression: 2.5 / 3.3 / 4.3 / 5.5 shots/sec. Two evolutions per rate tier; six evolutions to reach the highest tier (formerly three).
 - Opening normal enemies require two base-cannon hits, move 10% faster and spawn at 1.12s rather than 1.3s. Continuous health/speed growth and gradual type unlocks remain. Boss base health increases from 72 to 92; telegraphs, 120s random encounters, no overlapping Boss groups and post-victory relief are retained.
 - Combo bonus grows by 20% each 18 kills and caps at 2×; random temporary supply chance starts at 4.5% instead of 7%. Shop prices and existing permanent equipment are retained.
-- Twenty deterministic stationary-player simulations averaged 49s survival versus 55s before the change; this is a comparative fixture, not a real-player or Android benchmark. Early evolutions were reduced from 0–4 to 0–1 in that fixture. Further human feedback remains useful for balance.
+- The previous v5 pass’s twenty deterministic stationary-player simulations averaged 49s survival versus 55s before the change; this is a comparative fixture, not a real-player or Android benchmark. Early evolutions were reduced from 0–4 to 0–1 in that fixture. Further human feedback remains useful for balance.
 
 ## Verification
 
@@ -39,3 +39,15 @@ Enemy speeds and health increase gradually. Types unlock at 20/40/65/85/95 secon
 - Additional touch/layout checks at 360 and 430. Simulated 430px Chromium with 4× CPU slowdown and a Boss plus seven regular enemies measured median 16.7ms / p95 16.7ms frame intervals over 2.5 seconds with the final cartoon sprites. Local network; not an Android hardware benchmark.
 
 Long-term balance still benefits from real player feedback. Original Giscus remains pending its owner authorization; this upgrade does not change it.
+
+
+## Flight controller and battle usability (v6)
+
+- Foreground frames simulate at most 50ms each, discarding overdue wall time after a hitch; no 300ms automatic pause threshold. Actual `visibilitychange` to hidden or `pagehide`, manual pause and deliberate shop opening still pause. Returning from background requires explicit continuation. Combat time does not fast-forward through lag.
+- Battle HUD, pause and touch controls share a self-contained shell. A user gesture requests native Fullscreen API when available; CSS viewport focus mode is the fallback. Escape/exit returns to the original scroll position without resetting the run. Canvas keeps its original aspect ratio, with pointer coordinates corrected for letterboxing. Rules/shop remains accessible from the toolbar.
+- Full rules are retained inside a collapsed reference. First kill, first five-kill combo (+3 peanuts), first fake peanut, first graze (+2) and first chip each get a short, non-blocking prompt once per run. At 18s a short survival reminder provides early feedback without awarding a power upgrade.
+- `weaponStats()` is shared by firing damage and armory numbers. Cards show per-projectile damage, base fire rate, projectile count, current/next levels and piercing/explosion/slow/track effects. Equipment shows current/next percentages or counts. One optional ballistic preview runs at a time, only while visible; it stops in background, offscreen, on shop close and under reduced motion. Preview art is schematic, not replacement Graybird imagery.
+- All 11 Bosses retain their original attack and gain two signature skills (22 total): locked danger lanes, delayed target zones, expanding rings with a safe angular opening, descending walls with a marked safe gap, and telegraphed reinforcements. Health thresholds 65%/30% advance through three stages and shorten secondary-skill cooldowns. Warnings last 1.35s, are harmless, and hazards clear on victory. At most two simultaneous hazards and a fixed pool of 12; splitting Bosses share one skill clock. First Boss timing remains 120s random, with no overlap.
+- `python scripts/qa_game_flight.py`: real Chromium controller tests with 850ms/4s/600ms synthetic frame gaps, simulated visibility events, native fullscreen (1280px), forced API-unavailable fallback, inside-battle HUD, touch mapping, actual animated previews and reduced motion. Checked 360/375/390/430/768/1280/1920px. Simulated events are not physical Android device tests.
+
+- Final full-screen stress fixture at 430px with 4× Chromium CPU slowdown, phase-3 Boss, seven ordinary enemies and two telegraphed skills: 150 sampled frames over 2.5s, median 16.7ms / p95 16.8ms; the run remained active. This is local simulated-device evidence, not a physical Android benchmark.

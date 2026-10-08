@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {createGame,stepGame,difficulty,WEAPONS,EQUIPMENT,BOSS_NAMES,ENEMY_TYPES,cleanLoadout,purchaseUpgrade,applyLoadout,spawnEnemy,spawnBoss,hitEnemy,drop,chooseEvolution,damage,reviveGame,firingRate} from '../play/game-core.mjs';
+import {createGame,stepGame,difficulty,WEAPONS,EQUIPMENT,BOSS_NAMES,ENEMY_TYPES,cleanLoadout,purchaseUpgrade,applyLoadout,spawnEnemy,spawnBoss,hitEnemy,drop,chooseEvolution,damage,reviveGame,firingRate,weaponStats,frameSeconds,BOSS_SKILLS,castBossSkill} from '../play/game-core.mjs';
 const rng=seed=>()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
 function isolated(){const g=createGame();g.running=true;g.spawn=g.foodTimer=-999;g.nextSupply=g.nextBoss=g.nextEvent=99999;return g;}
 assert.equal(WEAPONS.length,6);assert.equal(EQUIPMENT.length,5);assert.equal(ENEMY_TYPES.length,15);assert.equal(BOSS_NAMES.length,11);
@@ -59,16 +59,16 @@ for(let i=0;i<BOSS_NAMES.length;i++){
 // Early progression must not snowball even when a dense wave is cleared instantly.
 {
  const g=isolated();g.fireTimer=999;
- const clearWave=()=>{for(let i=0;i<24;i++){const e=spawnEnemy(g,'ad',{x:100,y:100});hitEnemy(g,e,10000);}};
- clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no kill chip before 35s');
- g.elapsed=40;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);
- g.elapsed=50;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1,'kill sources share 24s cooldown');
- g.elapsed=65;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,2);
+ const clearWave=()=>{for(let i=0;i<36;i++){const e=spawnEnemy(g,'ad',{x:100,y:100});hitEnemy(g,e,10000);}};
+ clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no kill chip before 50s');
+ g.elapsed=55;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);
+ g.elapsed=65;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1,'kill sources share 60s cooldown');
+ g.items.filter(p=>p.kind==='chip').forEach(p=>p.active=false);g.elapsed=120;clearWave();assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);
 }
 {
- const g=isolated();g.nextSupply=55;g.fireTimer=999;g.invincible=100;
- stepGame(g,54.9);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no scheduled chip before 55s');
- stepGame(g,.2);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);assert.equal(g.nextSupply,120);
+ const g=isolated();g.nextSupply=65;g.fireTimer=999;g.invincible=100;
+ stepGame(g,64.9);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,0,'no scheduled chip before 65s');
+ stepGame(g,.2);assert.equal(g.items.filter(p=>p.active&&p.kind==='chip').length,1);assert.equal(g.nextSupply,155);
 }
 {
  const g=isolated();const rates=[];
@@ -78,6 +78,32 @@ for(let i=0;i<BOSS_NAMES.length;i++){
  assert.deepEqual(rates,[2.5,3.3,3.3,4.3,4.3,5.5],'six evolutions required to reach maximum fire rate');
  assert.ok(difficulty(0).hp>1,'unupgraded cannon needs two hits on ordinary starting monsters');
  assert.ok(difficulty(0).interval<1.3&&difficulty(0).speed>1.07,'opening pressure increased');
+}
+// Frame hitches stay bounded and never require an automatic foreground pause.
+assert.equal(frameSeconds(16),.016);assert.equal(frameSeconds(800),.05);assert.equal(frameSeconds(8000),.05);assert.equal(frameSeconds(-20),0);
+for(const w of WEAPONS){const stats=weaponStats(w.id,1);assert.ok(stats.rate>0&&stats.damage>0);assert.ok(weaponStats(w.id,2).damage>stats.damage);}
+// Every Boss has two reachable signature mechanics, with warning before damage.
+for(let roster=0;roster<BOSS_NAMES.length;roster++)for(let skill=0;skill<2;skill++){
+ const g=isolated();g.fireTimer=999;g.invincible=10;const e=spawnBoss(g,0,roster);const h=castBossSkill(g,e,skill);
+ assert.equal(h.label,BOSS_SKILLS[roster][skill].name);assert.ok(h.warning>=1.2);stepGame(g,.5);assert.ok(h.age<h.warning);
+ stepGame(g,2);assert.ok(Number.isFinite(h.r+h.x+h.y));
+ for(let i=0;i<12&&g.groups.some(p=>p.active);i++)for(const boss of g.enemies)if(boss.active&&boss.boss)hitEnemy(g,boss,10000);
+ assert.equal(g.hazards.some(p=>p.active),false,'victory clears pending hazards');
+}
+{
+ const g=isolated();g.fireTimer=999;const e=spawnBoss(g,0,0);hitEnemy(g,e,e.maxHp*.36);assert.equal(e.group.phase,2);hitEnemy(g,e,e.maxHp*.35);assert.equal(e.group.phase,3);
+ const h=castBossSkill(g,e,1);g.shield=1;g.invincible=0;g.target=h.x;g.targetY=h.y;e.attack=999;
+ stepGame(g,h.warning-.1);assert.equal(g.shield,1,'warning zone is harmless');stepGame(g,.15);assert.equal(g.shield,0,'active zone damages');
+}
+{
+ const g=isolated();g.fireTimer=999;const p=drop(g,'fake',100,100);stepGame(g,.1);assert.equal(g.tutorial.seen.fake,true);
+ drop(g,'fake',100,100);assert.equal(g.tutorial.queue.filter(line=>line.startsWith('真假花生')).length,0,'first-use hint appears only once');
+}
+// Marked wave gap is safe, outside it the active wave can hit.
+{
+ const g=isolated();g.fireTimer=999;const e=spawnBoss(g,0,3);e.attack=999;e.group.skillTimer=999;const h=castBossSkill(g,e,0);
+ h.age=h.warning+.1;h.y=g.y-1;g.target=g.x;g.targetY=g.y;stepGame(g,.01);assert.equal(g.shield,1);
+ g.x=h.gap+h.gapWidth+40;g.target=g.x;h.y=g.y-1;stepGame(g,.01);assert.equal(g.shield,0);
 }
 // Soak both arena sizes with actual random spawns, all pools and chip choices.
 for(const [w,h] of [[600,760],[900,600]]){
@@ -96,4 +122,4 @@ for(const [w,h] of [[600,760],[900,600]]){
  assert.equal(g.score,21,'small passive gains accumulate instead of disappearing in rounding');
 }
 assert.ok(difficulty(120).speed>difficulty(0).speed);assert.ok(difficulty(121).hp-difficulty(119).hp<.03);
-console.log('PASS: 6 weapons, 5 equipment lines, wallet validation, upgrades, 15 enemies, 11 bosses, random first Boss at 120s, no overlapping Boss, 9 rewards, splash, pause, revive, smooth difficulty and 300s pooled simulation in both arenas.');
+console.log('PASS: frame hitch budgets, slower/single-chip drops, 22 telegraphed Boss skills, 3 phases, safe wave gaps, shared shop/firing numbers, first-use hints, 6 weapons, 5 equipment lines, wallet validation, upgrades, 15 enemies, 11 bosses, random first Boss at 120s, no overlapping Boss, 9 rewards, splash, pause, revive, smooth difficulty and 300s pooled simulation in both arenas.');

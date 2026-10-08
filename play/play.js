@@ -1,4 +1,5 @@
-import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate} from './game-core.mjs?v=5-cartoon-balance';
+import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate, weaponStats, frameSeconds} from './game-core.mjs?v=6-flight';
+import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=6-flight';
 /* Independent Bird Nest: official images stay intact; personal progress stays local. */
 (() => {
  'use strict';
@@ -143,7 +144,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  function drawPeanut(x,y){ctx.save();ctx.translate(x,y);ctx.rotate(-.35);ctx.fillStyle='#e5bd7b';ctx.beginPath();ctx.ellipse(0,0,10,16,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9d6e37';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-12);ctx.quadraticCurveTo(-4,0,0,12);ctx.stroke();ctx.restore();}
  function sprite(text,color='#f1d1d2',box=false){const key=text+color+box;if(sprites.has(key))return sprites.get(key);const c=document.createElement('canvas'),g=c.getContext('2d');g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';c.width=Math.ceil(g.measureText(text).width)+20;c.height=42;g.font='22px Arial,"PingFang SC","Microsoft YaHei",sans-serif';if(box){g.fillStyle='#633c41';g.fillRect(0,0,c.width,c.height);g.strokeStyle='#be848a';g.strokeRect(.5,.5,c.width-1,c.height-1);}g.fillStyle=color;g.textAlign='center';g.fillText(text,c.width/2,29);sprites.set(key,c);return c;}
  function label(text,x,y,color,box=false){const c=sprite(text,color,box);ctx.drawImage(c,x-c.width/2,y-c.height/2);}
- const monsterTextures=new Map();for(const key of [...ENEMY_TYPES,...BOSS_NAMES.map((_,i)=>'boss-'+i)]){const image=new Image();image.src='/assets/game/'+key+'.webp?v=5-cartoon-balance';image.addEventListener('load',()=>{if(!game.running||game.paused)gameDraw();});monsterTextures.set(key,image);}
+ const monsterTextures=new Map();for(const key of [...ENEMY_TYPES,...BOSS_NAMES.map((_,i)=>'boss-'+i)]){const image=new Image();image.src='/assets/game/'+key+'.webp?v=6-flight';image.addEventListener('load',()=>{if(!game.running||game.paused)gameDraw();});monsterTextures.set(key,image);}
  const itemLabels={chip:'芯片',magnet:'磁',egg:'蛋',rage:'狂',slow:'慢',double:'×2',rapid:'快',repair:'修',clear:'净',fortune:'幸'};
  function gameDraw(){
   if(!ctx)return;const W=game.width,H=game.height;
@@ -151,6 +152,14 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
   ctx.beginPath();for(let x=0;x<W;x+=90){ctx.moveTo(x,0);ctx.lineTo(x,H);}for(let y=0;y<H;y+=90){ctx.moveTo(0,y);ctx.lineTo(W,y);}ctx.stroke();
   for(const e of game.enemies)if(e.active&&e.boss&&e.roster===5){ctx.strokeStyle='#a6cbe3';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.cocoonRadius,0,Math.PI*2);ctx.stroke();}
   for(const b of game.hostile)if(b.active&&b.age<b.delay){ctx.fillStyle='#be848a55';ctx.beginPath();ctx.ellipse(b.x,game.y,32,11,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#be848a';ctx.setLineDash([8,8]);ctx.beginPath();ctx.moveTo(b.x,0);ctx.lineTo(b.x,H);ctx.stroke();ctx.setLineDash([]);}
+  for(const h of game.hazards)if(h.active){
+   const warning=h.age<h.warning;ctx.strokeStyle=warning?'#d8b67a':'#be848a';ctx.fillStyle=warning?'#d8b67a18':'#be848a55';ctx.lineWidth=warning?2:4;ctx.setLineDash(warning?[9,7]:[]);
+   if(h.kind==='zone'||h.kind==='adds'){ctx.beginPath();ctx.arc(h.x,h.y,h.r,0,Math.PI*2);ctx.fill();ctx.stroke();}
+   if(h.kind==='lane'){ctx.fillRect(h.x-27,0,54,H);ctx.strokeRect(h.x-27,0,54,H);}
+   if(h.kind==='ring'){ctx.beginPath();ctx.arc(h.x,h.y,h.r,h.angle+.6,h.angle+Math.PI*2-.6);ctx.stroke();}
+   if(h.kind==='wave'){ctx.beginPath();ctx.moveTo(0,h.y);ctx.lineTo(h.gap-h.gapWidth,h.y);ctx.moveTo(h.gap+h.gapWidth,h.y);ctx.lineTo(W,h.y);ctx.stroke();ctx.strokeStyle='#a6cbe3';ctx.beginPath();ctx.moveTo(h.gap-h.gapWidth+10,h.y);ctx.lineTo(h.gap+h.gapWidth-10,h.y);ctx.stroke();}
+   ctx.setLineDash([]);
+  }
   for(const p of game.items)if(p.active){if(p.kind==='peanut'||p.kind==='fake'){drawPeanut(p.x,p.y);if(p.kind==='fake'&&p.flash>0){ctx.strokeStyle='#f1d1d2';ctx.lineWidth=3;ctx.strokeRect(p.x-20,p.y-23,40,46);label('!',p.x,p.y,'#f1d1d2');}}else label(itemLabels[p.kind],p.x,p.y,'#a6cbe3',true);}
   for(const e of game.enemies)if(e.active){
    if(e.phase==='warn'){ctx.strokeStyle='#be848a';ctx.lineWidth=3;ctx.setLineDash([12,9]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+e.vx*3,e.y+e.vy*3);ctx.stroke();ctx.setLineDash([]);}
@@ -183,7 +192,8 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
   $('game-build').textContent=`↟ 穿 ${game.build.pierce}/3 · ⋔ 散 ${game.build.spread}/3 · ⌖ 追 ${game.build.track}/3`;
   const effects=[];for(const key in game.effects)if(game.effects[key]>0)effects.push({magnet:'磁铁',rage:'狂暴',slow:'慢动作',double:'双倍',rapid:'装填',fortune:'幸运'}[key]+' '+Math.ceil(game.effects[key])+'s');$('game-effects').textContent=effects.join(' · ');
   let hp=0,max=0,names=[];for(const e of game.enemies)if(e.active&&e.boss){hp+=Math.max(0,e.hp);max+=e.maxHp;if(!names.includes(BOSS_NAMES[e.roster]))names.push(BOSS_NAMES[e.roster]);}
-  bossBar.hidden=!max;$('game-boss-name').textContent=names.join(' / ');$('game-boss-health').max=max||1;$('game-boss-health').value=hp;$('game-boss-hp').textContent=`${Math.ceil(hp)} / ${Math.ceil(max)}`;
+  bossBar.hidden=!max;$('game-boss-name').textContent=names.join(' / ')+(max?' · 阶段 '+Math.max(...game.groups.filter(g=>g.active).map(g=>g.phase||1)):'');$('game-boss-health').max=max||1;$('game-boss-health').value=hp;$('game-boss-hp').textContent=`${Math.ceil(hp)} / ${Math.ceil(max)}`;
+  const tip=$('game-tip');tip.hidden=!game.tutorial.left;if(!tip.hidden&&tip.textContent!==game.tutorial.line)tip.textContent=game.tutorial.line;canvas.parentElement.classList.toggle('has-boss',Boolean(max));
   if(noticeSerial!==game.noticeSerial){noticeSerial=game.noticeSerial;$('game-announcement').textContent=game.notice;}
  }
  function settle(){const reward=Math.max(0,game.score-settledScore);visitor.peanutBest=Math.max(visitor.peanutBest,game.score);visitor.peanuts=number(visitor.peanuts+reward);settledScore=game.score;award('game');persist();return reward;}
@@ -203,8 +213,7 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
   choicePanel.querySelector('button:not([disabled])')?.focus({preventScroll:true});hud(true);
  }
  function tick(time){
-  if(!game.running||game.paused||game.choice)return;const dt=Math.max(0,(time-game.last)/1000||0);game.last=time;
-  if(dt>.3){pauseGame(true);$('game-message').textContent='刚才卡了一下。准备好再继续。';return;}
+  if(!game.running||game.paused||game.choice)return;if(document.hidden){pauseGame(true);return;}const dt=frameSeconds(time-game.last);game.last=time;
   const reverse=game.event==='reverse'?-1:1;if(leftHeld)game.target-=520*game.moveSpeed*dt*reverse;if(rightHeld)game.target+=520*game.moveSpeed*dt*reverse;if(upHeld)game.targetY-=440*game.moveSpeed*dt;if(downHeld)game.targetY+=440*game.moveSpeed*dt;
   const result=stepGame(game,dt);hud();gameDraw();if(result==='hit'){finish();return;}if(result==='choice'){evolution();return;}game.frame=requestAnimationFrame(tick);
  }
@@ -216,13 +225,22 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
  document.querySelectorAll('#game-evolution [data-evolution]').forEach(b=>b.addEventListener('click',()=>{if(!chooseEvolution(game,b.dataset.evolution))return;if(game.choice){evolution();return;}choicePanel.hidden=true;$('game-pause').disabled=false;hud(true);if(document.hidden){game.paused=false;pauseGame(true);}else{canvas.focus({preventScroll:true});resumeFrame();}}));
  function key(e,on){if(e.key.startsWith('Arrow')){e.preventDefault();if(e.key==='ArrowLeft')leftHeld=on;if(e.key==='ArrowRight')rightHeld=on;if(e.key==='ArrowUp')upHeld=on;if(e.key==='ArrowDown')downHeld=on;}}
  canvas.addEventListener('keydown',e=>{key(e,true);if(e.code==='Space'&&game.running){e.preventDefault();pauseGame(!game.paused);}});canvas.addEventListener('keyup',e=>key(e,false));canvas.addEventListener('blur',()=>{leftHeld=rightHeld=upHeld=downHeld=false;});
- function point(e){const b=canvas.getBoundingClientRect(),x=clampGame((e.clientX-b.left)/b.width*game.width,30,game.width-30);game.target=game.event==='reverse'?game.width-x:x;game.targetY=clampGame((e.clientY-b.top)/b.height*game.height,45,game.height-35);}
+ function point(e){const b=canvas.getBoundingClientRect(),scale=Math.min(b.width/game.width,b.height/game.height),left=b.left+(b.width-game.width*scale)/2,top=b.top+(b.height-game.height*scale)/2,x=clampGame((e.clientX-left)/scale,30,game.width-30);game.target=game.event==='reverse'?game.width-x:x;game.targetY=clampGame((e.clientY-top)/scale,45,game.height-35);}
  function clampGame(n,a,b){return Math.max(a,Math.min(b,n));}
  canvas.addEventListener('pointerdown',e=>{if(!game.running||game.paused||game.choice)return;pointer=e.pointerId;canvas.setPointerCapture(pointer);point(e);});canvas.addEventListener('pointermove',e=>{if(game.running&&!game.paused&&!game.choice&&e.pointerId===pointer)point(e);});canvas.addEventListener('pointerup',()=>pointer=null);canvas.addEventListener('pointercancel',()=>pointer=null);
  [['game-left','left'],['game-right','right']].forEach(([id,d])=>{const b=$(id);const set=on=>{if(d==='left')leftHeld=on;else rightHeld=on;};b.addEventListener('pointerdown',e=>{set(true);b.setPointerCapture(e.pointerId);});b.addEventListener('pointerup',()=>set(false));b.addEventListener('pointercancel',()=>set(false));b.addEventListener('lostpointercapture',()=>set(false));b.addEventListener('keydown',e=>{if(e.code==='Space'||e.key==='Enter'){e.preventDefault();set(true);}});b.addEventListener('keyup',()=>set(false));});
  gameBird.addEventListener('load',gameDraw);gameWorm.addEventListener('load',gameDraw);hud(true);gameDraw();
+ // Native fullscreen when available, viewport focus mode otherwise; neither restarts the run.
+ const shell=$('game-shell');let focused=false,returnScroll=0;
+ function setFocused(on){if(on===focused)return;if(on)returnScroll=scrollY;focused=on;shell.classList.toggle('is-focused',on);document.body.classList.toggle('game-focused',on);$('game-fullscreen').textContent=on?'退出全屏':'全屏游戏';$('game-fullscreen').setAttribute('aria-pressed',String(on));if(!on)requestAnimationFrame(()=>{scrollTo(0,returnScroll);$('game-fullscreen').focus({preventScroll:true});});}
+ async function exitFocus(){if(document.fullscreenElement===shell&&document.exitFullscreen)try{await document.exitFullscreen();}catch(_){}setFocused(false);}
+ $('game-fullscreen').addEventListener('click',async()=>{if(focused){await exitFocus();return;}setFocused(true);if(shell.requestFullscreen)try{await shell.requestFullscreen();}catch(_){/* CSS focus mode remains fully usable. */}});
+ document.addEventListener('fullscreenchange',()=>{if(document.fullscreenElement===shell)setFocused(true);else if(focused)setFocused(false);});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&focused&&!document.fullscreenElement){e.preventDefault();exitFocus();}});
+ $('game-shop-jump').addEventListener('click',async()=>{if(game.running&&!game.paused&&!game.choice)pauseGame(true);await exitFocus();$('game-shop').open=true;$('game-shop').scrollIntoView({block:'start',behavior:'instant'});});
  // Permanent local armory: spending only settled peanuts, never the run's score.
  function renderShop(){
+  stopWeaponPreviews();
   if(lastResult&&!game.running){const cost=reviveCost();$('game-revive').disabled=visitor.peanuts<cost;$('game-revive').textContent=`花生买命 · ${cost} 粒${visitor.peanuts<cost?'（粮仓不足）':''}`;}
   for(const [id,items] of [['shop-weapons',WEAPONS],['shop-equipment',EQUIPMENT]]){
    const list=$(id);list.replaceChildren();
@@ -242,7 +260,20 @@ import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, R
      const equip=document.createElement('button');equip.type='button';equip.dataset.shopEquip=item.id;equip.textContent=visitor.armory.selected===item.id?'已装备':'装备';equip.setAttribute('aria-pressed',String(visitor.armory.selected===item.id));equip.disabled=!level||(game.running&&!game.paused)||game.choice;
      equip.addEventListener('click',()=>{if(!level||(game.running&&!game.paused)||game.choice)return;visitor.armory.selected=item.id;persist();renderShop();$('shop-status').textContent=item.name+'已装备，下一轮使用。';});actions.append(equip);
     }
-    article.append(h,p,actions);list.append(article);
+    article.append(h,p);
+    const stats=document.createElement('p');stats.className='shop-stats';
+    if(id==='shop-weapons'){
+     const current=weaponStats(item.id,Math.max(1,level),undefined,visitor.armory.levels.power),next=weaponStats(item.id,Math.min(3,level+1),undefined,visitor.armory.levels.power);
+     const line=v=>`每发伤害 ${v.damage.toFixed(2)} · 射速 ${v.rate.toFixed(2)}/秒 · 每次 ${v.projectiles} 发`;
+     stats.textContent=(level?'当前 Lv.'+level+'：'+line(current):'尚未解锁')+(price===undefined?' · 已满级':'\n'+(level?'升级后 Lv.'+(level+1):'解锁后 Lv.1')+'：'+line(next));
+     const effects=document.createElement('p');effects.className='shop-stats';const chosen=price===undefined?current:next;
+     effects.textContent=`${chosen.pierce>1?'穿透 '+chosen.pierce+' 个目标 · ':''}${chosen.splash?'爆破半径 '+chosen.splash+' · ':''}${chosen.slow?'减速 '+chosen.slow.toFixed(2)+' 秒 · ':''}${chosen.track?'追踪强度 '+chosen.track+' · ':''}基础数值；局内进化与临时补给另计。`;
+     article.append(stats,effects,weaponPreview(item.id,current,motion));
+    }else{
+     const value=n=>({shell:`开局 ${1+n} 枚护盾`,boots:`移动速度 +${n*8}%`,collector:`拾取范围 +${n*18} 像素`,power:`武器伤害 +${n*6}%`,fortune:`花生收益 +${n*5}%`}[item.id]);
+     stats.textContent='当前：'+value(level)+(price===undefined?' · 已满级':'\n升级后：'+value(level+1));article.append(stats);
+    }
+    article.append(actions);list.append(article);
    }
   }
  }

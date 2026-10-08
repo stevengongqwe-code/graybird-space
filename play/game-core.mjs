@@ -38,6 +38,13 @@ export function applyLoadout(g,value) {
  g.shield=1+loadout.levels.shell;g.moveSpeed=1+loadout.levels.boots*.08;g.pickupRadius=loadout.levels.collector*18;g.rewardBonus=loadout.levels.fortune*.05;
 }
 export const difficulty = t => ({interval:Math.max(.4,1.12-t*.0032),speed:Math.min(2.7,1.18+t/300),hp:1.45+Math.max(0,t-25)/110,cap:Math.min(24,8+Math.floor(t/35)),level:1+Math.floor(t/60)});
+export function weaponStats(id,level=1,build={pierce:0,spread:0,track:0},power=0){
+ const weapon=WEAPONS.find(w=>w.id===id)||WEAPONS[0];level=clamp(level,1,3);
+ const projectiles=weapon.id==='scatter'?3+(level===3?2:0):build.spread?3:1;
+ return {projectiles,damage:weapon.damage*(projectiles>1?.65:1)*(1+(level-1)*.25)*(1+power*.06)+(build.track===3?.5:0),rate:FIRE_RATES[0]*weapon.rate,pierce:weapon.id==='beam'?3+level:build.pierce?2+build.pierce:1,splash:weapon.id==='bomb'?55+level*10:0,slow:weapon.id==='frost'?1.3+level*.35:0,track:weapon.id==='seeker'?Math.max(2,build.track+level):build.track};
+}
+// A foreground frame hitch discards overdue wall time instead of pausing or fast-forwarding danger.
+export const frameSeconds=milliseconds=>Math.min(.05,Math.max(0,Number.isFinite(milliseconds)?milliseconds/1000:0));
 export const firingRate = g => FIRE_RATES[Math.min(3,g.gun-1)]*(WEAPONS.find(w=>w.id===g.weapon)?.rate||1)*(g.effects.rage>0?1.7:1)*(g.effects.rapid>0?1.25:1);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const TAU=Math.PI*2;
@@ -45,12 +52,13 @@ let nextID=0;
 function pool(size){return Array.from({length:size},()=>({active:false}));}
 function take(p){for(let i=0;i<p.length;i++)if(!p[i].active){const o=p[i];o.active=true;o.id=++nextID;return o;}return null;}
 export function createGame(width=900,height=600){
- return {width,height,running:false,paused:false,elapsed:0,x:width/2,y:height-72,target:width/2,targetY:height-72,hp:1,shield:1,invincible:0,score:0,rewardCarry:0,reliefUntil:0,kills:0,combo:0,maxCombo:0,grazes:0,shots:0,gun:1,build:{pierce:0,spread:0,track:0},effects:{magnet:0,rage:0,slow:0,double:0,rapid:0,fortune:0},enemies:pool(64),bullets:pool(256),hostile:pool(1024),items:pool(320),particles:pool(96),texts:pool(48),groups:pool(32),spawn:0,foodTimer:0,fireTimer:0,nextBoss:120,bossIndex:0,bossBag:[],pendingBossRoster:null,weapon:'worm',weaponLevel:1,loadout:cleanLoadout(),moveSpeed:1,pickupRadius:0,rewardBonus:0,nextSupply:55,lastChipDrop:-Infinity,bossesDefeated:0,warningIndex:-1,nextEvent:90,event:'',eventUntil:0,notice:'',noticeTime:0,noticeSerial:0,choice:false,choiceQueue:0,revives:0,cause:'',frame:0,last:0,random:Math.random};
+ return {width,height,running:false,paused:false,elapsed:0,x:width/2,y:height-72,target:width/2,targetY:height-72,hp:1,shield:1,invincible:0,score:0,rewardCarry:0,reliefUntil:0,kills:0,combo:0,maxCombo:0,grazes:0,shots:0,gun:1,build:{pierce:0,spread:0,track:0},effects:{magnet:0,rage:0,slow:0,double:0,rapid:0,fortune:0},enemies:pool(64),bullets:pool(256),hostile:pool(1024),items:pool(320),particles:pool(96),texts:pool(48),groups:pool(32),spawn:0,foodTimer:0,fireTimer:0,nextBoss:120,bossIndex:0,bossBag:[],pendingBossRoster:null,weapon:'worm',weaponLevel:1,loadout:cleanLoadout(),moveSpeed:1,pickupRadius:0,rewardBonus:0,nextSupply:65,lastChipDrop:-Infinity,tutorial:{seen:{},queue:[],line:"",left:0},hazards:pool(12),bossesDefeated:0,warningIndex:-1,nextEvent:90,event:'',eventUntil:0,notice:'',noticeTime:0,noticeSerial:0,choice:false,choiceQueue:0,revives:0,cause:'',frame:0,last:0,random:Math.random};
 }
 export function notice(g,line,seconds=2.5){g.notice=line;g.noticeTime=seconds;g.noticeSerial++;}
+function hint(g,key,line){if(g.tutorial.seen[key])return;g.tutorial.seen[key]=true;if(g.tutorial.queue.length<6)g.tutorial.queue.push(line);}
 function floating(g,x,y,label,color='#d5e8f3'){const p=take(g.texts);if(p)Object.assign(p,{x,y,label,color,life:1.1});}
 function sparks(g,x,y){for(let i=0;i<5;i++){const p=take(g.particles);if(p)Object.assign(p,{x,y,vx:(g.random()-.5)*130,vy:(g.random()-.5)*130,life:.35});}}
-export function drop(g,kind,x,y,value=1){let p=take(g.items);if(!p&&kind==='chip'){p=g.items.find(o=>o.kind==='peanut'||o.kind==='fake');if(p){p.active=true;p.id=++nextID;}}if(p)Object.assign(p,{kind,x:clamp(x,24,g.width-24),y,speed:145,vx:0,vy:0,value,age:0,flash:-1,r:kind==='peanut'||kind==='fake'?14:20});return p;}
+export function drop(g,kind,x,y,value=1){let p=take(g.items);if(!p&&kind==='chip'){p=g.items.find(o=>o.kind==='peanut'||o.kind==='fake');if(p){p.active=true;p.id=++nextID;}}if(p){if(kind==='chip')hint(g,'chip','进化芯片：捡到后选一种成长。每两次进化提升一档射速。');if(kind==='fake')hint(g,'fake','真假花生：靠近时闪框的别捡，那是诈骗。');}if(p)Object.assign(p,{kind,x:clamp(x,24,g.width-24),y,speed:145,vx:0,vy:0,value,age:0,flash:-1,r:kind==='peanut'||kind==='fake'?14:20});return p;}
 function enemySlot(g,priority=false){
  const count=g.enemies.reduce((n,e)=>n+(e.active&&!e.retiring?1:0),0);
  if(count>=(g.groups.some(o=>o.active)?Math.min(10,difficulty(g.elapsed).cap):difficulty(g.elapsed).cap)){if(!priority)return null;let victim=null,far=-1;for(const e of g.enemies)if(e.active&&!e.boss&&!e.retiring){const distance=Math.hypot(e.x-g.x,e.y-g.y);if(distance>far){far=distance;victim=e;}}if(!victim)return null;victim.active=false;}
@@ -67,30 +75,30 @@ function army(g,y=-35){if(difficulty(g.elapsed).cap-g.enemies.reduce((n,e)=>n+(e
 export function spawnBoss(g,index=g.bossIndex,selectedRoster=index%BOSS_NAMES.length){
  const group=take(g.groups);if(!group)return null;
  const roster=selectedRoster%BOSS_NAMES.length,scale=1+Math.min(.8,Math.floor(index/3)*.1),hp=Math.round((92+g.bossesDefeated*30)*scale*[1,1.05,.85,1,1,1,1,1,1.1,1.15,1.1][roster]);
- Object.assign(group,{roster,index,scale,maxHp:hp,remaining:1,defeated:false,rage:false});
+ Object.assign(group,{roster,index,scale,maxHp:hp,remaining:1,defeated:false,rage:false,phase:1,skillTimer:6,skillIndex:0});
  const e=enemySlot(g,true);if(!e){group.active=false;return null;}
  Object.assign(e,{type:'boss',boss:true,retiring:false,label:BOSS_NAMES[roster],roster,x:g.width/2,y:g.height*.23,baseX:g.width/2,r:52,hp,maxHp:hp,speed:85*scale,age:0,phase:'drift',timer:0,attack:1.6/scale,slow:0,vx:0,vy:0,affix:'',shield:0,graze:false,generation:0,flee:false,group,cocoonRadius:Math.hypot(g.width,g.height)*.65,tauntAt:10,flash:false});
  notice(g,BOSS_NAMES[roster]+' · '+BOSS_LINES[roster],3);return e;
 }
 function peanuts(g,x,y,count){for(let i=0;i<count;i++){const p=drop(g,'peanut',x+(g.random()-.5)*80,y,1);if(p){p.vx=(g.random()-.5)*240;p.vy=-80-g.random()*140;}}}
 function kill(g,e){
- if(!e.active)return;e.active=false;g.kills++;g.combo++;g.maxCombo=Math.max(g.maxCombo,g.combo);if(g.kills%24===0&&!e.boss)dropEvolution(g,e.x,e.y);sparks(g,e.x,e.y);
+ if(!e.active)return;e.active=false;g.kills++;g.combo++;if(g.kills===1)hint(g,'first-kill','首个干扰已清除。捡到的花生，阵亡后存进粮仓。');if(g.combo===5&&!g.tutorial.seen.combo){g.score+=3;hint(g,'combo','5 连击 · 花生 +3。躲开撞击，连击才留得住。');}g.maxCombo=Math.max(g.maxCombo,g.combo);if(g.kills%36===0&&!e.boss)dropEvolution(g,e.x,e.y);sparks(g,e.x,e.y);
  if(e.boss){
   const group=e.group;
   if(e.roster===2&&e.generation<2){group.remaining++;e.active=true;e.retiring=true;for(let i=0;i<2;i++){const child=enemySlot(g,true);if(child)Object.assign(child,e,{active:true,retiring:false,id:++nextID,x:clamp(e.x+(i?45:-45),35,g.width-35),baseX:e.x+(i?45:-45),y:e.y+28,generation:e.generation+1,hp:Math.ceil(e.maxHp*.55),maxHp:Math.ceil(e.maxHp*.55),r:Math.max(24,e.r*.7),age:0,speed:e.speed*(group.rage?1.8:1),affix:group.rage?'swift':'',label:['再强调一下','总而言之'][i],phase:'drift',attack:.7});else group.remaining--;}
    e.active=false;e.retiring=false;floating(g,e.x,e.y,'换句话说……');return;
   }
   group.remaining--;
-  if(group.remaining===0){group.defeated=true;group.active=false;g.bossesDefeated++;g.reliefUntil=g.elapsed+5;for(const b of g.hostile)b.active=false;drop(g,'magnet',e.x,e.y);g.nextEvent=Math.max(g.nextEvent,g.elapsed+12);g.nextBoss=Math.max(g.nextBoss,g.elapsed+30);peanuts(g,e.x,e.y,30+Math.floor(g.random()*21));dropEvolution(g,e.x,e.y,true);notice(g,BOSS_NAMES[e.roster]+'，下线了。',3);if(e.roster===3)for(const m of g.enemies)if(m.active&&!m.boss)m.flee=true;}
+  if(group.remaining===0){group.defeated=true;group.active=false;for(const h of g.hazards)if(h.group===group)h.active=false;g.bossesDefeated++;g.reliefUntil=g.elapsed+5;for(const b of g.hostile)b.active=false;drop(g,'magnet',e.x,e.y);g.nextEvent=Math.max(g.nextEvent,g.elapsed+12);g.nextBoss=Math.max(g.nextBoss,g.elapsed+30);peanuts(g,e.x,e.y,30+Math.floor(g.random()*21));dropEvolution(g,e.x,e.y,true);notice(g,BOSS_NAMES[e.roster]+'，下线了。',3);if(e.roster===3)for(const m of g.enemies)if(m.active&&!m.boss)m.flee=true;}
   return;
  }
  const x=e.x,y=e.y,type=e.type,affix=e.affix,speed=e.speed;const count=type==='elite'?5:type==='tank'?4:1;peanuts(g,x,y,count);
  if(type==='splitter'||affix==='split'){for(let i=0;i<2;i++)spawnEnemy(g,'small',{x:x+(i?24:-24),y,r:14,hp:1,maxHp:1,speed:speed*1.25},true);}
- if(type==='elite'&&g.random()<.18)dropEvolution(g,x,y);
+ if(type==='elite'&&g.random()<.1)dropEvolution(g,x,y);
  const chance=Math.min(.14,.045+g.elapsed/12000);
  if(g.random()<chance)drop(g,['magnet','egg','rage','slow','double','rapid','repair','clear','fortune'][Math.floor(g.random()*9)],x,y);
 }
-export function hitEnemy(g,e,amount=1){if(!e.active)return;if(e.shield>0){e.shield=Math.max(0,e.shield-amount);sparks(g,e.x,e.y);return;}e.hp-=amount;if(e.boss&&e.hp<=e.maxHp*.5&&!e.group.rage){e.group.rage=true;notice(g,e.label+' · 狂暴',2);if(e.roster===2)for(const a of g.enemies)if(a.active&&a.group===e.group&&a.generation>0){a.speed*=1.8;a.affix='swift';}}if(e.hp<=0)kill(g,e);}
+export function hitEnemy(g,e,amount=1){if(!e.active)return;if(e.shield>0){e.shield=Math.max(0,e.shield-amount);sparks(g,e.x,e.y);return;}e.hp-=amount;if(e.boss&&e.hp<=e.maxHp*.5&&!e.group.rage){e.group.rage=true;notice(g,e.label+' · 狂暴',2);if(e.roster===2)for(const a of g.enemies)if(a.active&&a.group===e.group&&a.generation>0){a.speed*=1.8;a.affix='swift';}}if(e.boss){const phase=e.hp/e.maxHp<=.3?3:e.hp/e.maxHp<=.65?2:1;if(phase>e.group.phase){e.group.phase=phase;e.group.skillTimer=Math.min(e.group.skillTimer,3);notice(g,e.label+' · 第 '+phase+' 阶段',2);}}if(e.hp<=0)kill(g,e);}
 export function damage(g,cause,amount=1){
  if(g.invincible>0||!g.running)return false;
  g.combo=0;g.cause=cause;
@@ -101,14 +109,16 @@ export function reviveGame(g){if(g.running)return false;g.revives++;g.hp=1;g.inv
 export function chooseEvolution(g,type){if(!g.choice||!(type in g.build)||g.build[type]>=3)return false;g.build[type]++;g.gun=Math.min(4,1+Math.floor((g.build.pierce+g.build.spread+g.build.track)/2));g.choiceQueue--;if(Object.values(g.build).every(v=>v===3)&&g.choiceQueue>0){g.score+=10*g.choiceQueue;g.choiceQueue=0;}g.choice=g.choiceQueue>0;g.fireTimer=0;notice(g,{pierce:'穿透虫，串起来。',spread:'散射虫，别挤。',track:'追踪虫，追着烦。'}[type]);return true;}
 // All ordinary chip sources share a cooldown: dense waves cannot snowball upgrades.
 function dropEvolution(g,x,y,bossReward=false){
- if(!bossReward&&(g.elapsed<35||g.elapsed-g.lastChipDrop<24))return false;
+ if(!bossReward&&(g.elapsed<50||g.elapsed-g.lastChipDrop<60))return false;
+ if(Object.values(g.build).every(v=>v===3))return false;
+ const existing=g.items.find(p=>p.active&&p.kind==='chip');if(existing){if(bossReward){existing.x=x;existing.y=y;existing.age=0;g.lastChipDrop=g.elapsed;}return false;}
  const item=drop(g,'chip',x,y);if(!item)return false;g.lastChipDrop=g.elapsed;return true;
 }
 function chip(g){if(Object.values(g.build).every(v=>v===3)){g.score+=10;floating(g,g.x,g.y-35,'芯片满级 +10');return;}g.choiceQueue++;g.choice=true;}
 function fire(g){
  const weapon=WEAPONS.find(w=>w.id===g.weapon)||WEAPONS[0],level=g.weaponLevel||1;
  const n=weapon.id==='scatter'?3+(level===3?2:0):g.build.spread?3:1,angle=.15+g.build.spread*.035;
- const damage=weapon.damage*(n>1?.65:1)*(1+(level-1)*.25)*(1+g.loadout.levels.power*.06)+(g.build.track===3?.5:0);
+ const damage=weaponStats(g.weapon,level,g.build,g.loadout.levels.power).damage;
  for(let i=0;i<n;i++){const b=take(g.bullets);if(b){const a=n===1?0:(i-(n-1)/2)*angle;Object.assign(b,{x:g.x,y:g.y-35,prevX:g.x,prevY:g.y-35,vx:Math.sin(a)*610,vy:-Math.cos(a)*610,r:7,damage,pierce:weapon.id==='beam'?3+level:g.build.pierce?2+g.build.pierce:1,weapon:weapon.id,splash:weapon.id==='bomb'?55+level*10:0,frost:weapon.id==='frost'?1.3+level*.35:0,hit1:0,hit2:0,hit3:0,hit4:0,hit5:0,track:weapon.id==='seeker'?Math.max(2,g.build.track+level):g.build.track,life:2.5});g.shots++;}}
 }
 function projectile(g,x,y,vx,vy,label='恶评',r=12,delay=0){const b=take(g.hostile);if(b)Object.assign(b,{x,y,prevX:x,prevY:y,vx,vy,label,r,age:0,delay,graze:false,life:14,damage:1});return b;}
@@ -131,6 +141,47 @@ function randomBoss(g){
  if(!g.bossBag.length){g.bossBag=Array.from({length:BOSS_NAMES.length},(_,i)=>i);for(let i=g.bossBag.length-1;i>0;i--){const j=Math.floor(g.random()*(i+1));[g.bossBag[i],g.bossBag[j]]=[g.bossBag[j],g.bossBag[i]];}}
  return g.bossBag.pop();
 }
+// Two complementary, telegraphed signature skills per Boss, in addition to its original attack.
+export const BOSS_SKILLS=[
+ [{name:'弹窗封锁',kind:'lane'},{name:'关闭按钮',kind:'zone'}],
+ [{name:'断章冲锋',kind:'lane'},{name:'惊叹回声',kind:'ring'}],
+ [{name:'上下文溢出',kind:'zone'},{name:'模型重采样',kind:'ring'}],
+ [{name:'列队推进',kind:'wave'},{name:'集结号',kind:'adds'}],
+ [{name:'钓鱼线路',kind:'lane'},{name:'验证码陷阱',kind:'zone'}],
+ [{name:'信息屏障',kind:'wave'},{name:'茧房回声',kind:'ring'}],
+ [{name:'退格洪流',kind:'wave'},{name:'定点恶评',kind:'zone'}],
+ [{name:'缓存重放',kind:'ring'},{name:'残影侵入',kind:'adds'}],
+ [{name:'钟摆锁定',kind:'lane'},{name:'秒针扫圈',kind:'ring'}],
+ [{name:'回收压线',kind:'wave'},{name:'垃圾倾倒',kind:'zone'}],
+ [{name:'吞噬震波',kind:'ring'},{name:'数据虫群',kind:'adds'}]
+];
+export function castBossSkill(g,e,index=0){
+ const skill=BOSS_SKILLS[e.roster]?.[index%2];if(!skill||!e.active||!e.group.active)return null;
+ // Never bury the arena in concurrent full-field hazards, even for splitting Bosses.
+ if(g.hazards.filter(h=>h.active).length>=2)return null;
+ const h=take(g.hazards);if(!h)return null;
+ const angle=Math.atan2(g.y-e.y,g.x-e.x),warning=1.35;
+ Object.assign(h,{kind:skill.kind,label:skill.name,group:e.group,age:0,warning,x:skill.kind==='zone'||skill.kind==='lane'?g.x:e.x,y:skill.kind==='zone'?g.y:e.y+45,r:skill.kind==='zone'?60:24,angle,gap:clamp(g.x,95,g.width-95),gapWidth:Math.max(95,g.width*.16),duration:skill.kind==='ring'?5:skill.kind==='wave'?6:skill.kind==='adds'?.15:.45,released:false,phase:e.group.phase,roster:e.roster});
+ notice(g,'⚠ '+e.label+' · '+skill.name,2);
+ return h;
+}
+function stepHazards(g,dt){
+ for(const h of g.hazards)if(h.active){
+  if(!h.group.active){h.active=false;continue;}h.age+=dt;if(h.age<h.warning)continue;
+  const t=h.age-h.warning;let hit=false;
+  if(h.kind==='lane')hit=Math.abs(g.x-h.x)<27+19;
+  if(h.kind==='zone')hit=Math.hypot(g.x-h.x,g.y-h.y)<h.r+19;
+  if(h.kind==='wave'){const old=h.y;h.y+=130*dt;hit=Math.abs(g.y-h.y)<18+19&&Math.abs(g.x-h.gap)>h.gapWidth-19;if(g.y>old&&g.y<h.y)hit=Math.abs(g.x-h.gap)>h.gapWidth-19;}
+  if(h.kind==='ring'){
+   h.r=24+t*120;const distance=Math.hypot(g.x-h.x,g.y-h.y),a=Math.atan2(g.y-h.y,g.x-h.x),difference=Math.abs(Math.atan2(Math.sin(a-h.angle),Math.cos(a-h.angle)));
+   hit=Math.abs(distance-h.r)<17+19&&difference>.6;
+  }
+  if(h.kind==='adds'&&!h.released){h.released=true;const type=h.roster===3?'army':h.roster===7?'ghost':'leech';for(let i=0;i<Math.min(3,h.phase+1);i++)spawnEnemy(g,type,{x:clamp(h.x+(i-1)*80,45,g.width-45),y:h.y+25});}
+  if(hit)damage(g,h.label);
+  if(t>h.duration||h.y>g.height+80||h.r>Math.hypot(g.width,g.height)+80)h.active=false;
+ }
+}
+
 function bossAI(g,e,dt){
  const group=e.group,s=group.scale,rage=group.rage;e.age+=dt;e.attack-=dt;
  e.flash=e.roster===4&&e.age%5<.5;
@@ -190,7 +241,7 @@ function enemyAI(g,e,dt,buff){
  if(e.type==='healer'&&e.age>=3){e.age-=3;for(const m of g.enemies)if(m.active&&m!==e&&!m.boss&&Math.hypot(m.x-e.x,m.y-e.y)<160)m.hp=Math.min(m.maxHp,m.hp+1);floating(g,e.x,e.y-20,'治疗 +1','#b7d66d');}
  if(e.y>g.height+80||e.x<-80||e.x>g.width+80)e.active=false;
 }
-function graze(g,o,distance,hitRadius){if(!o.graze&&g.invincible<=0&&distance>=hitRadius&&distance<hitRadius+10){o.graze=true;g.score+=2;g.grazes++;floating(g,g.x,g.y-45,'啾！','#e5bd7b');}}
+function graze(g,o,distance,hitRadius){if(!o.graze&&g.invincible<=0&&distance>=hitRadius&&distance<hitRadius+10){o.graze=true;g.score+=2;g.grazes++;hint(g,'graze','擦弹 +2 粒。贴近危险但没碰到，才算数。');floating(g,g.x,g.y-45,'啾！','#e5bd7b');}}
 function segmentDistance(x,y,ax,ay,bx,by){const vx=bx-ax,vy=by-ay,len=vx*vx+vy*vy,k=len?clamp(((x-ax)*vx+(y-ay)*vy)/len,0,1):0;return Math.hypot(x-ax-k*vx,y-ay-k*vy);}
 function pickup(g,p){
  p.active=false;if(p.kind==='fake'){damage(g,'诈骗短信');return;}
@@ -205,13 +256,13 @@ export function stepGame(g,seconds,random=g.random){
  if(!g.running||g.paused||g.choice||seconds<=0)return null;g.random=random;
  let remain=seconds;
  while(remain>1e-7&&g.running&&!g.choice){const dt=Math.min(1/120,remain);remain-=dt;g.elapsed+=dt;const d=difficulty(g.elapsed);
-  g.noticeTime=Math.max(0,g.noticeTime-dt);g.invincible=Math.max(0,g.invincible-dt);for(const k in g.effects)g.effects[k]=Math.max(0,g.effects[k]-dt);
+  g.noticeTime=Math.max(0,g.noticeTime-dt);const tutorial=g.tutorial;tutorial.left=Math.max(0,tutorial.left-dt);if(!tutorial.left&&tutorial.queue.length){tutorial.line=tutorial.queue.shift();tutorial.left=5;}if(g.elapsed>=18)hint(g,'early','先避开干扰，再收花生。军械库的解锁会留到下一轮。');g.invincible=Math.max(0,g.invincible-dt);for(const k in g.effects)g.effects[k]=Math.max(0,g.effects[k]-dt);
   g.target=clamp(g.target,30,g.width-30);g.targetY=clamp(g.targetY,45,g.height-35);g.x+=(g.target-g.x)*Math.min(1,dt*18*g.moveSpeed);g.y+=(g.targetY-g.y)*Math.min(1,dt*18*g.moveSpeed);
   const bossActive=g.groups.some(o=>o.active);
   if(!bossActive&&g.elapsed>=g.nextBoss-3&&g.warningIndex!==g.bossIndex){g.pendingBossRoster=randomBoss(g);g.warningIndex=g.bossIndex;notice(g,'⚠ '+BOSS_NAMES[g.pendingBossRoster]+' 接近',3);}
   if(g.elapsed>=g.nextBoss&&!bossActive){if(spawnBoss(g,g.bossIndex,g.pendingBossRoster??randomBoss(g))){g.bossIndex++;g.pendingBossRoster=null;g.nextBoss=g.elapsed+120;}}
   if(g.elapsed>=g.nextEvent&&!g.groups.some(o=>o.active)){triggerEvent(g,['reverse','meteor','fog'][Math.floor(random()*3)]);g.nextEvent=g.elapsed+90;}
-  if(g.elapsed>=g.nextSupply){dropEvolution(g,g.x,-25);g.nextSupply+=65;}
+  if(g.elapsed>=g.nextSupply){dropEvolution(g,g.x,-25);g.nextSupply+=90;}
   if(g.elapsed>=g.eventUntil)g.event='';
   g.spawn+=dt;const spawnInterval=d.interval*(bossActive?1.45:g.elapsed<g.reliefUntil?1.5:1);if(g.spawn>=spawnInterval){g.spawn-=spawnInterval;spawnWave(g);}
   g.foodTimer+=dt;if(g.foodTimer>=2){g.foodTimer-=2;drop(g,'peanut',30+random()*(g.width-60),-25);}
@@ -219,6 +270,8 @@ export function stepGame(g,seconds,random=g.random){
   const world=dt*(g.effects.slow>0?.35:1);let buff=1;
   for(const e of g.enemies)if(e.active&&e.boss&&e.roster===3)buff=Math.max(buff,1.4*e.group.scale*(e.group.rage?1.25:1));
   for(const e of g.enemies)if(e.active){enemyAI(g,e,world,buff);if(!e.active||e.flee)continue;const dist=Math.hypot(e.x-g.x,e.y-g.y),r=e.r+19;if(dist<r)damage(g,e.label,e.boss?e.group.scale:1);else graze(g,e,dist,r);}
+  for(const group of g.groups)if(group.active){group.skillTimer-=world;if(group.skillTimer<=0){const leader=g.enemies.find(e=>e.active&&e.boss&&e.group===group);if(leader){castBossSkill(g,leader,group.skillIndex++%2);group.skillTimer=group.phase===3?8:group.phase===2?10:12;}}}
+  stepHazards(g,world);
   if(!g.running)return 'hit';
   for(const b of g.bullets)if(b.active){
    b.prevX=b.x;b.prevY=b.y;b.life-=dt;

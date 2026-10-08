@@ -302,7 +302,10 @@ function chooseArtwork(index) {
  showArtwork(index);
  if (scrollArchiveMode) artFrames[activeArt].scrollIntoView({block: 'center', behavior: motion.matches ? 'instant' : 'smooth'});
  const subject = artFrames[activeArt].dataset.artSubject;
- if (pending < 0 || observations[pending].subject !== subject) selectRecord(observations.findIndex(note => note.subject === subject));
+ if (pending < 0 || observations[pending].subject !== subject) {
+  selectRecord(observations.findIndex(note => note.subject === subject), true, false);
+  showArtwork(index);
+ }
 }
 artButtons.forEach((button, index) => {
  button.addEventListener('click', () => chooseArtwork(index));
@@ -339,6 +342,8 @@ artFrames.forEach(figure => {
   const image = figure.querySelector('img');
   $('#art-dialog-image').src = image.getAttribute('src');
   $('#art-dialog-image').alt = image.alt;
+  $('#art-dialog-image').width = image.width;
+  $('#art-dialog-image').height = image.height;
   $('#art-dialog-title').textContent = figure.querySelector('.archive-coordinate').textContent;
   $('#art-dialog-note').textContent = figure.querySelector('h4').textContent;
   artDialog.showModal();

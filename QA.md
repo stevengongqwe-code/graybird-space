@@ -74,3 +74,13 @@ Production verification is performed after the code commit is deployed, against 
 - Chromium 390px, cache disabled, 4x CPU, 1.6Mbps/100ms network: nest LCP 820ms, archive LCP 672ms; measured CLS 0; subresource transfer 73544 bytes per page (HTML additional). Controlled local measurements, not physical Android guarantees.
 - Three.js: not applicable; no WebGL dependency or rotating globe is present. Preserve the original Earth in the scene illustration. No extra particle or rendering loop introduced.
 - Remaining limits: physical Android hardware unavailable; X discussion URLs still await real posts; submissions/comments intentionally unopened. Search covers titles and introductions, not an external full-text database. Production deployment and HTTPS are checked separately after the code commit.
+
+
+## 2026-10-08 original image restoration
+
+- Added all ten PNGs supplied by the owner, SHA-256 checked against the uploads without conversion or cropping. Existing JPG/WebP assets, notice, lunar hero, observation terminal, nest/archive routes and exact CNAME are preserved.
+- Extended the existing visual archive from five to eleven frames (ten supplied originals plus the existing life scene), with a visible thumbnail index and direct homepage gallery link. Wide and portrait images retain their complete compositions; inactive images remain fully visible. Archive count follows the actual frame count.
+- Full original integration checks passed at 375, 390, 768, 1280 and 1920px: every picture decoded and opened/closed (55 modal checks), keyboard navigation, mobile touch, at least 44px controls, no overflow, reduced motion and all eleven images without JavaScript. Screenshots inspected at mobile and desktop widths, including the loaded thumbnail index and portrait art.
+- Existing frontend QA passed at all five widths across homepage, nest, archive and entry routes, including search/filter/history, original terminal and dialog. Analytics requests were mocked in this local functional test because the test environment returned empty responses from the external GoatCounter script; production analytics code remains unchanged. No site JavaScript or local resource errors.
+- Internal link audit: 21 HTML pages, 47 unique resources/links and 66 fragments, PASS. JavaScript syntax and git whitespace checks passed.
+- Physical Android hardware and screen readers are unavailable. Mobile testing uses Chromium touch emulation. Production delivery is checked separately after publication.

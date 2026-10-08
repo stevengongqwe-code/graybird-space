@@ -1292,3 +1292,28 @@ footer { border-color:#ffffff1c; }
  .hero h1 { letter-spacing:-.06em; }
  .bird-copy h2 { line-height:1.35; }
 }
+
+/* Supplied image archive: show complete compositions and a visible image index. */
+.archive-index { grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; padding:16px 0; }
+.archive-index button { display:flex; flex-direction:column; align-items:stretch; gap:8px; padding:6px; min-width:0; text-align:left; }
+.archive-index button img { display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:contain; background:#07090b; }
+.archive-index button span { font-size:12px; line-height:1.6; letter-spacing:0; color:inherit; }
+.archive-counter,.archive-coordinate { font-size:12px; }
+.archive-frame figcaption p { font-size:16px; }
+.archive-image img { display:block; aspect-ratio:auto; height:auto; max-height:78vh; object-fit:contain; }
+.is-scroll-story .archive-image img { opacity:1; transform:none; }
+.archive-controls button,.art-dialog-header button,.art-dialog-note { font-size:14px; }
+.art-dialog-header p { font-size:12px; }
+@media(max-width:900px) { .archive-index { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+@media(max-width:600px) {
+ .archive-index { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+ .archive-index button { gap:6px; padding:4px; }
+ .archive-index button span { font-size:12px; }
+ .archive-heading { align-items:start; }
+ .archive-heading .eyebrow { font-size:10px; line-height:1.8; }
+ .archive-counter { font-size:12px; padding-top:3px; }
+ .archive-frame figcaption { display:block; min-height:0; }
+ .archive-coordinate { font-size:12px; line-height:1.8; }
+ .archive-image img { max-height:70vh; }
+ .art-dialog-header p { font-size:12px; }
+}

@@ -11,9 +11,10 @@
  showArtwork(activeArt);
  count.replaceChildren();
  const digits = document.createElement('span');
- digits.textContent = '05'; count.append(digits, ' RECORDS');
+ const artTotal = artFrames.length;
+ digits.textContent = String(artTotal).padStart(2, '0'); count.append(digits, ' RECORDS');
  // Avoid live-region announcements on each animation frame.
- count.removeAttribute('aria-live'); count.setAttribute('aria-label', '05 RECORDS');
+ count.removeAttribute('aria-live'); count.setAttribute('aria-label', `${artTotal} RECORDS`);
  digits.setAttribute('aria-hidden', 'true');
  function measure() {
   geometry = artFrames.map(el => { const box = el.getBoundingClientRect(); return {top: box.top + scrollY, height: box.height}; });
@@ -68,7 +69,7 @@
    const start = performance.now();
    function tick(now) {
     const progress = Math.min(1,(now-start)/600);
-    digits.textContent = String(document.hidden || reduced.matches ? 5 : Math.round(progress*5)).padStart(2,'0');
+    digits.textContent = String(document.hidden || reduced.matches ? artTotal : Math.round(progress*artTotal)).padStart(2,'0');
     if (progress < 1 && !document.hidden && !reduced.matches) requestAnimationFrame(tick);
    }
    requestAnimationFrame(tick);

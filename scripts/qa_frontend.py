@@ -1,17 +1,13 @@
 import asyncio,json,os,argparse
 from pathlib import Path
 from playwright.async_api import async_playwright
-from urllib.parse import urlsplit
 parser=argparse.ArgumentParser(description='Actual browser QA for Graybird; requires Playwright and an installed Chromium.')
 parser.add_argument('--base-url',default='http://127.0.0.1:8000')
 parser.add_argument('--widths',default='375,390,768,1280,1920')
 parser.add_argument('--browser',default='/usr/bin/chromium')
 parser.add_argument('--output',default='/tmp/graybird-qa')
-parser.add_argument('--stub-analytics',action='store_true',help='Local-only QA: replace GoatCounter with an empty script to avoid counting test visits.')
 args=parser.parse_args()
 BASE=args.base_url.rstrip('/')
-if args.stub_analytics and urlsplit(BASE).hostname not in ('localhost','127.0.0.1'):
- parser.error('--stub-analytics is only available for a local development server')
 WIDTHS=[int(value) for value in args.widths.split(',')]
 OUT=Path(args.output);OUT.mkdir(parents=True,exist_ok=True)
 async def main():
@@ -20,8 +16,6 @@ async def main():
   reports=[]
   for w in WIDTHS:
    page=await b.new_page(viewport={'width':w,'height':900},is_mobile=w<600,has_touch=w<600)
-   if args.stub_analytics:
-    await page.route('https://gc.zgo.at/**',lambda route:route.fulfill(status=200,body=''))
    errors=[];warnings=[];resources=[]
    page.on('pageerror',lambda e:errors.append(str(e)))
    page.on('console',lambda m:errors.append(m.text) if m.type=='error' else warnings.append(m.text) if m.type=='warning' else None)
@@ -82,5 +76,5 @@ async def main():
   for path in ['/nest/','/archive/']:
    await page.goto(BASE+path);assert await page.locator('.topic-card:visible').count()==17
    assert not await page.locator('.record-search').is_visible()
-  print(json.dumps({'base':BASE,'viewports':reports,'noJavaScript':'PASS','localAnalyticsStub':args.stub_analytics}));await b.close()
+  print(json.dumps({'base':BASE,'viewports':reports,'noJavaScript':'PASS'}));await b.close()
 asyncio.run(main())

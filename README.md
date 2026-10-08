@@ -64,18 +64,6 @@ The homepage and the shared `templates/community.html` page shell load GoatCount
 
 The private dashboard is `https://graybird-space.goatcounter.com/`; sign in to choose a date range and daily grouping. Unique visitors are estimates, distinct from total pageviews, and neither metric reconstructs visits before installation. Ad blockers or disabled JavaScript can prevent collection. No passwords or API tokens belong in the repository. Preserve this integration when editing the homepage; future generated pages inherit it from the template.
 
-## Interactive Bird Nest and visitor passport
-
-`/nest/#explore` opens a small CSS-built room using the original `assets/bird.webp` unchanged. Window, journal, computer and a small paper note respond to clicks or keyboard activation. Feeding works with two taps (pick up a peanut, then tap Graybird), keyboard activation or optional pointer dragging. Rapid feeding gets a short refusal instead of accumulating endless accepted food.
-
-Six personal stamps are earned through visiting the nest, exploring the window, opening the journal, feeding, opening a real archive article, and finding the paper note. They are exploration progress, not public engagement or member counts. `nest-play.js` keeps the nickname, randomly generated local passport ID, first-visit date and stamps in the current browser's `graybird.visitor.v1` localStorage entry. Nothing is sent to a new server; no account or owner identity is displayed. Denied storage falls back to in-memory progress. Clearing browser data or switching browsers/devices loses this local passport.
-
-The visitor can download a 1000×1280 PNG passport with the original bird artwork, nickname and actual earned stamps. An on-page image supports long-press saving when mobile downloads are unavailable. Link copying has a manual-copy fallback. Passport nickname rendering uses plain text, with a 16-character limit. No visitors, activity, global rankings or extra analytics events are invented.
-
-Room markup is in `templates/nest-play.html`, styling in `nest-play.css`, behavior in `nest-play.js`. The content builder inserts the room into the nest, loads its stylesheet only there, and includes the small passport script on full archive entries so reading can earn a stamp. Keep editing the source templates and rerun `python3 scripts/build_content.py`; do not hand-edit generated nest/archive HTML. Without JavaScript the room and its original illustration remain visible, controls are disabled, and all original content can still be read. Reduced motion removes the bird nudge and stamp rotation.
-
-Development QA: `python3 scripts/qa_nest.py --browser /path/to/chromium` checks two-tap/keyboard/drag feeding, unique stamps, reload persistence, safe nickname rendering, PNG export, storage denial and no-JavaScript reading at all five required widths. For the existing frontend suite, `--stub-analytics` is an explicit local-only option that replaces the analytics script during app checks without sending QA visits or depending on external network access. Production analytics must be checked separately. These tests are for local development, not physical Android or iOS certification.
-
 ## Frontend capability pack (adapted)
 
 The owner's frontend pack is integrated as repository-local instructions, not an installer: `AGENTS.md`, `GRAYBIRD_MASTER_VISUAL_CHARACTER_LOCK.md`, `DESIGN.md`, four skills under `.agents/skills/`, and `docs/FRONTEND_CAPABILITIES.md`. The obsolete slim character, forced new prototypes/font migration and mandatory GSAP/Lenis/Three.js stack are retired. The removed rotating globe remains removed. No global Codex files are overwritten and no upstream skills/packages are blindly installed.

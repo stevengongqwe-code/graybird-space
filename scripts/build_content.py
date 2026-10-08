@@ -79,7 +79,7 @@ def main():
  home='''<div class="section nest-home" id="now-discussing" role="region" aria-labelledby="nest-home-title">
 <div class="nest-home-heading"><div><p class="eyebrow">BIRD NEST / 一只鸟的互联网领地</p><h2 id="nest-home-title">正在讨论<span> / Now Discussing</span></h2></div><a class="community-text-link" href="/nest/">进入鸟窝 →</a></div>
 <p class="community-status">话题先留下。X 账号申诉中，评论现场暂未开放。</p>
-'''+''.join(TopicCard(t) for t in featured)+'''<div class="nest-home-bottom"><p>网站留下记录，X 承接实时讨论。这里会慢慢长成这只鸟自己的地方。</p><a class="community-text-link" href="/archive/">翻翻内容档案 →</a><a class="community-text-link" href="#terminal">接入观测系统 →</a></div></div>'''
+'''+''.join(TopicCard(t) for t in featured)+'''<div class="nest-home-bottom"><p>网站留下记录，X 承接实时讨论。这里会慢慢长成这只鸟自己的地方。</p><a class="community-text-link" href="/archive/">翻翻内容档案 →</a><a class="community-text-link" href="#terminal">接入观测系统 →</a><a class="community-text-link" href="#visual-archive">看看全部画面 →</a><a class="community-text-link" href="/play/">探索互动鸟窝 →</a></div></div>'''
  index=ROOT/'index.html';text=index.read_text()
  if '<!-- BIRD NEST START -->' not in text:raise ValueError('Home content markers missing')
  text=re.sub(r'<!-- BIRD NEST START -->.*?<!-- BIRD NEST END -->','<!-- BIRD NEST START -->\n'+home+'\n<!-- BIRD NEST END -->',text,flags=re.S)
@@ -92,7 +92,7 @@ def main():
   groups+=''.join(TopicCard(t) for t in records) if records else '<p class="community-empty">这里先留空。投稿入口暂未开放，也还没有收录鸟友内容。</p>'
   groups+='</section>'
  content=intro('GRAYBIRD / BIRD NEST','鸟窝。<span>互联网里的一小块地方。</span>','问题可以留下来，不急着有答案。认识一只鸟，再看看它最近在想什么。')
- content+='<p class="community-status">X 账号申诉中。现阶段可以阅读和保存话题，评论现场暂未开放。</p><nav class="forum-rooms" aria-label="鸟窝栏目">'+room_content+'</nav>'
+ content+='<p class="community-status">X 账号申诉中。现阶段可以阅读和保存话题，评论现场暂未开放。</p><a class="community-text-link" href="/play/">鸟在家。进入互动鸟窝 →</a><nav class="forum-rooms" aria-label="鸟窝栏目">'+room_content+'</nav>'
  content+='<div class="community-records" data-filter-scope="room">'+SearchRecords('在鸟窝里找一找')+filters('按栏目浏览',{k:r['name'] for k,r in ROOMS.items()})+'<p class="filter-summary" role="status" aria-live="polite"></p><div id="search-results">'+groups+'</div></div>'
  content+='<a class="community-text-link" href="/archive/">去档案馆慢慢翻 →</a>'
  write_page('/nest/','鸟窝 / Bird Nest — Graybird','Garybird 的私人互联网领地：议事厅、地球观察记录、夜话、实验室与鸟友投稿。',content,'nest')
@@ -112,7 +112,7 @@ def main():
  # Preserve every existing sitemap entry and append current static content routes.
  sitemap=ROOT/'sitemap.xml';ns='http://www.sitemaps.org/schemas/sitemap/0.9';ET.register_namespace('',ns)
  tree=ET.parse(sitemap);node=tree.getroot();existing={el.text for el in node.findall(f'{{{ns}}}url/{{{ns}}}loc')}
- for path in ['/nest/','/archive/']+[url(t) for t in TOPICS]:
+ for path in ['/nest/','/archive/','/play/']+[url(t) for t in TOPICS]:
   loc='https://graybird.space'+path
   if loc not in existing:ET.SubElement(ET.SubElement(node,f'{{{ns}}}url'),f'{{{ns}}}loc').text=loc
  ET.indent(tree,space='  ');tree.write(sitemap,encoding='UTF-8',xml_declaration=True)

@@ -1,0 +1,6 @@
+Worm and telescope icons from Noto Emoji, Copyright Google LLC.
+Source: https://github.com/googlefonts/noto-emoji/tree/main/2D/svg
+Files: emoji_u1f41b.svg and emoji_u1f52d.svg, unchanged.
+Licensed under Apache License 2.0; see LICENSE-NOTO.txt.
+These interface icons do not replace or alter the official Graybird character artwork.
+The project README identifies image resources as Apache-2.0; its current root font license is also preserved in LICENSE-NOTO-OFL.txt.

@@ -16,7 +16,7 @@ class Page(HTMLParser):
   for key in ('src','href'):
    if key in a:self.links.append(a[key])
   if 'srcset' in a:self.links.append(a['srcset'])
-files=[root/'index.html',root/'404.html',root/'nest/index.html']+list((root/'archive').rglob('*.html'))
+files=[root/'index.html',root/'404.html',root/'nest/index.html',root/'play/index.html']+list((root/'archive').rglob('*.html'))
 for f in files:
  page=Page();page.feed(f.read_text());assert len(page.ids)==len(set(page.ids)),f
  rel=f.relative_to(root).as_posix();base='/'+(rel[:-10] if rel.endswith('index.html') else rel)

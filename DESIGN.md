@@ -38,3 +38,7 @@ Use existing 23px mobile gutters, 7% desktop gutters and 8/12/16/24/32px spacing
 ## Source priorities
 
 Latest owner instruction → current official character lock → current implemented product → adapted capability skills. Imported old single-page/globe/slim-character rules are retired. Read `docs/FRONTEND_CAPABILITIES.md` for the integration record.
+
+## Independent interactive Bird Nest (2026-10-08)
+
+The owner explicitly requested seven additions while preserving every existing photo, content section and dynamic interface. `/play/` is the separate interactive destination; homepage and `/nest/` only gain text links. Existing source assets and observation scripts/styles are protected. The room uses the owner's original desk scene with labelled hotspots, not a replacement bird or a CSS illustration. Worm feeding, a local visitor card, daily prewritten letters, a 30-second signal game and optional night/audio live only on this route. Public comments use giscus after its account grant is complete; no local-only comments are presented as shared messages.

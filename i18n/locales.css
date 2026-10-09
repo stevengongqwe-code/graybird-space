@@ -1,0 +1,31 @@
+/* Locale-only layout adjustments. The original pages never load this file. */
+.language-picker { position: relative; margin-left: auto; flex-shrink: 0; color: var(--ink); font: 14px Arial,sans-serif; }
+.language-picker summary { min-height: 44px; min-width: 64px; display: flex; align-items: center; justify-content: center; cursor: pointer; list-style: none; border: 1px solid var(--line); }
+.language-picker summary::-webkit-details-marker { display:none; }
+.language-picker > nav { position:absolute; right:0; top:48px; width:160px; display:flex; flex-direction:column; padding:8px; background:var(--bg); border:1px solid var(--line); z-index:100; }
+.language-picker > nav a { display:flex; align-items:center; min-height:44px; padding:0 12px; }
+.language-picker a[aria-current] { color:var(--blue); }
+.language-picker :focus-visible { outline:2px solid var(--blue); outline-offset:3px; }
+.language-recommendation { position:absolute; right:0; top:212px; background:var(--bg); border:1px solid var(--line); padding:12px; width:200px; z-index:101; }
+.language-recommendation a { display:inline-flex; align-items:center; min-height:44px; }
+.header { gap:16px; flex-wrap:wrap; }
+.header > nav { flex-wrap:wrap; }
+.header > nav a { min-height:44px; display:inline-flex; align-items:center; }
+.home-game-copy,.home-game-action { min-width:0; }
+.home-game-action { white-space:normal; }
+:lang(en) h2,:lang(en) h3 { overflow-wrap:anywhere; }
+:lang(ja) body { font-family: Arial,'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif; }
+:lang(ja) h2,:lang(ja) h3 { overflow-wrap:anywhere; }
+@media(max-width:600px) {
+ .header > nav { order:3; width:100%; gap:16px; }
+ .language-picker { margin-left:auto; }
+ .header .brand { flex-shrink:0; }
+ .home-game-entry { flex-wrap:wrap; }
+ .home-game-action { margin-left:auto; }
+ .hero-heading h1 { font-size:clamp(40px,14vw,72px); }
+ .record-actions { flex-wrap:wrap; }
+ .record-footer { gap:12px; flex-wrap:wrap; }
+}
+.header { height:auto; min-height:80px; padding-top:12px; padding-bottom:12px; }
+.header .language-picker > nav { gap:0; align-items:stretch; }
+.header .language-picker > nav a { gap:0; }

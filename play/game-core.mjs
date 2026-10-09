@@ -124,7 +124,7 @@ export function damage(g,cause,amount=1,source=null){
  if(g.invincible>0||!g.running)return false;
  g.combo=0;g.cause=cause;g.hurtRing=C.feedback.hurtRing;g.hurtX=source?.x??g.x;g.hurtY=source?.y??g.y;feedback(g,'hurt');
  if(g.shield>0){g.shield--;g.invincible=1;floating(g,g.x,g.y-40,'蛋碎了','#a6cbe3');return false;}
- g.hp-=amount;if(g.hp<=0){g.running=false;g.choice=false;g.supplyChoice=false;return true;}g.invincible=1;return false;
+ g.hp-=amount;if(g.hp<=0){feedback(g,'death');g.running=false;g.choice=false;g.supplyChoice=false;return true;}g.invincible=1;return false;
 }
 export function reviveGame(g){if(g.running)return false;g.revives++;g.hp=1;g.invincible=2;g.running=true;g.paused=false;g.choice=false;g.combo=0;g.cause='';for(const b of g.hostile)if(b.active&&Math.hypot(b.x-g.x,b.y-g.y)<150)b.active=false;for(const e of g.enemies)if(e.active&&!e.boss&&Math.hypot(e.x-g.x,e.y-g.y)<120)e.active=false;for(const h of g.hazards)h.active=false;notice(g,'花生买命。贵得要死。');return true;}
 export function chooseEvolution(g,type){if(!g.choice||!(type in g.build)||g.build[type]>=3)return false;g.build[type]++;g.gun=Math.min(4,1+Math.floor((g.build.pierce+g.build.spread+g.build.track)/2));g.choiceQueue--;if(Object.values(g.build).every(v=>v===3)&&g.choiceQueue>0){g.score+=10*g.choiceQueue;g.choiceQueue=0;}g.choice=g.choiceQueue>0;g.firstGrowth=true;g.combos=unlockedCombos(g.build).map(c=>c.id);feedback(g,'evolve');g.fireTimer=0;notice(g,{pierce:'穿透虫，串起来。',spread:'散射虫，别挤。',track:'追踪虫，追着烦。'}[type]);return true;}
@@ -266,7 +266,7 @@ export function graze(g,o,distance,hitRadius){if(!o.graze&&g.invincible<=0&&dist
 export function segmentDistance(x,y,ax,ay,bx,by){const vx=bx-ax,vy=by-ay,len=vx*vx+vy*vy,k=len?clamp(((x-ax)*vx+(y-ay)*vy)/len,0,1):0;return Math.hypot(x-ax-k*vx,y-ay-k*vy);}
 function pickup(g,p){
  p.active=false;if(p.kind==='fake'){damage(g,'诈骗短信',1,p);return;}
- feedback(g,'pickup');if(p.kind==='energy'){chargeCounter(g,C.counter.energyPeanut);g.score+=2;return;}if(p.kind==='peanut'){const earned=p.value*Math.min(2,1+Math.floor(g.combo/18)*.2)*(1+g.rewardBonus)*(g.effects.double>0?2:1)*(g.effects.fortune>0?1.25:1)+g.rewardCarry;const v=Math.floor(earned+1e-9);g.rewardCarry=Math.max(0,earned-v);g.score+=v;return;}
+ feedback(g,p.kind==='peanut'||p.kind==='energy'?'pickup':'reward');if(p.kind==='energy'){chargeCounter(g,C.counter.energyPeanut);g.score+=2;return;}if(p.kind==='peanut'){const earned=p.value*Math.min(2,1+Math.floor(g.combo/18)*.2)*(1+g.rewardBonus)*(g.effects.double>0?2:1)*(g.effects.fortune>0?1.25:1)+g.rewardCarry;const v=Math.floor(earned+1e-9);g.rewardCarry=Math.max(0,earned-v);g.score+=v;return;}
  if(p.kind==='chip'){chip(g);return;}
  if(p.kind==='repair'){g.shield=Math.min(4,g.shield+1);g.invincible=Math.max(g.invincible,1.5);notice(g,'补给维修 · 重新罩好。');return;}
  if(p.kind==='clear'){for(const e of g.enemies)if(e.active)hitEnemy(g,e,e.boss?6:4);for(const b of g.hostile)b.active=false;notice(g,'净屏脉冲 · 清静一会儿。');return;}
@@ -280,7 +280,7 @@ export function stepGame(g,seconds,random=g.random){
   for(const k of ['grazeRing','hurtRing','readyRing'])g[k]=Math.max(0,g[k]-dt);for(const e of g.enemies)if(e.active)e.hitFlash=Math.max(0,(e.hitFlash||0)-dt);g.noticeTime=Math.max(0,g.noticeTime-dt);const tutorial=g.tutorial;tutorial.left=Math.max(0,tutorial.left-dt);if(!tutorial.left&&tutorial.queue.length){tutorial.line=tutorial.queue.shift();tutorial.left=5;}if(g.elapsed>=18)hint(g,'early','先避开干扰，再收花生。军械库的解锁会留到下一轮。');g.invincible=Math.max(0,g.invincible-dt);for(const k in g.effects)g.effects[k]=Math.max(0,g.effects[k]-dt);
   g.target=clamp(g.target,30,g.width-30);g.targetY=clamp(g.targetY,45,g.height-35);g.x+=(g.target-g.x)*Math.min(1,dt*18*g.moveSpeed);g.y+=(g.targetY-g.y)*Math.min(1,dt*18*g.moveSpeed);
   const bossActive=g.groups.some(o=>o.active);
-  if(!bossActive&&g.elapsed>=g.nextBoss-C.pacing.bossWarning&&g.warningIndex!==g.bossIndex){g.pendingBossRoster=randomBoss(g);g.warningIndex=g.bossIndex;notice(g,'⚠ '+BOSS_NAMES[g.pendingBossRoster]+' 接近',C.pacing.bossWarning);}
+  if(!bossActive&&g.elapsed>=g.nextBoss-C.pacing.bossWarning&&g.warningIndex!==g.bossIndex){g.pendingBossRoster=randomBoss(g);g.warningIndex=g.bossIndex;feedback(g,'warning');notice(g,'⚠ '+BOSS_NAMES[g.pendingBossRoster]+' 接近',C.pacing.bossWarning);}
   if(g.elapsed>=g.nextBoss&&!bossActive){if(spawnBoss(g,g.bossIndex,g.pendingBossRoster??randomBoss(g))){g.bossIndex++;g.pendingBossRoster=null;g.nextBoss=g.elapsed+C.pacing.bossInterval;}}
   if(g.elapsed>=g.nextEvent&&g.elapsed<g.nextBoss-C.pacing.bossWarning-6&&!g.groups.some(o=>o.active)){triggerEvent(g,['reverse','meteor','fog'][Math.floor(random()*3)]);g.nextEvent=g.elapsed+C.pacing.eventInterval;}
   if(g.elapsed>=g.nextSupply){if(!g.firstGrowth&&!g.items.some(p=>p.active&&p.kind==='chip'))dropEvolution(g,g.x,g.y-95);else dropEvolution(g,g.x,-25);g.nextSupply+=C.pacing.supplyInterval;}if(!g.eliteSpawned&&g.elapsed>=C.pacing.elite){g.eliteSpawned=true;spawnEnemy(g,'elite',{x:g.width*.25,y:-40},true);notice(g,'⚠ 精英信号：优先清除，反击能量 +20。',2);}

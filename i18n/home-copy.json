@@ -1516,5 +1516,35 @@
     "zh": "开始挑战 ↗",
     "en": "Take the challenge ↗",
     "ja": "挑戦する ↗"
+  },
+  {
+    "key": "welcome.0",
+    "zh": "第一次来",
+    "en": "First visit",
+    "ja": "初めての方へ"
+  },
+  {
+    "key": "welcome.1",
+    "zh": "第一次来？认识一只灰鸟，或者直接开一局。",
+    "en": "First visit? Meet a gray bird, or jump into a game.",
+    "ja": "初めて？灰色の鳥に会うか、ゲームを始めよう。"
+  },
+  {
+    "key": "welcome.2",
+    "zh": "推荐入口",
+    "en": "Start here",
+    "ja": "おすすめの入口"
+  },
+  {
+    "key": "welcome.3",
+    "zh": "认识灰鸟 →",
+    "en": "Meet Graybird →",
+    "ja": "Graybirdを知る →"
+  },
+  {
+    "key": "welcome.4",
+    "zh": "直接玩花生猎人 →",
+    "en": "Play Peanut Hunter →",
+    "ja": "花生ハンターで遊ぶ →"
   }
 ]

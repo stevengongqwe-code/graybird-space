@@ -46,6 +46,7 @@ def update_search_metadata():
                       'sameAs': ['https://www.instagram.com/graybird.space/']}
             tag = '<script type="application/ld+json">'+json.dumps(schema, ensure_ascii=True)+'</script>'
             head = re.sub(r'<script type="application/ld\+json">.*?</script>', lambda _: tag, head, flags=re.S)
+        head = re.sub(r'\n{3,}', '\n\n', head)
         target.write_text(head+'</head>'+body)
     ns = 'http://www.sitemaps.org/schemas/sitemap/0.9'
     ET.register_namespace('', ns)
@@ -54,7 +55,7 @@ def update_search_metadata():
     urls = tree.getroot()
     existing = {node.text for node in urls.findall(f'{{{ns}}}url/{{{ns}}}loc')}
     # Preserve existing archive URLs; redirect-only mode aliases are intentionally omitted.
-    for path, *_ in PAGES.values():
+    for path in [*[value[0] for value in PAGES.values()], "/about/"]:
         location = ORIGIN+path
         if location not in existing:
             ET.SubElement(ET.SubElement(urls, f'{{{ns}}}url'), f'{{{ns}}}loc').text = location

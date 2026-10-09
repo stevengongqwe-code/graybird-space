@@ -60,7 +60,7 @@ Maintenance limits: the initial opening topics are editorial prompts, not active
 
 ## Visitor analytics
 
-The homepage and the shared `templates/community.html` page shell load GoatCounter asynchronously from `https://gc.zgo.at/count.js`, with endpoint `https://graybird-space.goatcounter.com/count`. Run the content builder after template changes so Bird Nest, archive and all article pages receive the same integration. Only pageviews are collected; no custom interaction events are configured. Existing canonical URLs keep archive searches and hash filters grouped under the page's canonical path. The 404 page is intentionally excluded.
+The homepage and the shared `templates/community.html` page shell load GoatCounter asynchronously from `https://gc.zgo.at/count.js`, with endpoint `https://graybird-space.goatcounter.com/count`. Run the content builder after template changes so Bird Nest, archive and all article pages receive the same integration. Pageviews and fixed interaction events are collected: homepage game/about clicks, new runs, ended runs, revivals, generated score cards, share attempts, completed system shares and copied challenge links. No nickname, score, visitor ID or saved progress is included in the custom events. Events are aggregate counts, not a visitor-level funnel; reviving a run may lead to another ended-run event. Blocked analytics never blocks play. Existing canonical URLs keep archive searches and hash filters grouped under the page's canonical path. The 404 page is intentionally excluded.
 
 The private dashboard is `https://graybird-space.goatcounter.com/`; sign in to choose a date range and daily grouping. Unique visitors are estimates, distinct from total pageviews, and neither metric reconstructs visits before installation. Ad blockers or disabled JavaScript can prevent collection. No passwords or API tokens belong in the repository. Preserve this integration when editing the homepage; future generated pages inherit it from the template.
 
@@ -79,3 +79,13 @@ python3 scripts/qa_frontend.py --base-url http://127.0.0.1:8000 --output /tmp/gr
 Defaults cover 375/390/768/1280/1920px. `--browser` selects an already installed browser. The script reports page/console/resource checks and writes paused-motion screenshots; inspect those screenshots as well. Use `--base-url https://graybird.space --widths 390,1280` for authorized live acceptance while keeping HTTPS verification enabled. Do not enable `ignore_https_errors` to hide trust failures.
 
 Run `python3 scripts/check_links.py --base-url http://127.0.0.1:8000` for generated-page resource and fragment checks (Python standard library only). The browser QA dependency is developer-only; existing cloud tooling already provides Python Playwright/Chromium. For a different development machine, provision those tools separately rather than adding them to the website's runtime or executing the legacy pack installer.
+
+## First visits, game results and sharing
+
+The three homepages have an additive first-visit strip linking to `/about/` and `/play/#game`. `/about/` introduces the independent Graybird character with English and Japanese reading sections; it does not link the character to a real person. Official images are reused unchanged.
+
+The first game guide remembers acknowledgement in a separate `graybird.first-game.v1` local storage key. The guide stays available as a collapsed section, even when storage is unavailable. Result actions provide a new run, a cause-specific tip, a PNG score card and a challenge link. System sharing uses an already generated card when file sharing is supported; otherwise it shares a link, copies text or exposes a read-only text field for manual copying. Cancelling a share is not counted as success. Existing game saves, economy and combat are retained.
+
+`engagement.js` queues at most 20 fixed events while the existing GoatCounter script loads. Analytics errors are isolated from game behavior. The private dashboard at https://graybird-space.goatcounter.com/ shows these event names; this does not create a public leaderboard.
+
+Run `python3 scripts/build_locales.py --skip-inventory` after homepage edits. It retains search metadata through `optimize_search.py`. Browser QA: `QA_BROWSER=/path/to/chromium node scripts/qa_welcome.cjs` with `CODEX_PRIMARY_RUNTIME_NODE_MODULES` pointing to the runtime dependencies and a local server at port 8000 (override with `QA_BASE`). Test screenshots are written outside the repository.

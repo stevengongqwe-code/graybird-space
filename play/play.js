@@ -1,7 +1,7 @@
-import {GAME_CONFIG,cleanPreferences,cleanTutorial,unlockedCombos} from './game-config.mjs?v=7-counter';
-import {combatFeedback} from './combat-feedback.mjs?v=7-counter';
-import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate, weaponStats, frameSeconds,releaseCounter,supplyPurchase,settleIncome,hint} from './game-core.mjs?v=7-counter';
-import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter';
+import {GAME_CONFIG,cleanPreferences,cleanTutorial,unlockedCombos} from './game-config.mjs?v=8-sound';
+import {combatFeedback} from './combat-feedback.mjs?v=8-sound';
+import {createGame, stepGame, difficulty, FIRE_RATES, BOSS_NAMES, DEATH_LINES, REVIVE_COSTS, chooseEvolution, reviveGame, ENEMY_TYPES, WEAPONS, EQUIPMENT, cleanLoadout, purchaseUpgrade, applyLoadout, firingRate, weaponStats, frameSeconds,releaseCounter,supplyPurchase,settleIncome,hint} from './game-core.mjs?v=8-sound';
+import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=8-sound';
 /* Independent Bird Nest: official images stay intact; personal progress stays local. */
 (() => {
  'use strict';
@@ -206,6 +206,7 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter
   if(noticeSerial!==game.noticeSerial){noticeSerial=game.noticeSerial;$('game-announcement').textContent=game.notice;}
  }
  function settle(){const reward=settleIncome(game);visitor.gameTutorial={...cleanTutorial(visitor.gameTutorial),...cleanTutorial(game.tutorial.seen)};visitor.peanutBest=Math.max(visitor.peanutBest,game.score);visitor.peanuts=number(visitor.peanuts+reward);award('game');persist();return reward;}
+ function actionSound(kind){game.feedback=game.feedback.filter(event=>event!==kind);soundFX.drain(game);soundFX.cue(kind);}
  function reviveCost(){return game.revives>=GAME_CONFIG.economy.reviveLimit?Infinity:REVIVE_COSTS[game.revives];}
  function finish(){
   $('game-supply').hidden=true;
@@ -228,13 +229,13 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter
   const result=stepGame(game,dt);soundFX.drain(game);hud();gameDraw();if(result==='hit'){finish();return;}if(result==='choice'){evolution();return;}if(result==='supply'){supplyPanel();return;}game.frame=requestAnimationFrame(tick);
  }
  function resumeFrame(){game.last=performance.now();game.frame=requestAnimationFrame(tick);}
- function startGame(){if(!ctx)return;soundFX.reset();soundFX.unlock();$('game-supply').hidden=true;cancelAnimationFrame(game.frame);fitGame();game.running=true;lastHud=-1;leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;lastResult=null;$('game-overlay').hidden=true;choicePanel.hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';$('game-shop').open=false;renderShop();canvas.focus({preventScroll:true});hud(true);gameDraw();resumeFrame();}
- function pauseGame(on){if(!game.running||game.choice||game.supplyChoice)return;game.paused=on;cancelAnimationFrame(game.frame);game.frame=0;$('game-pause').textContent=on?'继续':'暂停';leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;if(on){soundFX.suspend();$('game-overlay').hidden=false;$('game-message').textContent='先停一下。花生等你回来。';$('game-start').textContent='继续这轮';}else{soundFX.unlock();$('game-overlay').hidden=true;canvas.focus({preventScroll:true});resumeFrame();}}
+ function startGame(){if(!ctx)return;soundFX.reset();soundFX.cue('start');$('game-supply').hidden=true;cancelAnimationFrame(game.frame);fitGame();game.running=true;lastHud=-1;leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;lastResult=null;$('game-overlay').hidden=true;choicePanel.hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('score-export').hidden=true;$('game-pause').disabled=false;$('game-pause').textContent='暂停';$('game-shop').open=false;renderShop();canvas.focus({preventScroll:true});hud(true);gameDraw();resumeFrame();}
+ function pauseGame(on){if(!game.running||game.choice||game.supplyChoice)return;game.paused=on;cancelAnimationFrame(game.frame);game.frame=0;$('game-pause').textContent=on?'继续':'暂停';leftHeld=rightHeld=upHeld=downHeld=false;pointer=null;if(on){game.feedback.length=0;soundFX.suspend();$('game-overlay').hidden=false;$('game-message').textContent='先停一下。花生等你回来。';$('game-start').textContent='继续这轮';}else{soundFX.cue('resume');$('game-overlay').hidden=true;canvas.focus({preventScroll:true});resumeFrame();}}
  $('game-start').disabled=!ctx;$('game-start').addEventListener('click',()=>{if(game.running&&game.paused)pauseGame(false);else startGame();});$('game-pause').addEventListener('click',()=>pauseGame(!game.paused));
- $('game-revive').addEventListener('click',()=>{const cost=reviveCost();if(game.running||!lastResult||visitor.peanuts<cost)return;visitor.peanuts-=cost;persist();reviveGame(game);lastResult=null;$('game-overlay').hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('game-pause').disabled=false;hud(true);canvas.focus({preventScroll:true});resumeFrame();});
- document.querySelectorAll('#game-evolution [data-evolution]').forEach(b=>b.addEventListener('click',()=>{if(!chooseEvolution(game,b.dataset.evolution))return;if(game.choice){evolution();return;}choicePanel.hidden=true;$('game-pause').disabled=false;hud(true);if(game.supplyChoice){supplyPanel();return;}if(document.hidden){game.paused=false;pauseGame(true);}else{canvas.focus({preventScroll:true});resumeFrame();}}));
+ $('game-revive').addEventListener('click',()=>{const cost=reviveCost();if(game.running||!lastResult||visitor.peanuts<cost)return;visitor.peanuts-=cost;persist();game.feedback.length=0;soundFX.reset();reviveGame(game);soundFX.cue('revive');lastResult=null;$('game-overlay').hidden=true;$('game-result').hidden=true;$('game-revive').hidden=true;$('game-pause').disabled=false;hud(true);canvas.focus({preventScroll:true});resumeFrame();});
+ document.querySelectorAll('#game-evolution [data-evolution]').forEach(b=>b.addEventListener('click',()=>{if(!chooseEvolution(game,b.dataset.evolution))return;actionSound('evolve');if(game.choice){evolution();return;}choicePanel.hidden=true;$('game-pause').disabled=false;hud(true);if(game.supplyChoice){supplyPanel();return;}if(document.hidden){game.paused=false;pauseGame(true);}else{canvas.focus({preventScroll:true});resumeFrame();}}));
  function key(e,on){if(e.key.startsWith('Arrow')){e.preventDefault();if(e.key==='ArrowLeft')leftHeld=on;if(e.key==='ArrowRight')rightHeld=on;if(e.key==='ArrowUp')upHeld=on;if(e.key==='ArrowDown')downHeld=on;}}
- canvas.addEventListener('keydown',e=>{key(e,true);if(e.code===preferences.counterKey&&game.running){e.preventDefault();if(!e.repeat){soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);}}if(e.code==='KeyP'&&game.running&&!e.repeat){e.preventDefault();pauseGame(!game.paused);}if(e.code==='Enter'&&!game.running&&!e.repeat){e.preventDefault();startGame();}});canvas.addEventListener('keyup',e=>key(e,false));canvas.addEventListener('blur',()=>{leftHeld=rightHeld=upHeld=downHeld=false;});
+ canvas.addEventListener('keydown',e=>{key(e,true);if(e.code===preferences.counterKey&&game.running){e.preventDefault();if(!e.repeat){if(releaseCounter(game))actionSound('counter');hud(true);}}if(e.code==='KeyP'&&game.running&&!e.repeat){e.preventDefault();pauseGame(!game.paused);}if(e.code==='Enter'&&!game.running&&!e.repeat){e.preventDefault();startGame();}});canvas.addEventListener('keyup',e=>key(e,false));canvas.addEventListener('blur',()=>{leftHeld=rightHeld=upHeld=downHeld=false;});
  function point(e){const b=canvas.getBoundingClientRect(),scale=Math.min(b.width/game.width,b.height/game.height),left=b.left+(b.width-game.width*scale)/2,top=b.top+(b.height-game.height*scale)/2,x=clampGame((e.clientX-left)/scale,30,game.width-30);game.target=game.event==='reverse'?game.width-x:x;game.targetY=clampGame((e.clientY-top)/scale-(e.pointerType==='touch'?45:0),45,game.height-35);}
  function clampGame(n,a,b){return Math.max(a,Math.min(b,n));}
  canvas.addEventListener('pointerdown',e=>{if(!game.running||game.paused||game.choice||game.supplyChoice)return;pointer=e.pointerId;canvas.setPointerCapture(pointer);point(e);});canvas.addEventListener('pointermove',e=>{if(game.running&&!game.paused&&!game.choice&&e.pointerId===pointer)point(e);});canvas.addEventListener('pointerup',e=>{if(e.pointerId===pointer)pointer=null;});canvas.addEventListener('pointercancel',e=>{if(e.pointerId===pointer)pointer=null;});
@@ -242,13 +243,13 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter
  gameBird.addEventListener('load',gameDraw);gameWorm.addEventListener('load',gameDraw);hud(true);gameDraw();
 
  function supplyPanel(){cancelAnimationFrame(game.frame);game.frame=0;const panel=$('game-supply');panel.hidden=false;choicePanel.hidden=true;$('game-overlay').hidden=true;$('game-pause').disabled=true;const available=Math.max(0,game.score-game.spent-game.credited);$('supply-balance').textContent='可用 '+available+' 粒 · 现有护盾 '+game.shield;panel.querySelectorAll('[data-supply]').forEach(b=>{b.disabled=b.dataset.supply==='repair'?(available<GAME_CONFIG.economy.repair||game.shield>=4):b.dataset.supply==='boost'?available<GAME_CONFIG.economy.boost:false;});panel.querySelector('button:not([disabled])').focus({preventScroll:true});hud(true);}
- document.querySelectorAll('[data-supply]').forEach(b=>b.addEventListener('click',()=>{if(!supplyPurchase(game,b.dataset.supply))return;$('game-supply').hidden=true;$('game-pause').disabled=false;soundFX.drain(game);hud(true);if(game.choice){evolution();return;}if(document.hidden){pauseGame(true);return;}canvas.focus({preventScroll:true});resumeFrame();}));
- $('game-counter').addEventListener('pointerdown',e=>{e.preventDefault();soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);});
- $('game-counter').addEventListener('click',()=>{soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);});
- $('game-counter').addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();soundFX.unlock();releaseCounter(game);soundFX.drain(game);hud(true);}});
+ document.querySelectorAll('[data-supply]').forEach(b=>b.addEventListener('click',()=>{if(!supplyPurchase(game,b.dataset.supply)){const kind=b.dataset.supply,available=Math.max(0,game.score-game.spent-game.credited);if(game.supplyChoice&&available<(GAME_CONFIG.economy[kind]||0))soundFX.cue('insufficient');return;}$('game-supply').hidden=true;$('game-pause').disabled=false;actionSound('supply');hud(true);if(game.choice){evolution();return;}if(document.hidden){pauseGame(true);return;}canvas.focus({preventScroll:true});resumeFrame();}));
+ $('game-counter').addEventListener('pointerdown',e=>{e.preventDefault();if(releaseCounter(game))actionSound('counter');hud(true);});
+ $('game-counter').addEventListener('click',()=>{if(releaseCounter(game))actionSound('counter');hud(true);});
+ $('game-counter').addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();if(releaseCounter(game))actionSound('counter');hud(true);}});
  document.querySelector('.game-settings').addEventListener('toggle',()=>{if(document.querySelector('.game-settings').open&&game.running&&!game.paused&&!game.choice&&!game.supplyChoice)pauseGame(true);});
- const settings=[['combat-sound','sound'],['combat-shake','shake'],['combat-flash','flash']];for(const [id,key]of settings){$(id).checked=preferences[key];$(id).addEventListener('change',()=>{preferences[key]=$(id).checked;visitor.combat={...preferences};persist();soundFX.unlock();});}
- $('combat-volume').value=preferences.volume*100;$('combat-volume').addEventListener('input',()=>{preferences.volume=+$('combat-volume').value/100;visitor.combat={...preferences};persist();});
+ const settings=[['combat-sound','sound'],['combat-shake','shake'],['combat-flash','flash']];for(const [id,key]of settings){$(id).checked=preferences[key];$(id).addEventListener('change',()=>{preferences[key]=$(id).checked;visitor.combat={...preferences};persist();soundFX.settings();soundFX.unlock();});}
+ $('combat-volume').value=preferences.volume*100;$('combat-volume').addEventListener('input',()=>{preferences.volume=+$('combat-volume').value/100;soundFX.settings();visitor.combat={...preferences};persist();});
  $('combat-key').value=preferences.counterKey;$('combat-key').addEventListener('change',()=>{preferences.counterKey=$('combat-key').value;visitor.combat={...preferences};persist();});
  $('game-help').addEventListener('click',()=>{visitor.gameTutorial={};game.tutorial.seen={};game.tutorial.queue=[];hint(game,'move','拖动或方向键移动，自动射击；Space / E 反击，P 暂停。');persist();$('game-announcement').textContent='即时提示已重置，下次出现对应物品会再次说明。';});
 
@@ -272,10 +273,10 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=7-counter
     const p=document.createElement('p');p.textContent=item.description;
     const actions=document.createElement('div');actions.className='shop-item-actions';
     const buy=document.createElement('button');buy.type='button';buy.dataset.shopBuy=item.id;
-    buy.textContent=price===undefined?'已满级':(level?'升级':'解锁')+' · '+price+' 粒';buy.disabled=price===undefined||visitor.peanuts<price||(game.running&&!game.paused)||game.choice;
+    buy.textContent=price===undefined?'已满级':(level?'升级':'解锁')+' · '+price+' 粒';buy.disabled=price===undefined||(game.running&&!game.paused)||game.choice;
     buy.addEventListener('click',()=>{
      if((game.running&&!game.paused)||game.choice)return;
-     const result=purchaseUpgrade(visitor.armory,visitor.peanuts,item.id);if(!result.ok)return;
+     const result=purchaseUpgrade(visitor.armory,visitor.peanuts,item.id);if(!result.ok){if(visitor.peanuts<price){soundFX.cue('insufficient');$('shop-status').textContent='粮仓不足，还差 '+(price-visitor.peanuts)+' 粒花生。';}return;}soundFX.cue('purchase');
      visitor.armory=result.loadout;visitor.peanuts=result.balance;persist();renderShop();$('shop-status').textContent=item.name+'已升级，下一轮生效。';
     });actions.append(buy);
     if(id==='shop-weapons'){

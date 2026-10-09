@@ -11,19 +11,21 @@ class Page(HTMLParser):
   super().__init__();self.tags=[];self.feed(text)
  def handle_starttag(self,tag,attrs):self.tags.append((tag,dict(attrs)))
 class Locales(unittest.TestCase):
- def test_original_files_unchanged_except_authorized_instagram(self):
+ def test_original_files_unchanged_except_authorized_home_additions(self):
   names=subprocess.check_output(['git','ls-tree','-r','--name-only',BASE],cwd=ROOT,text=True).splitlines()
   for name in names:
    expected=subprocess.check_output(['git','show',BASE+':'+name],cwd=ROOT)
    actual=(ROOT/name).read_bytes()
    if name=='index.html':
-    # Steven explicitly authorized only these two original-page link additions.
+    # Steven authorized Instagram links and the isolated Universe entrance block.
+    actual=re.sub(rb'<!-- BEGIN universe entrances: additive homepage links -->.*?<!-- END universe entrances -->\n',b'',actual,flags=re.S)
+    actual=actual.replace(b'<link rel="stylesheet" href="/universe/home-entrances.css?v=1">\n',b'',1)
     for link in ['<a class="transmission-link" href="https://www.instagram.com/graybird.space/" target="_blank" rel="noopener noreferrer">Instagram <span>↗</span></a>\n','<a href="https://www.instagram.com/graybird.space/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>\n']:
      self.assertEqual(actual.count(link.encode()),1)
      actual=actual.replace(link.encode(),b'',1)
    self.assertEqual(hashlib.sha256(expected).digest(),hashlib.sha256(actual).digest(),name)
  def test_translations_complete(self):
-  rows=json.loads((ROOT/'i18n/home-copy.json').read_text());self.assertEqual(len(rows),241)
+  rows=json.loads((ROOT/'i18n/home-copy.json').read_text());self.assertEqual(len(rows),253)
   self.assertEqual(len({r['key'] for r in rows}),len(rows))
   for row in rows:
    for locale in ('en','ja'):self.assertTrue(row[locale].strip(),row['key'])

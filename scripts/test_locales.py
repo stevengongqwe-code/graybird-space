@@ -11,11 +11,17 @@ class Page(HTMLParser):
   super().__init__();self.tags=[];self.feed(text)
  def handle_starttag(self,tag,attrs):self.tags.append((tag,dict(attrs)))
 class Locales(unittest.TestCase):
- def test_original_files_unchanged(self):
+ def test_original_files_unchanged_except_authorized_instagram(self):
   names=subprocess.check_output(['git','ls-tree','-r','--name-only',BASE],cwd=ROOT,text=True).splitlines()
   for name in names:
    expected=subprocess.check_output(['git','show',BASE+':'+name],cwd=ROOT)
-   self.assertEqual(hashlib.sha256(expected).digest(),hashlib.sha256((ROOT/name).read_bytes()).digest(),name)
+   actual=(ROOT/name).read_bytes()
+   if name=='index.html':
+    # Steven explicitly authorized only these two original-page link additions.
+    for link in ['<a class="transmission-link" href="https://www.instagram.com/graybird.space/" target="_blank" rel="noopener noreferrer">Instagram <span>↗</span></a>\n','<a href="https://www.instagram.com/graybird.space/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>\n']:
+     self.assertEqual(actual.count(link.encode()),1)
+     actual=actual.replace(link.encode(),b'',1)
+   self.assertEqual(hashlib.sha256(expected).digest(),hashlib.sha256(actual).digest(),name)
  def test_translations_complete(self):
   rows=json.loads((ROOT/'i18n/home-copy.json').read_text());self.assertEqual(len(rows),241)
   self.assertEqual(len({r['key'] for r in rows}),len(rows))
@@ -54,6 +60,14 @@ class Locales(unittest.TestCase):
     self.assertIsNone(re.search('[\u4e00-\u9fff]',clean))
    # Original artwork may contain Chinese inscriptions: bytes remain unchanged.
    self.assertIn('data-language="zh">中文',text)
+ def test_instagram_links(self):
+  for path in ('index.html','en/index.html','ja/index.html'):
+   page=Page((ROOT/path).read_text())
+   links=[attrs for tag,attrs in page.tags if tag=='a' and attrs.get('href')=='https://www.instagram.com/graybird.space/']
+   self.assertEqual(len(links),2,path)
+   for link in links:
+    self.assertEqual(link['target'],'_blank')
+    self.assertEqual(set(link['rel'].split()),{'noopener','noreferrer'})
  def test_runtime_shared_and_read_only(self):
   runtime=(ROOT/'i18n/home-runtime.js').read_text()
   self.assertIsNone(re.search('[\u4e00-\u9fff]',runtime))
@@ -64,6 +78,6 @@ class Locales(unittest.TestCase):
  def test_repeatable_build(self):
   paths=[ROOT/'en/index.html',ROOT/'ja/index.html',*sorted((ROOT/'i18n').glob('*'))]
   before={str(p):p.read_bytes() for p in paths if p.is_file()}
-  subprocess.run(['python3','scripts/build_locales.py'],cwd=ROOT,check=True)
+  subprocess.run(['python3','scripts/build_locales.py','--skip-inventory'],cwd=ROOT,check=True)
   for p,value in before.items():self.assertEqual(Path(p).read_bytes(),value,p)
 if __name__=='__main__':unittest.main()

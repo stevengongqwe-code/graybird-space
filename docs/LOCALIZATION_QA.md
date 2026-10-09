@@ -36,3 +36,9 @@ Before marking ready, run a static server in the repository and inspect `/`, `/e
 ## Maintenance
 
 Edit `i18n/home-copy.json`, run `python3 scripts/build_locales.py`, then both locale tests. Do not edit generated pages or runtime manually. Changes to the upstream homepage can be consumed only after explicitly authorized upstream work; missing translated script strings fail the locale build. No publishing step is included in the builder.
+
+## Owner-authorized follow-up: Instagram links
+
+After publication, Steven explicitly asked to embed `https://www.instagram.com/graybird.space` in the website. This grants a narrow exception to the read-only Chinese homepage: add one Instagram link in the social/transmission section and one in the footer. Both use a new tab with `noopener noreferrer`, and the generated English/Japanese homepages include the same additions. No existing content is removed. The baseline test strips only those two exact authorized additions before comparing the original homepage hash. All other original files remain byte-for-byte protected.
+
+Run `python3 scripts/build_locales.py --skip-inventory` for an English-only link addition; it updates locale pages while preserving the unrelated full-site copy inventory. Six locale test groups and the runtime checks passed for this follow-up; real browser/physical Android coverage remains unverified.

@@ -116,5 +116,7 @@ def main():
   loc='https://graybird.space'+path
   if loc not in existing:ET.SubElement(ET.SubElement(node,f'{{{ns}}}url'),f'{{{ns}}}loc').text=loc
  ET.indent(tree,space='  ');tree.write(sitemap,encoding='UTF-8',xml_declaration=True)
+ from optimize_search import update_search_metadata
+ update_search_metadata()
  print(f'Built Bird Nest, archive and {len(TOPICS)} static entries. No framework or server required.')
 if __name__=='__main__':main()

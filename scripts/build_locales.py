@@ -89,6 +89,8 @@ def main(skip_inventory=False):
         for code,path in [('zh',''),('en','en/'),('ja','ja/'),('x-default','')]:sitemap+=f'<xhtml:link rel="alternate" hreflang="{code}" href="https://graybird.space/{path}"/>'
         sitemap+='</url>\n'
     (ROOT/'i18n/sitemap.xml').write_text(sitemap+'</urlset>\n')
+    from optimize_search import update_search_metadata
+    update_search_metadata()
     if not skip_inventory: scan_inventory()
     print('Built /en/ and /ja/; ' + ('inventory preserved.' if skip_inventory else 'original site copy scanned.'))
 if __name__=='__main__':

@@ -38,7 +38,7 @@ def scan_inventory():
                 if HAN.search(line): records.append({'key':f'inventory.{len(records):04d}','zh':line.strip(),'file':relative,'line':number,'kind':'data'})
     (ROOT/'i18n/copy-inventory.json').write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n')
 
-def main():
+def main(skip_inventory=False):
     source=(ROOT/'index.html').read_text()
     js=(ROOT/'script.js').read_text()
     # The one dynamic Chinese template literal is outside single-quoted strings.
@@ -89,6 +89,10 @@ def main():
         for code,path in [('zh',''),('en','en/'),('ja','ja/'),('x-default','')]:sitemap+=f'<xhtml:link rel="alternate" hreflang="{code}" href="https://graybird.space/{path}"/>'
         sitemap+='</url>\n'
     (ROOT/'i18n/sitemap.xml').write_text(sitemap+'</urlset>\n')
-    scan_inventory()
-    print('Built /en/ and /ja/ from the read-only homepage and script; scanned original site copy.')
-if __name__=='__main__':main()
+    if not skip_inventory: scan_inventory()
+    print('Built /en/ and /ja/; ' + ('inventory preserved.' if skip_inventory else 'original site copy scanned.'))
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--skip-inventory',action='store_true',help='Rebuild locale pages without rescanning unrelated site copy')
+    main(parser.parse_args().skip_inventory)

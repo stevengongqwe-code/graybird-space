@@ -1,0 +1,15 @@
+/* Additive entrance area; all rules scoped to the new section. */
+.universe-entrances{margin:20px 4.5% 28px;padding:22px 24px;border:1px solid #2a2e32;color:#eeefed;background:#0d1115}
+.universe-entrances-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 20px;margin-bottom:14px}
+.universe-entrances-heading p{margin:0;font:10px/1.5 monospace;letter-spacing:.12em;color:#a6cbe3}
+.universe-entrances-heading h2{margin:0;font-size:22px;line-height:1.4;font-weight:500;letter-spacing:0}
+.universe-entrances-heading>span{font-size:13px;color:#a0a5aa}
+.universe-entrances-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.universe-entrances-links>a{display:grid;grid-template-columns:24px 1fr;gap:6px 10px;align-content:start;padding:16px 0 4px;border-top:1px solid #2a2e32;min-height:128px;color:inherit;text-decoration:none}
+.universe-entrances-links strong{font-size:19px;font-weight:500;line-height:1.5}
+.universe-entrances-links>a>span:not(.universe-entrances-number){grid-column:2;font-size:13px;line-height:1.6;color:#a0a5aa}
+.universe-entrances-number{font:11px/2 monospace;color:#a6cbe3}
+.universe-entrances-links>a>.universe-entrances-action{margin-top:6px;color:#a6cbe3!important}
+.universe-entrances-links>a:focus-visible{outline:2px solid #a6cbe3;outline-offset:5px}
+@media(hover:hover){.universe-entrances-links>a:hover{border-color:#a6cbe3}}
+@media(max-width:600px){.universe-entrances{margin:12px 20px 20px;padding:16px}.universe-entrances-heading{gap:6px 10px}.universe-entrances-heading h2{font-size:20px}.universe-entrances-heading>span{flex-basis:100%}.universe-entrances-links{grid-template-columns:1fr;gap:12px}.universe-entrances-links>a{min-height:90px;padding-top:12px}.universe-entrances-links strong{font-size:18px}}

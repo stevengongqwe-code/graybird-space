@@ -1444,5 +1444,77 @@
     "zh": "HORIZON UNKNOWN / 远方未定",
     "en": "HORIZON UNKNOWN",
     "ja": "行き先は未定"
+  },
+  {
+    "key": "universe.home.00",
+    "zh": "NEW / 新开放",
+    "en": "NEW / JUST OPENED",
+    "ja": "NEW / 新登場"
+  },
+  {
+    "key": "universe.home.01",
+    "zh": "探索灰鸟宇宙",
+    "en": "Explore the Graybird universe",
+    "ja": "Graybirdの宇宙を探索"
+  },
+  {
+    "key": "universe.home.02",
+    "zh": "三个新地方，进去看看。",
+    "en": "Three new places. Take a look.",
+    "ja": "新しい三つの場所。のぞいてみよう。"
+  },
+  {
+    "key": "universe.home.03",
+    "zh": "无限宇宙",
+    "en": "Procedural universe · Chinese",
+    "ja": "広がる宇宙 · 中国語"
+  },
+  {
+    "key": "universe.home.04",
+    "zh": "探索星球，遇见文明，收集隐藏线索。",
+    "en": "Explore planets, meet civilizations, find hidden clues.",
+    "ja": "惑星を探索し、文明に出会い、隠された手がかりを集める。"
+  },
+  {
+    "key": "universe.home.05",
+    "zh": "出发探索 ↗",
+    "en": "Start exploring ↗",
+    "ja": "探索へ ↗"
+  },
+  {
+    "key": "universe.home.06",
+    "zh": "养灰鸟",
+    "en": "Raise Graybird · Chinese",
+    "ja": "Graybirdと暮らす · 中国語"
+  },
+  {
+    "key": "universe.home.07",
+    "zh": "喂食、休息、聊天。灰鸟会记住你。",
+    "en": "Feed, rest, talk. Graybird remembers you.",
+    "ja": "ごはん、休息、おしゃべり。Graybirdはあなたを覚えている。"
+  },
+  {
+    "key": "universe.home.08",
+    "zh": "看看灰鸟 ↗",
+    "en": "Visit Graybird ↗",
+    "ja": "Graybirdに会う ↗"
+  },
+  {
+    "key": "universe.home.09",
+    "zh": "每日 Boss",
+    "en": "Daily Boss · Chinese",
+    "ja": "毎日のBoss · 中国語"
+  },
+  {
+    "key": "universe.home.10",
+    "zh": "今天的对手已就位。拖动灰鸟开始挑战。",
+    "en": "Today's opponent is ready. Drag Graybird to take on the challenge.",
+    "ja": "今日の相手が待っている。Graybirdをドラッグして挑もう。"
+  },
+  {
+    "key": "universe.home.11",
+    "zh": "开始挑战 ↗",
+    "en": "Take the challenge ↗",
+    "ja": "挑戦する ↗"
   }
 ]

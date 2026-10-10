@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#090b0d"><title>拯救小灰鸟 · Graybird</title><meta name="description" content="跟随动物园伙伴潜入小黑屋，启动零点救援，再把灰鸟带回家。手机与电脑都能玩的七幕剧情冒险。"><link rel="canonical" href="https://graybird.space/save-graybird/"><link rel="icon" href="/assets/favicon.png"><link rel="stylesheet" href="game.css?v=1"><script type="module" src="game.js?v=1"></script></head>
+<body>
+<a class="skip" href="#game">跳至游戏</a>
+<header><a class="brand" href="/">GRAYBIRD <span> / STORY GAMES</span></a><nav aria-label="网站导航"><a href="/rescue/">原作画廊 ↗</a><a href="/">返回首页</a></nav></header>
+<main>
+<section id="landing" class="landing">
+ <div class="cover"><img src="/assets/rescue/01-operation.webp" alt="动物园的伙伴们聚在小黑屋外，准备营救灰鸟" width="1450" height="622"><div class="cover-shade"></div><div class="cover-copy"><p class="eyebrow">THE RESCUE / 一场关于朋友的冒险</p><h1>拯救<br>小灰鸟<span>。</span></h1><p>它没有回来。<br>于是，朋友们出发了。</p></div></div>
+ <div class="launch"><div><span class="eyebrow">七幕剧情 · 单人冒险</span><p>潜入小黑屋，等到零点，再一起闯出去。</p></div><div class="launch-actions"><button id="start" class="primary" disabled>正在接收救援信号…</button><button id="continue" hidden>继续营救</button></div></div>
+ <p id="load-status" role="status">正在加载角色母板与漫画。无需登录，进度只保存在这台设备。</p>
+ <details class="instructions"><summary>怎么玩</summary><p>电脑：WASD / 方向键移动，E 接入装置，空格释放能力，数字键切换伙伴，P 暂停。</p><p>手机：拖动场景移动，或按屏幕方向键；点「接入」与「能力」。到达发光装置后接入，跟随每幕目标。失败可以从当前幕重新开始。</p><p>每位伙伴有自己的能力。灰鸟获救后才能操作；紫袍伙伴提供屏障，红衣伙伴远程接通装置，粉猫恢复生命。</p></details>
+ <section class="cast"><p class="eyebrow">THE CREW / 救援小队</p><h2>一起去，把它带回来。</h2><div id="cast-list"></div></section>
+</section>
+<section id="game" class="game" hidden aria-label="拯救小灰鸟游戏">
+ <div class="mission-bar"><div><p id="chapter-label" class="eyebrow"></p><h2 id="mission-name"></h2></div><div class="mission-actions"><button id="sound" aria-pressed="false">声音：关</button><button id="pause">暂停</button></div></div>
+ <div class="hud"><span id="health" aria-label="生命"></span><span id="goal"></span><span id="alarm"></span></div>
+ <div class="arena-wrap"><canvas id="arena" width="960" height="640" tabindex="0" aria-label="游戏场景，方向键移动，E接入，空格能力"></canvas><div id="toast" role="status" aria-live="polite"></div><div class="arena-edge" aria-hidden="true"></div></div>
+ <div class="play-controls"><div class="dpad" aria-label="移动方向"><button data-dir="up" aria-label="向上">↑</button><button data-dir="left" aria-label="向左">←</button><button data-dir="down" aria-label="向下">↓</button><button data-dir="right" aria-label="向右">→</button></div><p id="active-character"></p><div class="action-buttons"><button id="interact" class="primary">接入 E</button><button id="ability">能力 Space</button></div></div>
+ <p id="scene-help" class="scene-help"></p><div id="roster" class="roster" role="group" aria-label="切换救援伙伴"></div>
+ <details class="instructions"><summary>操作与无障碍模式</summary><p>WASD / 方向键移动，E 接入，空格能力，1–8 切换伙伴，P 暂停。手机拖动场景或使用方向按钮。暂停后可以随时继续。</p><label><input id="assist" type="checkbox"> 故事模式：降低伤害与警戒，更容易看完整个故事</label><p>减少动态效果跟随设备设置。读故事或暂停时，游戏计时停止。伙伴可在行动中随时切换。</p></details>
+</section>
+<section id="ending" class="ending" hidden><p class="eyebrow">MISSION COMPLETE / 信号重新亮起</p><h1>灰鸟回来了<span>。</span></h1><img src="/assets/rescue/07-afterglow.webp" alt="伙伴们守在获救的灰鸟身边" width="1450" height="622" loading="lazy"><p class="ending-line">“原来一只鸟不在的时候，真的会有人惦记着它。”</p><div id="result"></div><div class="ending-actions"><button id="replay" class="primary">再救一次</button><button id="copy-card">复制营救纪念卡</button><a href="/rescue/">看看朋友们的原作 ↗</a></div><p id="copy-status" role="status"></p></section>
+<section class="credits"><p class="eyebrow">WITH GRATITUDE / 创作致谢</p><p>七幕救援漫画：<a href="https://x.com/JokerLiu1119" target="_blank" rel="noopener noreferrer">老泥鳅 · @JokerLiu1119</a></p><p>舰队与屏障伙伴来作：<a href="https://x.com/Alexvhyn" target="_blank" rel="noopener noreferrer">Alex_理想主义版 · @Alexvhyn</a></p><p>角色造型沿用伙伴提供的三视图，Graybird 沿用官方母板。游戏是对救援故事的玩法改编；角色称呼与能力为本游戏设计。</p></section>
+</main><footer><span>GRAYBIRD / BRING OUR FRIEND HOME</span><a href="/rescue/">救援纪事 ↗</a></footer>
+<dialog id="story" aria-labelledby="story-title"><div class="story-image"><img id="story-art" alt=""></div><div class="story-copy"><p id="story-no" class="eyebrow"></p><h2 id="story-title"></h2><p id="story-text"></p><p id="story-goal"></p><button id="story-next" class="primary">进入这一幕 →</button></div></dialog>
+<dialog id="pause-dialog" aria-labelledby="pause-title"><p class="eyebrow">SIGNAL HELD</p><h2 id="pause-title">先喘口气。</h2><p>伙伴们等着你。游戏会自动保存当前章节；继续营救时从本幕开头出发。</p><button id="resume" class="primary">继续营救</button><button id="quit">返回标题</button></dialog>
+<dialog id="failure" aria-labelledby="failure-title"><p class="eyebrow">TRY AGAIN / 伙伴不会放弃</p><h2 id="failure-title">差一点，就到了。</h2><p>警戒与伤害让行动暂时中断。可以换个伙伴，试着用护盾或潜行能力。</p><button id="retry" class="primary">从这一幕重试</button><button id="failure-home">返回标题</button></dialog>
+<noscript>这款游戏需要开启 JavaScript。你仍可以<a href="/rescue/">阅读原作漫画</a>。</noscript>
+</body></html>

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "captain",
+    "name": "披风队长",
+    "skill": "护盾",
+    "description": "召唤护盾，抵挡危险并降低警戒。",
+    "image": "/assets/save-graybird/captain.jpg",
+    "crop": [
+      0.025,
+      0.03,
+      0.275,
+      0.88
+    ]
+  },
+  {
+    "id": "engineer",
+    "name": "红衣眼镜伙伴",
+    "skill": "远程解码",
+    "description": "远程接通当前最近的装置。",
+    "image": "/assets/save-graybird/engineer.png",
+    "crop": [
+      0,
+      0.025,
+      0.33,
+      0.91
+    ]
+  },
+  {
+    "id": "runner",
+    "name": "香蕉驴",
+    "skill": "疾行",
+    "description": "短时间加速穿越危险区。",
+    "image": "/assets/save-graybird/runner.jpg",
+    "crop": [
+      0.035,
+      0,
+      0.29,
+      0.89
+    ]
+  },
+  {
+    "id": "mage",
+    "name": "紫袍伙伴",
+    "skill": "屏障",
+    "description": "清除飞来的弹幕，展开保护屏障。",
+    "image": "/assets/save-graybird/mage.jpg",
+    "crop": [
+      0.03,
+      0.01,
+      0.185,
+      0.975
+    ]
+  },
+  {
+    "id": "scout",
+    "name": "黑帽小熊",
+    "skill": "潜行",
+    "description": "降低探照灯和哨兵的发现概率。",
+    "image": "/assets/save-graybird/scout.jpg",
+    "crop": [
+      0.01,
+      0.025,
+      0.28,
+      0.425
+    ]
+  },
+  {
+    "id": "healer",
+    "name": "粉猫 Evan",
+    "skill": "疗愈",
+    "description": "恢复一格生命，并暂时保护队伍。",
+    "image": "/assets/save-graybird/healer.jpg",
+    "crop": [
+      0.01,
+      0.1,
+      0.36,
+      0.73
+    ]
+  },
+  {
+    "id": "guardian",
+    "name": "紫毛伙伴",
+    "skill": "震荡",
+    "description": "清除弹幕并震退附近哨兵。",
+    "image": "/assets/save-graybird/guardian.jpg",
+    "crop": [
+      0.005,
+      0.07,
+      0.33,
+      0.81
+    ]
+  },
+  {
+    "id": "graybird",
+    "name": "灰鸟",
+    "skill": "信号反击",
+    "description": "救出后解锁：发射信号，击退追兵。",
+    "image": "/assets/save-graybird/graybird.png",
+    "crop": [
+      0.015,
+      0.195,
+      0.327,
+      0.61
+    ]
+  }
+]

@@ -143,7 +143,7 @@ import {weaponPreview,stopWeaponPreviews} from './armory-preview.mjs?v=8-sound';
  // Peanut Hunter: only section 04 uses this controller and renderer.
  const preferences=cleanPreferences(visitor.combat),soundFX=combatFeedback(preferences,motion);
  const canvas=$('signal-game'),ctx=canvas.getContext('2d'),gameBird=new Image(),gameWorm=new Image();
- gameBird.src='/assets/bird.webp';gameWorm.src='/assets/icons/worm.svg';
+ gameBird.src='/assets/graybird-official-game-20261011.webp';gameWorm.src='/assets/icons/worm.svg';
  let game=createGame(),lastResult=null,scoreFile=null,leftHeld=false,rightHeld=false,upHeld=false,downHeld=false,pointer=null,lastHud=-1,noticeSerial=-1;
  const sprites=new Map(),bossBar=$('game-boss-bar'),choicePanel=$('game-evolution');
  function fitGame(){const mobile=matchMedia('(max-width:600px)').matches;game=createGame(mobile?600:900,mobile?760:600);applyLoadout(game,visitor.armory);game.tutorial.seen=cleanTutorial(visitor.gameTutorial);hint(game,'move','电脑移动鼠标即可跟随；也可按住拖动或使用方向键，灰鸟自动射击。');canvas.width=game.width;canvas.height=game.height;canvas.parentElement.style.aspectRatio=`${game.width} / ${game.height}`;}

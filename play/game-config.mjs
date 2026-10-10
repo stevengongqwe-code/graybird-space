@@ -16,5 +16,5 @@ export const unlockedCombos=build=>COMBOS.filter(c=>Object.entries(c.requires).e
 export const threatLimit = g => Math.max(5,Math.min(26,7+g.elapsed/12)*(g.groups.some(o=>o.active)?.55:g.event?.8:1)*(g.shield===0?.85:1));
 export const threatUsed = g => g.enemies.reduce((n,e)=>n+(e.active&&!e.boss&&!e.retiring?(GAME_CONFIG.threat[e.type]||1):0),0);
 export const canSpawn = (g,type) => threatUsed(g)+(GAME_CONFIG.threat[type]||1)<=threatLimit(g)&&g.hostile.reduce((n,b)=>n+Boolean(b.active),0)<(g.groups.some(o=>o.active)?140:90);
-export function cleanPreferences(value={}){return {sound:value?.sound===true,volume:Number.isFinite(value?.volume)?Math.max(0,Math.min(.5,value.volume)):.15,shake:value?.shake!==false,flash:value?.flash!==false,counterKey:value?.counterKey==='KeyE'?'KeyE':'Space'};}
+export function cleanPreferences(value={}){return {sound:value?.sound===true,volume:Number.isFinite(value?.volume)?Math.max(0,Math.min(.5,value.volume)):.15,shake:value?.shake!==false,flash:value?.flash!==false,mouseFollow:value?.mouseFollow!==false,counterKey:value?.counterKey==='KeyE'?'KeyE':'Space'};}
 export function cleanTutorial(value={}){const out={};for(const key of ['move','first-kill','combo','early','chip','fake','graze','counter','ready','supply','energy'])if(value?.[key]===true)out[key]=true;return out;}

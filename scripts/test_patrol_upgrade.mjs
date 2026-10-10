@@ -32,7 +32,7 @@ assert.deepEqual(unlockedCombos({pierce:2,track:1,spread:0}).map(c=>c.id),['boom
  const g=game();g.nextSupply=C.pacing.firstChip;stepGame(g,27.9);assert.ok(!g.items.some(p=>p.active&&p.kind==='chip'));stepGame(g,1);assert.equal(g.choice,true);assert.ok(g.elapsed>=28&&g.elapsed<29);chooseEvolution(g,'pierce');assert.equal(g.firstGrowth,true);const t=g.elapsed;stepGame(g,20);assert.equal(g.build.pierce,1);g.paused=true;stepGame(g,100);assert.ok(g.elapsed<t+21);assert.equal(frameSeconds(4000),.05);
 }
 {
- const old={selected:'beam',levels:{worm:3,beam:2,shell:2,fortune:3}};const clean=cleanLoadout(old);assert.equal(clean.selected,'beam');assert.equal(clean.levels.shell,2);assert.equal(clean.levels.fortune,3);assert.equal(cleanPreferences({volume:NaN}).volume,.15);assert.deepEqual(cleanTutorial({graze:true,injected:'bad'}),{graze:true});
+ const old={selected:'beam',levels:{worm:3,beam:2,shell:2,fortune:3}};const clean=cleanLoadout(old);assert.equal(clean.selected,'beam');assert.equal(clean.levels.shell,2);assert.equal(clean.levels.fortune,3);assert.equal(cleanPreferences({volume:NaN}).volume,.15);assert.equal(cleanPreferences().mouseFollow,true);assert.equal(cleanPreferences({mouseFollow:false}).mouseFollow,false);assert.equal(cleanPreferences({mouseFollow:true}).mouseFollow,true);assert.deepEqual(cleanTutorial({graze:true,injected:'bad'}),{graze:true});
 }
 {
  const g=game();g.fireTimer=0;g.weapon='seeker';const h=spawnEnemy(g,'healer',{x:100,y:100,speed:0}),a=spawnEnemy(g,'ad',{x:g.x,y:300,speed:0});stepGame(g,.02);const shot=g.bullets.find(b=>b.active);const target=shot.targetID;a.x=shot.x;a.y=shot.y-100;stepGame(g,.02);assert.equal(shot.targetID,target,'tracking target is stable');
